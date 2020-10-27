@@ -75,22 +75,30 @@ def assert_not_file(path):
         raise OSError('Invalid path, file already exists: {}'.format(path))
 
 
-def clean_dir(path, dirs=True, files=True):
+def _clean_dir_empty_dirs(root, dirs):
+    for dirname in dirs:
+        dirpath = os.path.join(root, dirname)
+        if is_empty_dir(dirpath):
+            # os.rmdir(dirpath)
+            remove_dir(dirpath)
+
+
+def _clean_dir_empty_files(root, files):
+    for filename in files:
+        filepath = os.path.join(root, filename)
+        if is_empty_file(filepath):
+            remove_file(filepath)
+
+
+def clean_dir(path, empty_dirs=True, empty_files=True):
     """
-    Clean a directory by removing empty sub-directories and/or empty files.
+    Clean a directory by removing empty directories and/or empty files.
     """
     for root, dirs, files in os.walk(path, topdown=False):
-        if files:
-            for filename in files:
-                filepath = os.path.join(root, filename)
-                if is_empty_file(filepath):
-                    remove_file(filepath)
-        if dirs:
-            for dirname in dirs:
-                dirpath = os.path.join(root, dirname)
-                if is_empty_dir(dirpath):
-                    # os.rmdir(dirpath)
-                    remove_dir(dirpath)
+        if empty_files:
+            _clean_dir_empty_files(root, files)
+        if empty_dirs:
+            _clean_dir_empty_dirs(root, dirs)
 
 
 def copy_dir(path, dest, overwrite=False, **kwargs):
@@ -333,6 +341,16 @@ def list_files(path):
     return _filter_paths(path, os.listdir(path), predicate=is_file)
 
 
+def _make_dirs_py2(path):
+    # https://stackoverflow.com/questions/12517451/automatically-creating-directories-with-file-output
+    try:
+        os.makedirs(path)
+    except OSError as e:
+        # Guard against race condition
+        if e.errno != errno.EEXIST:
+            raise e
+
+
 def make_dirs(path):
     """
     Create the directories needed to ensure that the given path exists.
@@ -342,13 +360,7 @@ def make_dirs(path):
         return
     assert_not_file(path)
     if PY2:
-        # https://stackoverflow.com/questions/12517451/automatically-creating-directories-with-file-output
-        try:
-            os.makedirs(path)
-        except OSError as e:
-            # Guard against race condition
-            if e.errno != errno.EEXIST:
-                raise e
+        _make_dirs_py2(path)
         return
     os.makedirs(path, exist_ok=True)
 
