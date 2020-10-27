@@ -205,29 +205,29 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(path)
         self.assertTrue(fsutil.exists(path))
 
-    def test_get_basename(self):
+    def test_get_file_basename(self):
         s = 'Document'
-        self.assertEqual(fsutil.get_basename(s), 'Document')
+        self.assertEqual(fsutil.get_file_basename(s), 'Document')
         s = 'Document.txt'
-        self.assertEqual(fsutil.get_basename(s), 'Document')
+        self.assertEqual(fsutil.get_file_basename(s), 'Document')
         s = '.Document.txt'
-        self.assertEqual(fsutil.get_basename(s), '.Document')
+        self.assertEqual(fsutil.get_file_basename(s), '.Document')
         s = '/root/a/b/c/Document.txt'
-        self.assertEqual(fsutil.get_basename(s), 'Document')
+        self.assertEqual(fsutil.get_file_basename(s), 'Document')
         s = 'https://domain-name.com/Document.txt?p=1'
-        self.assertEqual(fsutil.get_basename(s), 'Document')
+        self.assertEqual(fsutil.get_file_basename(s), 'Document')
 
-    def test_get_extension(self):
+    def test_get_file_extension(self):
         s = 'Document'
-        self.assertEqual(fsutil.get_extension(s), '')
+        self.assertEqual(fsutil.get_file_extension(s), '')
         s = 'Document.txt'
-        self.assertEqual(fsutil.get_extension(s), 'txt')
+        self.assertEqual(fsutil.get_file_extension(s), 'txt')
         s = '.Document.txt'
-        self.assertEqual(fsutil.get_extension(s), 'txt')
+        self.assertEqual(fsutil.get_file_extension(s), 'txt')
         s = '/root/a/b/c/Document.txt'
-        self.assertEqual(fsutil.get_extension(s), 'txt')
+        self.assertEqual(fsutil.get_file_extension(s), 'txt')
         s = 'https://domain-name.com/Document.txt?p=1'
-        self.assertEqual(fsutil.get_extension(s), 'txt')
+        self.assertEqual(fsutil.get_file_extension(s), 'txt')
 
     def test_get_filename(self):
         s = 'Document'

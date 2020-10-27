@@ -210,7 +210,7 @@ def _filter_paths(basepath, relpaths, predicate=None):
     return paths
 
 
-def get_basename(path):
+def get_file_basename(path):
     """
     Get the file basename from the given path/url.
     """
@@ -218,7 +218,7 @@ def get_basename(path):
     return basename
 
 
-def get_extension(path):
+def get_file_extension(path):
     """
     Get the file extension from the given path/url.
     """
@@ -480,7 +480,7 @@ def rename_file_basename(path, basename):
     """
     Rename a file basename with the given basename.
     """
-    extension = get_extension(path)
+    extension = get_file_extension(path)
     filename = join_filename(basename, extension)
     rename_file(path, filename)
 
@@ -489,7 +489,7 @@ def rename_file_extension(path, extension):
     """
     Rename a file extension with the given extension.
     """
-    basename = get_basename(path)
+    basename = get_file_basename(path)
     filename = join_filename(basename, extension)
     rename_file(path, filename)
 
