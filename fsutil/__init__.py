@@ -496,7 +496,7 @@ def rename_file_extension(path, extension):
 
 def search_dirs(path, pattern):
     """
-    Search for directories at path matching the given query.
+    Search for directories at path matching the given pattern.
     """
     assert_dir(path)
     pathname = os.path.join(path, pattern)
@@ -507,7 +507,7 @@ def search_dirs(path, pattern):
 
 def search_files(path, pattern):
     """
-    Search for files at path matching the given query.
+    Search for files at path matching the given pattern.
     """
     assert_dir(path)
     pathname = os.path.join(path, pattern)
