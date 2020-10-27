@@ -9,7 +9,6 @@
 [![](https://img.shields.io/circleci/build/gh/fabiocaccamo/python-fsutil?logo=circleci&label=build)](https://circleci.com/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codecov/c/gh/fabiocaccamo/python-fsutil?logo=codecov)](https://codecov.io/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codacy/grade/fc40788ae7d74d1fb34a38934113c4e5?logo=codacy)](https://www.codacy.com/app/fabiocaccamo/python-fsutil)
-<!-- [![](https://img.shields.io/scrutinizer/quality/g/fabiocaccamo/python-fsutil?logo=scrutinizer)](https://scrutinizer-ci.com/g/fabiocaccamo/python-fsutil/?branch=master) -->
 [![](https://img.shields.io/codeclimate/maintainability/fabiocaccamo/python-fsutil?logo=code-climate)](https://codeclimate.com/github/fabiocaccamo/python-fsutil/)
 [![](https://requires.io/github/fabiocaccamo/python-fsutil/requirements.svg?branch=master)](https://requires.io/github/fabiocaccamo/python-fsutil/requirements/?branch=master)
 
