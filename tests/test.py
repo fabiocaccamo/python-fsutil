@@ -67,6 +67,11 @@ class fsutil_test_case(unittest.TestCase):
             fsutil.assert_file(path)
 
     @temp_context
+    def test_clean_dir(self):
+        # TODO
+        pass
+
+    @temp_context
     def test_copy_file(self):
         path = temp_path('a/b/c.txt')
         fsutil.create_file(path, content='hello world')
