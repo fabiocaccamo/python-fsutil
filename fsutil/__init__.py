@@ -79,7 +79,6 @@ def _clean_dir_empty_dirs(path):
     for root, dirs, _ in os.walk(path, topdown=False):
         for dirname in dirs:
             dirpath = os.path.join(root, dirname)
-            print(dirpath)
             if is_empty_dir(dirpath):
                 remove_dir(dirpath)
 
@@ -256,9 +255,6 @@ def get_filename(path):
     filepath = urlsplit(path).path
     filename = os.path.basename(filepath)
     return filename
-
-
-
 
 
 def is_dir(path):

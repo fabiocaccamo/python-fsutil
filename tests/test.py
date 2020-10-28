@@ -25,7 +25,6 @@ class fsutil_test_case(unittest.TestCase):
             fsutil.assert_dir(path)
         fsutil.create_dir(path)
         fsutil.assert_dir(path)
-        print(__file__)
 
     @temp_context
     def test_assert_dir_with_file(self):
