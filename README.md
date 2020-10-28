@@ -240,7 +240,7 @@ extension = fsutil.get_file_extension(path)
 #### `get_file_hash`
 
 ```python
-# Get the hash of the file at the gived path using
+# Get the hash of the file at the given path using
 # the specified algorithm function (md5 by default).
 filehash = fsutil.get_file_hash(path, func='md5')
 ```
