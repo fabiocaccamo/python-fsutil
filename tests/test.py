@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import fsutil
-import functools
 import unittest
 
 
 def temp_path(filepath=''):
-    return fsutil.get_path(__file__, 'temp/{}'.format(filepath))
+    return fsutil.join_path(__file__, 'temp/{}'.format(filepath))
 
 
 def temp_context(func):
-    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         fsutil.remove_dir(temp_path())
         func(*args, **kwargs)
@@ -27,6 +25,7 @@ class fsutil_test_case(unittest.TestCase):
             fsutil.assert_dir(path)
         fsutil.create_dir(path)
         fsutil.assert_dir(path)
+        print(__file__)
 
     @temp_context
     def test_assert_dir_with_file(self):

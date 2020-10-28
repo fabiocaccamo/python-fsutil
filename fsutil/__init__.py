@@ -261,14 +261,6 @@ def get_hash(path, func='md5'):
     return hash_hex
 
 
-def get_path(basefile, path):
-    """
-    Get the absolute path relative to the given basefile (__file__) directory path.
-    """
-    basedir = os.path.dirname(os.path.realpath(basefile))
-    return os.path.abspath(os.path.join(basedir, path))
-
-
 def is_dir(path):
     """
     Determine whether the specified path represents an existing directory.
@@ -325,6 +317,18 @@ def join_filepath(dirpath, filename):
     """
     filepath = os.path.join(dirpath, filename)
     return filepath
+
+
+def join_path(path, *paths):
+    """
+    Create a path joining path and paths.
+    If path is __file__ (or a .py file), the resulting path will be relative
+    to the directory path of the module in which it's used.
+    """
+    basepath = path
+    if path.endswith('.py'):
+        basepath = os.path.dirname(os.path.realpath(path))
+    return os.path.abspath(os.path.join(basepath, *paths))
 
 
 def list_dirs(path):
