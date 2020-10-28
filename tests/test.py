@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import fsutil
+import threading
 import unittest
 
 
@@ -392,6 +393,14 @@ class fsutil_test_case(unittest.TestCase):
     def test_make_dirs(self):
         path = temp_path('a/b/c/')
         fsutil.make_dirs(path)
+        self.assertTrue(fsutil.is_dir(path))
+
+    def test_make_dirs_race_condition(self):
+        path = temp_path('a/b/c/')
+        for i in range(0, 10):
+            t = threading.Thread(target=fsutil.make_dirs, args=[path], kwargs={})
+            t.start()
+        t.join()
         self.assertTrue(fsutil.is_dir(path))
 
     @temp_context
