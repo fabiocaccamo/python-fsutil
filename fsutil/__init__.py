@@ -327,7 +327,7 @@ def join_path(path, *paths):
     to the directory path of the module in which it's used.
     """
     basepath = path
-    if path.endswith('.py'):
+    if get_file_extension(path) in ['py', 'pyc', 'pyo']:
         basepath = os.path.dirname(os.path.realpath(path))
     return os.path.abspath(os.path.join(basepath, *paths))
 
