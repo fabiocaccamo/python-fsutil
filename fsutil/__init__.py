@@ -75,30 +75,31 @@ def assert_not_file(path):
         raise OSError('Invalid path, file already exists: {}'.format(path))
 
 
-def _clean_dir_empty_dirs(root, dirs):
-    for dirname in dirs:
-        dirpath = os.path.join(root, dirname)
-        if is_empty_dir(dirpath):
-            # os.rmdir(dirpath)
-            remove_dir(dirpath)
+def _clean_dir_empty_dirs(path):
+    for root, dirs, _ in os.walk(path, topdown=False):
+        for dirname in dirs:
+            dirpath = os.path.join(root, dirname)
+            print(dirpath)
+            if is_empty_dir(dirpath):
+                remove_dir(dirpath)
 
 
-def _clean_dir_empty_files(root, files):
-    for filename in files:
-        filepath = os.path.join(root, filename)
-        if is_empty_file(filepath):
-            remove_file(filepath)
+def _clean_dir_empty_files(path):
+    for root, _, files in os.walk(path, topdown=False):
+        for filename in files:
+            filepath = os.path.join(root, filename)
+            if is_empty_file(filepath):
+                remove_file(filepath)
 
 
-def clean_dir(path, empty_dirs=True, empty_files=True):
+def clean_dir(path, dirs=True, files=True):
     """
     Clean a directory by removing empty directories and/or empty files.
     """
-    for root, dirs, files in os.walk(path, topdown=False):
-        if empty_files:
-            _clean_dir_empty_files(root, files)
-        if empty_dirs:
-            _clean_dir_empty_dirs(root, dirs)
+    if files:
+        _clean_dir_empty_files(path)
+    if dirs:
+        _clean_dir_empty_dirs(path)
 
 
 def copy_dir(path, dest, overwrite=False, **kwargs):

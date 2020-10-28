@@ -66,9 +66,66 @@ class fsutil_test_case(unittest.TestCase):
             fsutil.assert_file(path)
 
     @temp_context
-    def test_clean_dir(self):
-        # TODO
-        pass
+    def test_clean_dir_only_dirs(self):
+        path = temp_path('a/b/c.txt')
+        fsutil.create_dir(temp_path('x/y/z/a'))
+        fsutil.create_dir(temp_path('x/y/z/b'))
+        fsutil.create_dir(temp_path('x/y/z/c'))
+        fsutil.create_dir(temp_path('x/y/z/d'))
+        fsutil.create_dir(temp_path('x/y/z/e'))
+        fsutil.create_file(temp_path('x/y/z/b/f.txt'), content='hello world')
+        fsutil.create_file(temp_path('x/y/z/d/f.txt'), content='hello world')
+        fsutil.clean_dir(temp_path('x/y'), dirs=False, files=True)
+        self.assertTrue(fsutil.exists(temp_path('x/y/z/a')))
+        self.assertTrue(fsutil.exists(temp_path('x/y/z/b')))
+        self.assertTrue(fsutil.exists(temp_path('x/y/z/c')))
+        self.assertTrue(fsutil.exists(temp_path('x/y/z/d')))
+        self.assertTrue(fsutil.exists(temp_path('x/y/z/e')))
+        fsutil.clean_dir(temp_path('x/y'), dirs=True, files=True)
+        self.assertFalse(fsutil.exists(temp_path('x/y/z/a')))
+        self.assertTrue(fsutil.exists(temp_path('x/y/z/b')))
+        self.assertFalse(fsutil.exists(temp_path('x/y/z/c')))
+        self.assertTrue(fsutil.exists(temp_path('x/y/z/d')))
+        self.assertFalse(fsutil.exists(temp_path('x/y/z/e')))
+
+    @temp_context
+    def test_clean_dir_only_files(self):
+        path = temp_path('a/b/c.txt')
+        fsutil.create_file(temp_path('a/b/c/f1.txt'), content='hello world')
+        fsutil.create_file(temp_path('a/b/c/f2.txt'))
+        fsutil.create_file(temp_path('a/b/c/f3.txt'), content='hello world')
+        fsutil.create_file(temp_path('a/b/c/f4.txt'))
+        fsutil.create_file(temp_path('a/b/c/f5.txt'), content='hello world')
+        fsutil.clean_dir(temp_path('a'), dirs=False, files=False)
+        self.assertTrue(fsutil.exists(temp_path('a/b/c/f1.txt')))
+        self.assertTrue(fsutil.exists(temp_path('a/b/c/f2.txt')))
+        self.assertTrue(fsutil.exists(temp_path('a/b/c/f3.txt')))
+        self.assertTrue(fsutil.exists(temp_path('a/b/c/f4.txt')))
+        self.assertTrue(fsutil.exists(temp_path('a/b/c/f5.txt')))
+        fsutil.clean_dir(temp_path('a'), dirs=False, files=True)
+        self.assertTrue(fsutil.exists(temp_path('a/b/c/f1.txt')))
+        self.assertFalse(fsutil.exists(temp_path('a/b/c/f2.txt')))
+        self.assertTrue(fsutil.exists(temp_path('a/b/c/f3.txt')))
+        self.assertFalse(fsutil.exists(temp_path('a/b/c/f4.txt')))
+        self.assertTrue(fsutil.exists(temp_path('a/b/c/f5.txt')))
+
+    @temp_context
+    def test_clean_dir_dirs_and_files(self):
+        path = temp_path('a/b/c.txt')
+        fsutil.create_file(temp_path('a/b/c/f1.txt'))
+        fsutil.create_file(temp_path('a/b/c/f2.txt'))
+        fsutil.create_file(temp_path('a/b/c/f3.txt'))
+        fsutil.create_file(temp_path('a/b/c/d/f4.txt'))
+        fsutil.create_file(temp_path('a/b/c/d/f5.txt'))
+        fsutil.clean_dir(temp_path('a'), dirs=True, files=True)
+        self.assertFalse(fsutil.exists(temp_path('a/b/c/d/f5.txt')))
+        self.assertFalse(fsutil.exists(temp_path('a/b/c/d/f4.txt')))
+        self.assertFalse(fsutil.exists(temp_path('a/b/c/f3.txt')))
+        self.assertFalse(fsutil.exists(temp_path('a/b/c/f2.txt')))
+        self.assertFalse(fsutil.exists(temp_path('a/b/c/f1.txt')))
+        self.assertFalse(fsutil.exists(temp_path('a/b/c')))
+        self.assertFalse(fsutil.exists(temp_path('a/b')))
+        self.assertTrue(fsutil.exists(temp_path('a')))
 
     @temp_context
     def test_copy_file(self):
