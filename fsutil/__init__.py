@@ -235,6 +235,20 @@ def get_file_extension(path):
     return extension
 
 
+def get_file_hash(path, func='md5'):
+    """
+    Get the hash of the file at the gived path using
+    the specified algorithm function (md5 by default).
+    """
+    assert_file(path)
+    hash = hashlib.new(func)
+    with open(path, 'rb') as file:
+        for chunk in iter(lambda: file.read(4096), b''):
+            hash.update(chunk)
+    hash_hex = hash.hexdigest()
+    return hash_hex
+
+
 def get_filename(path):
     """
     Get the filename from the given path/url.
@@ -244,22 +258,7 @@ def get_filename(path):
     return filename
 
 
-def get_hash(path, func='md5'):
-    """
-    Get the hash of the file at the gived path using
-    the specified algorithm function (md5 by default).
-    """
-    # hash = hashlib.md5()
-    hash = hashlib.new(func)
-    paths = list(path) if isinstance(path, (list, set, tuple, )) else [path]
-    paths.sort()
-    for path in paths:
-        assert_file(path)
-        with open(path, 'rb') as file:
-            for chunk in iter(lambda: file.read(4096), b''):
-                hash.update(chunk)
-    hash_hex = hash.hexdigest()
-    return hash_hex
+
 
 
 def is_dir(path):

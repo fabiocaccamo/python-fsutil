@@ -135,7 +135,7 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.copy_file(path, dest)
         self.assertTrue(fsutil.is_file(path))
         self.assertTrue(fsutil.is_file(dest))
-        self.assertEqual(fsutil.get_hash(path), fsutil.get_hash(dest))
+        self.assertEqual(fsutil.get_file_hash(path), fsutil.get_file_hash(dest))
 
     @temp_context
     def test_copy_dir(self):
@@ -290,6 +290,13 @@ class fsutil_test_case(unittest.TestCase):
         s = 'https://domain-name.com/Document.txt?p=1'
         self.assertEqual(fsutil.get_file_extension(s), 'txt')
 
+    @temp_context
+    def test_get_file_hash(self):
+        path = temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello World')
+        hash = fsutil.get_file_hash(path)
+        self.assertEqual(hash, 'b10a8db164e0754105b7a99be72e3fe5')
+
     def test_get_filename(self):
         s = 'Document'
         self.assertEqual(fsutil.get_filename(s), 'Document')
@@ -301,13 +308,6 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.get_filename(s), 'Document.txt')
         s = 'https://domain-name.com/Document.txt?p=1'
         self.assertEqual(fsutil.get_filename(s), 'Document.txt')
-
-    @temp_context
-    def test_get_hash(self):
-        path = temp_path('a/b/c.txt')
-        fsutil.create_file(path, content='Hello World')
-        hash = fsutil.get_hash(path)
-        self.assertEqual(hash, 'b10a8db164e0754105b7a99be72e3fe5')
 
     @temp_context
     def test_is_dir(self):
