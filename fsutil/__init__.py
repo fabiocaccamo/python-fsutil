@@ -76,17 +76,17 @@ def assert_not_file(path):
 
 
 def _clean_dir_empty_dirs(path):
-    for root, dirs, _ in os.walk(path, topdown=False):
-        for dirname in dirs:
-            dirpath = os.path.join(root, dirname)
+    for basepath, dirnames, _ in os.walk(path, topdown=False):
+        for dirname in dirnames:
+            dirpath = os.path.join(basepath, dirname)
             if is_empty_dir(dirpath):
                 remove_dir(dirpath)
 
 
 def _clean_dir_empty_files(path):
-    for root, _, files in os.walk(path, topdown=False):
-        for filename in files:
-            filepath = os.path.join(root, filename)
+    for basepath, _, filenames in os.walk(path, topdown=False):
+        for filename in filenames:
+            filepath = os.path.join(basepath, filename)
             if is_empty_file(filepath):
                 remove_file(filepath)
 
@@ -173,7 +173,8 @@ def delete_dir(path):
     """
     Alias for remove_dir.
     """
-    return remove_dir(path)
+    removed = remove_dir(path)
+    return removed
 
 
 def delete_dirs(*paths):
@@ -187,7 +188,8 @@ def delete_file(path):
     """
     Alias for delete_file.
     """
-    return remove_file(path)
+    removed = remove_file(path)
+    return removed
 
 
 def delete_files(*paths):
@@ -324,7 +326,7 @@ def join_path(path, *paths):
     basepath = path
     if get_file_extension(path) in ['py', 'pyc', 'pyo']:
         basepath = os.path.dirname(os.path.realpath(path))
-    return os.path.abspath(os.path.join(basepath, *paths))
+    return os.path.join(basepath, *paths)
 
 
 def list_dirs(path):
