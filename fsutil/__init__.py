@@ -510,26 +510,31 @@ def rename_file_extension(path, extension):
     rename_file(path, filename)
 
 
+def _search_paths(path, pattern):
+    """
+    Search all paths relative to path matching the given pattern.
+    """
+    assert_dir(path)
+    pathname = os.path.join(path, pattern)
+    options = {} if PY2 else {'recursive': True}
+    paths = glob.glob(pathname, **options)
+    return paths
+
+
 def search_dirs(path, pattern):
     """
     Search for directories at path matching the given pattern.
     """
-    assert_dir(path)
-    pathname = os.path.join(path, pattern)
-    options = {} if PY2 else { 'recursive':True }
-    subpaths = glob.glob(pathname, **options)
-    return _filter_paths(path, subpaths, predicate=is_dir)
+    return _filter_paths(
+        path, _search_paths(path, pattern), predicate=is_dir)
 
 
 def search_files(path, pattern):
     """
     Search for files at path matching the given pattern.
     """
-    assert_dir(path)
-    pathname = os.path.join(path, pattern)
-    options = {} if PY2 else { 'recursive':True }
-    subpaths = glob.glob(pathname, **options)
-    return _filter_paths(path, subpaths, predicate=is_file)
+    return _filter_paths(
+        path, _search_paths(path, pattern), predicate=is_file)
 
 
 def split_filename(path):
