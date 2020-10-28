@@ -62,8 +62,8 @@ import fsutil
 -   [`exists`](#exists)
 -   [`get_file_basename`](#get_file_basename)
 -   [`get_file_extension`](#get_file_extension)
+-   [`get_file_hash`](#get_file_hash)
 -   [`get_filename`](#get_filename)
--   [`get_hash`](#get_hash)
 -   [`is_dir`](#is_dir)
 -   [`is_empty`](#is_empty)
 -   [`is_empty_dir`](#is_empty_dir)
@@ -237,19 +237,19 @@ basename = fsutil.get_file_basename(path)
 extension = fsutil.get_file_extension(path)
 ```
 
+#### `get_file_hash`
+
+```python
+# Get the hash of the file at the gived path using
+# the specified algorithm function (md5 by default).
+filehash = fsutil.get_file_hash(path, func='md5')
+```
+
 #### `get_filename`
 
 ```python
 # Get the filename from the given path/url.
 filename = fsutil.get_filename(path)
-```
-
-#### `get_hash`
-
-```python
-# Get the hash of the file at the gived path using
-# the specified algorithm function (md5 by default).
-filehash = fsutil.get_hash(path, func='md5')
 ```
 
 #### `is_dir`
