@@ -102,6 +102,36 @@ def clean_dir(path, dirs=True, files=True):
         _clean_dir_empty_dirs(path)
 
 
+def convert_size_bytes_to_string(size):
+    """
+    Convert the given size bytes to string using the right unit suffix.
+    """
+    size = float(size)
+    units = SIZE_UNITS
+    factor = 0
+    factor_limit = (len(units) - 1)
+    while (size >= 1024) and (factor <= factor_limit):
+        size /= 1024
+        factor += 1
+    s_format = '{:.2f} {}' if (factor > 1) else '{:.0f} {}'
+    s = s_format.format(size, units[factor])
+    return s
+
+
+def convert_size_string_to_bytes(size):
+    """
+    Convert the given size string to bytes.
+    """
+    units = [item.lower() for item in SIZE_UNITS]
+    parts = size.strip().replace('  ', ' ').split(' ')
+    amount = float(parts[0])
+    unit = parts[1]
+    factor = units.index(unit.lower())
+    if not factor:
+        return amount
+    return int((1024 ** factor) * amount)
+
+
 def copy_dir(path, dest, overwrite=False, **kwargs):
     """
     Copy the directory at the given path and all its content to dest path.
@@ -221,22 +251,6 @@ def _filter_paths(basepath, relpaths, predicate=None):
     return paths
 
 
-def format_size(size):
-    """
-    Format the given size (in bytes) using the right unit suffix.
-    """
-    size = float(size)
-    units = SIZE_UNITS
-    factor = 0
-    factor_limit = (len(units) - 1)
-    while (size >= 1024) and (factor <= factor_limit):
-        size /= 1024
-        factor += 1
-    size_format = '{:.2f} {}' if (factor > 1) else '{:.0f} {}'
-    size_formatted = size_format.format(size, units[factor])
-    return size_formatted
-
-
 def get_dir_size(path):
     """
     Get the directory size in bytes.
@@ -256,7 +270,7 @@ def get_dir_size_formatted(path):
     Get the directory size formatted using the right unit suffix.
     """
     size = get_dir_size(path)
-    size_formatted = format_size(size)
+    size_formatted = convert_size_bytes_to_string(size)
     return size_formatted
 
 
@@ -305,7 +319,7 @@ def get_file_size_formatted(path):
     Get the directory size formatted using the right unit suffix.
     """
     size = get_file_size(path)
-    size_formatted = format_size(size)
+    size_formatted = convert_size_bytes_to_string(size)
     return size_formatted
 
 
@@ -467,20 +481,6 @@ def move_file(path, dest, overwrite=False, **kwargs):
         assert_not_exists(dest)
     make_dirs_for_file(dest)
     shutil.move(path, dest, **kwargs)
-
-
-def parse_size(size):
-    """
-    Parse a size string (eg. 2.5 MB) and return the corresponding size in bytes.
-    """
-    units = [item.lower() for item in SIZE_UNITS]
-    parts = size.strip().replace('  ', ' ').split(' ')
-    amount = float(parts[0])
-    unit = parts[1]
-    factor = units.index(unit.lower())
-    if not factor:
-        return amount
-    return int((1024 ** factor) * amount)
 
 
 def read_file(path, encoding='utf-8'):

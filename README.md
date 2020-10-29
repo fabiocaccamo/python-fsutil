@@ -50,6 +50,8 @@ import fsutil
 -   [`assert_not_exists`](#assert_not_exists)
 -   [`assert_not_file`](#assert_not_file)
 -   [`clean_dir`](#clean_dir)
+-   [`convert_size_bytes_to_string`](#convert_size_bytes_to_string)
+-   [`convert_size_string_to_bytes`](#convert_size_string_to_bytes)
 -   [`copy_dir`](#copy_dir)
 -   [`copy_dir_content`](#copy_dir_content)
 -   [`copy_file`](#copy_file)
@@ -60,7 +62,6 @@ import fsutil
 -   [`delete_file`](#delete_file)
 -   [`delete_files`](#delete_files)
 -   [`exists`](#exists)
--   [`format_size`](#format_size)
 -   [`get_dir_size`](#get_dir_size)
 -   [`get_dir_size_formatted`](#get_dir_size_formatted)
 -   [`get_file_basename`](#get_file_basename)
@@ -83,7 +84,6 @@ import fsutil
 -   [`make_dirs_for_file`](#make_dirs_for_file)
 -   [`move_dir`](#move_dir)
 -   [`move_file`](#move_file)
--   [`parse_size`](#parse_size)
 -   [`read_file`](#read_file)
 -   [`remove_dir`](#remove_dir)
 -   [`remove_dirs`](#remove_dirs)
@@ -147,6 +147,20 @@ fsutil.assert_not_file(path)
 ```python
 # Clean a directory by removing empty sub-directories and/or empty files.
 fsutil.clean_dir(path, dirs=True, files=True)
+```
+
+#### `convert_size_bytes_to_string`
+
+```python
+# Convert the given size bytes to string using the right unit suffix.
+size_str = fsutil.convert_size_bytes_to_string(size)
+```
+
+#### `convert_size_string_to_bytes`
+
+```python
+# Convert the given size string to bytes.
+size_bytes = fsutil.convert_size_string_to_bytes(size)
 ```
 
 #### `copy_dir`
@@ -227,13 +241,6 @@ fsutil.delete_files(*paths)
 ```python
 # Check if a directory of a file exists at the given path.
 value = fsutil.exists(path)
-```
-
-#### `format_size`
-
-```python
-# Format the given size (in bytes) using the right unit suffix.
-size_str = fsutil.format_size(size)
 ```
 
 #### `get_dir_size`
@@ -399,13 +406,6 @@ fsutil.move_dir(path, dest, overwrite=False, **kwargs)
 # More informations about kwargs supported options here:
 # https://docs.python.org/3/library/shutil.html#shutil.move
 fsutil.move_file(path, dest, overwrite=False, **kwargs)
-```
-
-#### `parse_size`
-
-```python
-# Parse a size string (eg. 2.5 MB) and return the corresponding size in bytes.
-fsutil.parse_size(size)
 ```
 
 #### `read_file`
