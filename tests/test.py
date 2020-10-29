@@ -5,16 +5,23 @@ import threading
 import unittest
 
 
-def temp_path(filepath=''):
-    return fsutil.join_path(__file__, 'temp/{}'.format(filepath))
-
-
 def temp_context(func):
     def wrapper(*args, **kwargs):
         fsutil.remove_dir(temp_path())
         func(*args, **kwargs)
         fsutil.remove_dir(temp_path())
     return wrapper
+
+
+def temp_path(filepath=''):
+    return fsutil.join_path(__file__, 'temp/{}'.format(filepath))
+
+
+def temp_file_size(path, size):
+    size_bytes = fsutil.parse_size(size)
+    with open(path, 'wb') as file:
+        file.seek(size_bytes - 1)
+        file.write(b'\0')
 
 
 class fsutil_test_case(unittest.TestCase):
@@ -266,6 +273,86 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(path)
         self.assertTrue(fsutil.exists(path))
 
+    def test_format_size(self):
+        self.assertEqual(fsutil.format_size(1023), '1023 bytes')
+        self.assertEqual(fsutil.format_size(1024), '1 KB')
+        self.assertEqual(fsutil.format_size(1048576), '1.00 MB')
+        self.assertEqual(fsutil.format_size(1572864), '1.50 MB')
+        self.assertEqual(fsutil.format_size(1073741824), '1.00 GB')
+        self.assertEqual(fsutil.format_size(1879048192), '1.75 GB')
+        self.assertEqual(fsutil.format_size(1099511627776), '1.00 TB')
+
+    def test_format_size_and_parse_size(self):
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('1023 bytes')), '1023 bytes')
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('1 KB')), '1 KB')
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('1.00 MB')), '1.00 MB')
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('1.25 MB')), '1.25 MB')
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('2.50 MB')), '2.50 MB')
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('1.00 GB')), '1.00 GB')
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('1.09 GB')), '1.09 GB')
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('1.99 GB')), '1.99 GB')
+        self.assertEqual(fsutil.format_size(fsutil.parse_size('1.00 TB')), '1.00 TB')
+
+    @temp_context
+    def test_get_dir_size(self):
+        path = temp_path('a/a-1.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '1.05 MB') # 1101004
+
+        path = temp_path('a/b/b-1.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '2 MB') # 2097152
+
+        path = temp_path('a/b/b-2.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '2.25 MB') # 2359296
+
+        path = temp_path('a/b/c/c-1.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '3.75 MB') # 3932160
+
+        path = temp_path('a/b/c/c-2.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '500 KB') # 512000
+
+        path = temp_path('a/b/c/c-3.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '200 KB') # 204800
+
+        self.assertEqual(fsutil.get_dir_size(temp_path('a')), 10206412)
+        self.assertEqual(fsutil.get_dir_size(temp_path('a/b')), 9105408)
+        self.assertEqual(fsutil.get_dir_size(temp_path('a/b/c')), 4648960)
+
+    @temp_context
+    def test_get_dir_size_formatted(self):
+        path = temp_path('a/a-1.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '1.05 MB') # 1101004
+
+        path = temp_path('a/b/b-1.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '2 MB') # 2097152
+
+        path = temp_path('a/b/b-2.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '2.25 MB') # 2359296
+
+        path = temp_path('a/b/c/c-1.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '3.75 MB') # 3932160
+
+        path = temp_path('a/b/c/c-2.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '500 KB') # 512000
+
+        path = temp_path('a/b/c/c-3.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '200 KB') # 204800
+
+        self.assertEqual(fsutil.get_dir_size_formatted(temp_path('a')), '9.73 MB')
+        self.assertEqual(fsutil.get_dir_size_formatted(temp_path('a/b')), '8.68 MB')
+        self.assertEqual(fsutil.get_dir_size_formatted(temp_path('a/b/c')), '4.43 MB')
+
     def test_get_file_basename(self):
         s = 'Document'
         self.assertEqual(fsutil.get_file_basename(s), 'Document')
@@ -296,6 +383,22 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(path, content='Hello World')
         hash = fsutil.get_file_hash(path)
         self.assertEqual(hash, 'b10a8db164e0754105b7a99be72e3fe5')
+
+    @temp_context
+    def test_get_file_size(self):
+        path = temp_path('a/b/c.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '1.75 MB')
+        size = fsutil.get_file_size(path)
+        self.assertEqual(size, fsutil.parse_size('1.75 MB'))
+
+    @temp_context
+    def test_get_file_size_formatted(self):
+        path = temp_path('a/b/c.txt')
+        fsutil.create_file(path)
+        temp_file_size(path, '1.75 MB')
+        size = fsutil.get_file_size_formatted(path)
+        self.assertEqual(size, '1.75 MB')
 
     def test_get_filename(self):
         s = 'Document'
@@ -457,6 +560,23 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.move_file(path, dest)
         self.assertFalse(fsutil.exists(path))
         self.assertTrue(fsutil.is_file(temp_path('a/c.txt')))
+
+    def test_parse_size(self):
+        self.assertEqual(fsutil.parse_size('1 KB'), 1024)
+        self.assertEqual(fsutil.parse_size('1.00 MB'), 1048576)
+        self.assertEqual(fsutil.parse_size('1.00 GB'), 1073741824)
+        self.assertEqual(fsutil.parse_size('1.00 TB'), 1099511627776)
+
+    def test_parse_size_and_format_size(self):
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(1023)), 1023)
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(1024)), 1024)
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(1048576)), 1048576)
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(1310720)), 1310720)
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(2621440)), 2621440)
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(1073741824)), 1073741824)
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(1170378588)), 1170378588)
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(2136746229)), 2136746229)
+        self.assertEqual(fsutil.parse_size(fsutil.format_size(1099511627776)), 1099511627776)
 
     @temp_context
     def test_read_file(self):

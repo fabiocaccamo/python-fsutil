@@ -60,9 +60,14 @@ import fsutil
 -   [`delete_file`](#delete_file)
 -   [`delete_files`](#delete_files)
 -   [`exists`](#exists)
+-   [`format_size`](#format_size)
+-   [`get_dir_size`](#get_dir_size)
+-   [`get_dir_size_formatted`](#get_dir_size_formatted)
 -   [`get_file_basename`](#get_file_basename)
 -   [`get_file_extension`](#get_file_extension)
 -   [`get_file_hash`](#get_file_hash)
+-   [`get_file_size`](#get_file_size)
+-   [`get_file_size_formatted`](#get_file_size_formatted)
 -   [`get_filename`](#get_filename)
 -   [`is_dir`](#is_dir)
 -   [`is_empty`](#is_empty)
@@ -78,6 +83,7 @@ import fsutil
 -   [`make_dirs_for_file`](#make_dirs_for_file)
 -   [`move_dir`](#move_dir)
 -   [`move_file`](#move_file)
+-   [`parse_size`](#parse_size)
 -   [`read_file`](#read_file)
 -   [`remove_dir`](#remove_dir)
 -   [`remove_dirs`](#remove_dirs)
@@ -223,6 +229,27 @@ fsutil.delete_files(*paths)
 value = fsutil.exists(path)
 ```
 
+#### `format_size`
+
+```python
+# Format the given size (in bytes) using the right unit suffix.
+size_str = fsutil.format_size(size)
+```
+
+#### `get_dir_size`
+
+```python
+# Get the directory size in bytes.
+size = fsutil.get_dir_size(path)
+```
+
+#### `get_dir_size_formatted`
+
+```python
+# Get the directory size formatted using the right unit suffix.
+size_str = fsutil.get_dir_size_formatted(path)
+```
+
 #### `get_file_basename`
 
 ```python
@@ -243,6 +270,20 @@ extension = fsutil.get_file_extension(path)
 # Get the hash of the file at the given path using
 # the specified algorithm function (md5 by default).
 filehash = fsutil.get_file_hash(path, func='md5')
+```
+
+#### `get_file_size`
+
+```python
+# Get the file size in bytes.
+size = fsutil.get_file_size(path)
+```
+
+#### `get_file_size_formatted`
+
+```python
+# Get the file size formatted using the right unit suffix.
+size_str = fsutil.get_file_size_formatted(path)
 ```
 
 #### `get_filename`
@@ -358,6 +399,13 @@ fsutil.move_dir(path, dest, overwrite=False, **kwargs)
 # More informations about kwargs supported options here:
 # https://docs.python.org/3/library/shutil.html#shutil.move
 fsutil.move_file(path, dest, overwrite=False, **kwargs)
+```
+
+#### `parse_size`
+
+```python
+# Parse a size string (eg. 2.5 MB) and return the corresponding size in bytes.
+fsutil.parse_size(size)
 ```
 
 #### `read_file`

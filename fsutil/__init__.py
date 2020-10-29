@@ -20,6 +20,7 @@ except ImportError:
 
 
 PY2 = bool(sys.version_info.major == 2)
+SIZE_UNITS = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
 
 def assert_dir(path):
@@ -220,6 +221,45 @@ def _filter_paths(basepath, relpaths, predicate=None):
     return paths
 
 
+def format_size(size):
+    """
+    Format the given size (in bytes) using the right unit suffix.
+    """
+    size = float(size)
+    units = SIZE_UNITS
+    factor = 0
+    factor_limit = (len(units) - 1)
+    while (size >= 1024) and (factor <= factor_limit):
+        size /= 1024
+        factor += 1
+    size_format = '{:.2f} {}' if (factor > 1) else '{:.0f} {}'
+    size_formatted = size_format.format(size, units[factor])
+    return size_formatted
+
+
+def get_dir_size(path):
+    """
+    Get the directory size in bytes.
+    """
+    assert_dir(path)
+    size = 0
+    for basepath, _, filenames in os.walk(path):
+        for filename in filenames:
+            filepath = os.path.join(basepath, filename)
+            if not os.path.islink(filepath):
+                size += get_file_size(filepath)
+    return size
+
+
+def get_dir_size_formatted(path):
+    """
+    Get the directory size formatted using the right unit suffix.
+    """
+    size = get_dir_size(path)
+    size_formatted = format_size(size)
+    return size_formatted
+
+
 def get_file_basename(path):
     """
     Get the file basename from the given path/url.
@@ -248,6 +288,25 @@ def get_file_hash(path, func='md5'):
             hash.update(chunk)
     hash_hex = hash.hexdigest()
     return hash_hex
+
+
+def get_file_size(path):
+    """
+    Get the directory size in bytes.
+    """
+    assert_file(path)
+    # size = os.stat(path).st_size
+    size = os.path.getsize(path)
+    return size
+
+
+def get_file_size_formatted(path):
+    """
+    Get the directory size formatted using the right unit suffix.
+    """
+    size = get_file_size(path)
+    size_formatted = format_size(size)
+    return size_formatted
 
 
 def get_filename(path):
@@ -288,8 +347,7 @@ def is_empty_file(path):
     """
     Determine whether the specified path represents an empty file.
     """
-    assert_file(path)
-    return os.stat(path).st_size == 0
+    return get_file_size(path) == 0
 
 
 def is_file(path):
@@ -409,6 +467,20 @@ def move_file(path, dest, overwrite=False, **kwargs):
         assert_not_exists(dest)
     make_dirs_for_file(dest)
     shutil.move(path, dest, **kwargs)
+
+
+def parse_size(size):
+    """
+    Parse a size string (eg. 2.5 MB) and return the corresponding size in bytes.
+    """
+    units = [item.lower() for item in SIZE_UNITS]
+    parts = size.strip().replace('  ', ' ').split(' ')
+    amount = float(parts[0])
+    unit = parts[1]
+    factor = units.index(unit.lower())
+    if not factor:
+        return amount
+    return int((1024 ** factor) * amount)
 
 
 def read_file(path, encoding='utf-8'):
