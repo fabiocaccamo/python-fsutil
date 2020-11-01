@@ -246,8 +246,8 @@ def _filter_paths(basepath, relpaths, predicate=None):
     for relpath in relpaths:
         abspath = os.path.join(basepath, relpath)
         if predicate is None or predicate(abspath):
-            paths.append((relpath, abspath, ))
-    paths.sort(key=lambda path: path[0])
+            paths.append(abspath)
+    paths.sort()
     return paths
 
 

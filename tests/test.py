@@ -151,14 +151,14 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(temp_path('a/b/f-2.txt'))
         fsutil.create_file(temp_path('a/b/f-3.txt'))
         fsutil.copy_dir(temp_path('a/b'), temp_path('x/y/z'))
-        files = fsutil.list_files(temp_path('a/b'))
-        files_names = [file[0] for file in files]
-        self.assertEqual(len(files), 3)
-        self.assertEqual(files_names, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
-        files = fsutil.list_files(temp_path('x/y/z/b/'))
-        files_names = [file[0] for file in files]
-        self.assertEqual(len(files), 3)
-        self.assertEqual(files_names, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
+        filepaths = fsutil.list_files(temp_path('a/b'))
+        filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
+        self.assertEqual(len(filepaths), 3)
+        self.assertEqual(filenames, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
+        filepaths = fsutil.list_files(temp_path('x/y/z/b/'))
+        filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
+        self.assertEqual(len(filepaths), 3)
+        self.assertEqual(filenames, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
 
     @temp_context
     def test_copy_dir_with_overwrite(self):
@@ -177,10 +177,10 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(temp_path('a/b/f-2.txt'))
         fsutil.create_file(temp_path('a/b/f-3.txt'))
         fsutil.copy_dir_content(temp_path('a/b'), temp_path('z'))
-        files = fsutil.list_files(temp_path('z'))
-        files_names = [file[0] for file in files]
-        self.assertEqual(len(files), 3)
-        self.assertEqual(files_names, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
+        filepaths = fsutil.list_files(temp_path('z'))
+        filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
+        self.assertEqual(len(filepaths), 3)
+        self.assertEqual(filenames, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
 
     @temp_context
     def test_create_file(self):
@@ -457,20 +457,20 @@ class fsutil_test_case(unittest.TestCase):
         for i in range(0, 5):
             fsutil.create_dir(temp_path('a/b/c/d-{}'.format(i)))
             fsutil.create_file(temp_path('a/b/c/f-{}'.format(i)), content='{}'.format(i))
-        dirs = fsutil.list_dirs(temp_path('a/b/c'))
-        dirs_names = [dir[0] for dir in dirs]
-        self.assertEqual(len(dirs), 5)
-        self.assertEqual(dirs_names, ['d-0', 'd-1', 'd-2', 'd-3', 'd-4'])
+        dirpaths = fsutil.list_dirs(temp_path('a/b/c'))
+        dirnames = [fsutil.split_path(dirpath)[-1] for dirpath in dirpaths]
+        self.assertEqual(len(dirpaths), 5)
+        self.assertEqual(dirnames, ['d-0', 'd-1', 'd-2', 'd-3', 'd-4'])
 
     @temp_context
     def test_list_files(self):
         for i in range(0, 5):
             fsutil.create_dir(temp_path('a/b/c/d-{}'.format(i)))
             fsutil.create_file(temp_path('a/b/c/f-{}.txt'.format(i)), content='{}'.format(i))
-        files = fsutil.list_files(temp_path('a/b/c'))
-        files_names = [file[0] for file in files]
-        self.assertEqual(len(files), 5)
-        self.assertEqual(files_names, ['f-0.txt', 'f-1.txt', 'f-2.txt', 'f-3.txt', 'f-4.txt'])
+        filepaths = fsutil.list_files(temp_path('a/b/c'))
+        filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
+        self.assertEqual(len(filepaths), 5)
+        self.assertEqual(filenames, ['f-0.txt', 'f-1.txt', 'f-2.txt', 'f-3.txt', 'f-4.txt'])
 
     @temp_context
     def test_make_dirs(self):
@@ -673,8 +673,7 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(temp_path('a/x/c/IMG_1005.png'))
         fsutil.create_file(temp_path('x/b/c/IMG_1006.png'))
         fsutil.create_file(temp_path('a/b/c/DOC_1007.png'))
-        results_raw = fsutil.search_files(temp_path('a/'), '**/c/IMG_*.png')
-        results = [result[0] for result in results_raw]
+        results = fsutil.search_files(temp_path('a/'), '**/c/IMG_*.png')
         expected_results = [
             temp_path('a/b/c/IMG_1002.png'),
             temp_path('a/x/c/IMG_1005.png'),
@@ -688,7 +687,7 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(temp_path('x/y/z/c/IMG_1001.jpg'))
         fsutil.create_file(temp_path('a/c/IMG_1002.png'))
         fsutil.create_file(temp_path('c/b/c/IMG_1003.jpg'))
-        results = [result[0] for result in fsutil.search_dirs(temp_path(''), '**/c')]
+        results = fsutil.search_dirs(temp_path(''), '**/c')
         expected_results = [
             temp_path('a/b/c'),
             temp_path('a/c'),
@@ -716,6 +715,11 @@ class fsutil_test_case(unittest.TestCase):
         s = '/root/a/b/c/Document.txt'
         self.assertEqual(fsutil.split_filepath(
             s), ('/root/a/b/c', 'Document.txt', ))
+
+    def test_split_path(self):
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.split_path(
+            s), ['root', 'a', 'b', 'c', 'Document.txt'])
 
     @temp_context
     def test_write_file(self):
