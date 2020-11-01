@@ -97,6 +97,7 @@ import fsutil
 -   [`search_files`](#search_files)
 -   [`split_filename`](#split_filename)
 -   [`split_filepath`](#split_filepath)
+-   [`split_path`](#split_path)
 -   [`write_file`](#write_file)
 
 
@@ -503,6 +504,13 @@ basename, extension = fsutil.split_filename(path)
 ```python
 # Split a filename and returns its directory-path and filename.
 dirpath, filename = fsutil.split_filepath(path)
+```
+
+#### `split_path`
+
+```python
+# Split a path and returns its path-names.
+path_names = fsutil.split_path(path)
 ```
 
 #### `write_file`

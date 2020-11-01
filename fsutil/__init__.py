@@ -626,6 +626,16 @@ def split_filepath(path):
     return (dirpath, filename, )
 
 
+def split_path(path):
+    """
+    Split a path and returns its path-names.
+    """
+    head, tail = os.path.split(path)
+    names = head.split(os.sep) + [tail]
+    names = list(filter(None, names))
+    return names
+
+
 def write_file(path, content, append=False, encoding='utf-8'):
     """
     Write file with the specified content at the given path.
