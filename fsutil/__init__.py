@@ -495,6 +495,19 @@ def read_file(path, encoding='utf-8'):
     return content
 
 
+def read_file_lines(path, strip_white=True, skip_empty=True, encoding='utf-8'):
+    """
+    Read file content lines according to the given options.
+    """
+    content = read_file(path, encoding)
+    lines = content.splitlines()
+    if strip_white:
+        lines = [line.strip() for line in lines]
+    if skip_empty:
+        lines = [line for line in lines if line]
+    return lines
+
+
 def remove_dir(path, **kwargs):
     """
     Remove a directory at the given path and all its content.
