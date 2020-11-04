@@ -5,223 +5,204 @@ import threading
 import unittest
 
 
-def temp_context(func):
-    def wrapper(*args, **kwargs):
-        fsutil.remove_dir(temp_path())
-        func(*args, **kwargs)
-        fsutil.remove_dir(temp_path())
-    return wrapper
-
-
-def temp_path(filepath=''):
-    return fsutil.join_path(__file__, 'temp/{}'.format(filepath))
-
-
-def temp_file_size(path, size):
-    fsutil.create_file(path)
-    size_bytes = fsutil.convert_size_string_to_bytes(size)
-    with open(path, 'wb') as file:
-        file.seek(size_bytes - 1)
-        file.write(b'\0')
-
-
 class fsutil_test_case(unittest.TestCase):
 
-    @temp_context
+    def setUp(self):
+        fsutil.remove_dir(self.temp_path())
+
+    def tearDown(self):
+        fsutil.remove_dir(self.temp_path())
+
+    @staticmethod
+    def temp_path(filepath=''):
+        return fsutil.join_path(__file__, 'temp/{}'.format(filepath))
+
+    @staticmethod
+    def temp_file_of_size(path, size):
+        fsutil.create_file(path)
+        size_bytes = fsutil.convert_size_string_to_bytes(size)
+        with open(path, 'wb') as file:
+            file.seek(size_bytes - 1)
+            file.write(b'\0')
+
     def test_assert_dir(self):
-        path = temp_path('a/b/')
+        path = self.temp_path('a/b/')
         with self.assertRaises(OSError):
             fsutil.assert_dir(path)
         fsutil.create_dir(path)
         fsutil.assert_dir(path)
 
-    @temp_context
     def test_assert_dir_with_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path)
         with self.assertRaises(OSError):
             fsutil.assert_dir(path)
 
-    @temp_context
     def test_assert_exists_with_directory(self):
-        path = temp_path('a/b/')
+        path = self.temp_path('a/b/')
         with self.assertRaises(OSError):
             fsutil.assert_exists(path)
         fsutil.create_dir(path)
         fsutil.assert_exists(path)
 
-    @temp_context
     def test_assert_exists_with_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         with self.assertRaises(OSError):
             fsutil.assert_exists(path)
         fsutil.create_file(path)
         fsutil.assert_exists(path)
 
-    @temp_context
     def test_assert_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         with self.assertRaises(OSError):
             fsutil.assert_file(path)
         fsutil.create_file(path)
         fsutil.assert_file(path)
 
-    @temp_context
     def test_assert_file_with_directory(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_dir(path)
         with self.assertRaises(OSError):
             fsutil.assert_file(path)
 
-    @temp_context
     def test_clean_dir_only_dirs(self):
-        path = temp_path('a/b/c.txt')
-        fsutil.create_dir(temp_path('x/y/z/a'))
-        fsutil.create_dir(temp_path('x/y/z/b'))
-        fsutil.create_dir(temp_path('x/y/z/c'))
-        fsutil.create_dir(temp_path('x/y/z/d'))
-        fsutil.create_dir(temp_path('x/y/z/e'))
-        fsutil.create_file(temp_path('x/y/z/b/f.txt'), content='hello world')
-        fsutil.create_file(temp_path('x/y/z/d/f.txt'), content='hello world')
-        fsutil.clean_dir(temp_path('x/y'), dirs=False, files=True)
-        self.assertTrue(fsutil.exists(temp_path('x/y/z/a')))
-        self.assertTrue(fsutil.exists(temp_path('x/y/z/b')))
-        self.assertTrue(fsutil.exists(temp_path('x/y/z/c')))
-        self.assertTrue(fsutil.exists(temp_path('x/y/z/d')))
-        self.assertTrue(fsutil.exists(temp_path('x/y/z/e')))
-        fsutil.clean_dir(temp_path('x/y'), dirs=True, files=True)
-        self.assertFalse(fsutil.exists(temp_path('x/y/z/a')))
-        self.assertTrue(fsutil.exists(temp_path('x/y/z/b')))
-        self.assertFalse(fsutil.exists(temp_path('x/y/z/c')))
-        self.assertTrue(fsutil.exists(temp_path('x/y/z/d')))
-        self.assertFalse(fsutil.exists(temp_path('x/y/z/e')))
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_dir(self.temp_path('x/y/z/a'))
+        fsutil.create_dir(self.temp_path('x/y/z/b'))
+        fsutil.create_dir(self.temp_path('x/y/z/c'))
+        fsutil.create_dir(self.temp_path('x/y/z/d'))
+        fsutil.create_dir(self.temp_path('x/y/z/e'))
+        fsutil.create_file(self.temp_path('x/y/z/b/f.txt'), content='hello world')
+        fsutil.create_file(self.temp_path('x/y/z/d/f.txt'), content='hello world')
+        fsutil.clean_dir(self.temp_path('x/y'), dirs=False, files=True)
+        self.assertTrue(fsutil.exists(self.temp_path('x/y/z/a')))
+        self.assertTrue(fsutil.exists(self.temp_path('x/y/z/b')))
+        self.assertTrue(fsutil.exists(self.temp_path('x/y/z/c')))
+        self.assertTrue(fsutil.exists(self.temp_path('x/y/z/d')))
+        self.assertTrue(fsutil.exists(self.temp_path('x/y/z/e')))
+        fsutil.clean_dir(self.temp_path('x/y'), dirs=True, files=True)
+        self.assertFalse(fsutil.exists(self.temp_path('x/y/z/a')))
+        self.assertTrue(fsutil.exists(self.temp_path('x/y/z/b')))
+        self.assertFalse(fsutil.exists(self.temp_path('x/y/z/c')))
+        self.assertTrue(fsutil.exists(self.temp_path('x/y/z/d')))
+        self.assertFalse(fsutil.exists(self.temp_path('x/y/z/e')))
 
-    @temp_context
     def test_clean_dir_only_files(self):
-        path = temp_path('a/b/c.txt')
-        fsutil.create_file(temp_path('a/b/c/f1.txt'), content='hello world')
-        fsutil.create_file(temp_path('a/b/c/f2.txt'))
-        fsutil.create_file(temp_path('a/b/c/f3.txt'), content='hello world')
-        fsutil.create_file(temp_path('a/b/c/f4.txt'))
-        fsutil.create_file(temp_path('a/b/c/f5.txt'), content='hello world')
-        fsutil.clean_dir(temp_path('a'), dirs=False, files=False)
-        self.assertTrue(fsutil.exists(temp_path('a/b/c/f1.txt')))
-        self.assertTrue(fsutil.exists(temp_path('a/b/c/f2.txt')))
-        self.assertTrue(fsutil.exists(temp_path('a/b/c/f3.txt')))
-        self.assertTrue(fsutil.exists(temp_path('a/b/c/f4.txt')))
-        self.assertTrue(fsutil.exists(temp_path('a/b/c/f5.txt')))
-        fsutil.clean_dir(temp_path('a'), dirs=False, files=True)
-        self.assertTrue(fsutil.exists(temp_path('a/b/c/f1.txt')))
-        self.assertFalse(fsutil.exists(temp_path('a/b/c/f2.txt')))
-        self.assertTrue(fsutil.exists(temp_path('a/b/c/f3.txt')))
-        self.assertFalse(fsutil.exists(temp_path('a/b/c/f4.txt')))
-        self.assertTrue(fsutil.exists(temp_path('a/b/c/f5.txt')))
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(self.temp_path('a/b/c/f1.txt'), content='hello world')
+        fsutil.create_file(self.temp_path('a/b/c/f2.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/f3.txt'), content='hello world')
+        fsutil.create_file(self.temp_path('a/b/c/f4.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/f5.txt'), content='hello world')
+        fsutil.clean_dir(self.temp_path('a'), dirs=False, files=False)
+        self.assertTrue(fsutil.exists(self.temp_path('a/b/c/f1.txt')))
+        self.assertTrue(fsutil.exists(self.temp_path('a/b/c/f2.txt')))
+        self.assertTrue(fsutil.exists(self.temp_path('a/b/c/f3.txt')))
+        self.assertTrue(fsutil.exists(self.temp_path('a/b/c/f4.txt')))
+        self.assertTrue(fsutil.exists(self.temp_path('a/b/c/f5.txt')))
+        fsutil.clean_dir(self.temp_path('a'), dirs=False, files=True)
+        self.assertTrue(fsutil.exists(self.temp_path('a/b/c/f1.txt')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b/c/f2.txt')))
+        self.assertTrue(fsutil.exists(self.temp_path('a/b/c/f3.txt')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b/c/f4.txt')))
+        self.assertTrue(fsutil.exists(self.temp_path('a/b/c/f5.txt')))
 
-    @temp_context
     def test_clean_dir_dirs_and_files(self):
-        path = temp_path('a/b/c.txt')
-        fsutil.create_file(temp_path('a/b/c/f1.txt'))
-        fsutil.create_file(temp_path('a/b/c/f2.txt'))
-        fsutil.create_file(temp_path('a/b/c/f3.txt'))
-        fsutil.create_file(temp_path('a/b/c/d/f4.txt'))
-        fsutil.create_file(temp_path('a/b/c/d/f5.txt'))
-        fsutil.clean_dir(temp_path('a'), dirs=True, files=True)
-        self.assertFalse(fsutil.exists(temp_path('a/b/c/d/f5.txt')))
-        self.assertFalse(fsutil.exists(temp_path('a/b/c/d/f4.txt')))
-        self.assertFalse(fsutil.exists(temp_path('a/b/c/f3.txt')))
-        self.assertFalse(fsutil.exists(temp_path('a/b/c/f2.txt')))
-        self.assertFalse(fsutil.exists(temp_path('a/b/c/f1.txt')))
-        self.assertFalse(fsutil.exists(temp_path('a/b/c')))
-        self.assertFalse(fsutil.exists(temp_path('a/b')))
-        self.assertTrue(fsutil.exists(temp_path('a')))
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(self.temp_path('a/b/c/f1.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/f2.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/f3.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/d/f4.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/d/f5.txt'))
+        fsutil.clean_dir(self.temp_path('a'), dirs=True, files=True)
+        self.assertFalse(fsutil.exists(self.temp_path('a/b/c/d/f5.txt')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b/c/d/f4.txt')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b/c/f3.txt')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b/c/f2.txt')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b/c/f1.txt')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b/c')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b')))
+        self.assertTrue(fsutil.exists(self.temp_path('a')))
 
-    @temp_context
     def test_copy_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='hello world')
-        dest = temp_path('x/y/z.txt')
+        dest = self.temp_path('x/y/z.txt')
         fsutil.copy_file(path, dest)
         self.assertTrue(fsutil.is_file(path))
         self.assertTrue(fsutil.is_file(dest))
         self.assertEqual(fsutil.get_file_hash(path), fsutil.get_file_hash(dest))
 
-    @temp_context
     def test_copy_dir(self):
-        fsutil.create_file(temp_path('a/b/f-1.txt'))
-        fsutil.create_file(temp_path('a/b/f-2.txt'))
-        fsutil.create_file(temp_path('a/b/f-3.txt'))
-        fsutil.copy_dir(temp_path('a/b'), temp_path('x/y/z'))
-        filepaths = fsutil.list_files(temp_path('a/b'))
+        fsutil.create_file(self.temp_path('a/b/f-1.txt'))
+        fsutil.create_file(self.temp_path('a/b/f-2.txt'))
+        fsutil.create_file(self.temp_path('a/b/f-3.txt'))
+        fsutil.copy_dir(self.temp_path('a/b'), self.temp_path('x/y/z'))
+        filepaths = fsutil.list_files(self.temp_path('a/b'))
         filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
         self.assertEqual(len(filepaths), 3)
         self.assertEqual(filenames, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
-        filepaths = fsutil.list_files(temp_path('x/y/z/b/'))
+        filepaths = fsutil.list_files(self.temp_path('x/y/z/b/'))
         filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
         self.assertEqual(len(filepaths), 3)
         self.assertEqual(filenames, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
 
-    @temp_context
     def test_copy_dir_with_overwrite(self):
-        fsutil.create_file(temp_path('a/b/f-1.txt'))
-        fsutil.create_file(temp_path('a/b/f-2.txt'))
-        fsutil.create_file(temp_path('a/b/f-3.txt'))
-        fsutil.create_file(temp_path('x/y/z/f-0.txt'))
-        fsutil.copy_dir(temp_path('a/b'), temp_path('x/y/z'), overwrite=False)
+        fsutil.create_file(self.temp_path('a/b/f-1.txt'))
+        fsutil.create_file(self.temp_path('a/b/f-2.txt'))
+        fsutil.create_file(self.temp_path('a/b/f-3.txt'))
+        fsutil.create_file(self.temp_path('x/y/z/f-0.txt'))
+        fsutil.copy_dir(self.temp_path('a/b'), self.temp_path('x/y/z'), overwrite=False)
         with self.assertRaises(OSError):
-            fsutil.copy_dir(temp_path('a/b'), temp_path('x/y/z'), overwrite=False)
-        fsutil.copy_dir(temp_path('a/b'), temp_path('x/y/z'), overwrite=True)
+            fsutil.copy_dir(self.temp_path('a/b'), self.temp_path('x/y/z'), overwrite=False)
+        fsutil.copy_dir(self.temp_path('a/b'), self.temp_path('x/y/z'), overwrite=True)
 
-    @temp_context
     def test_copy_dir_content(self):
-        fsutil.create_file(temp_path('a/b/f-1.txt'))
-        fsutil.create_file(temp_path('a/b/f-2.txt'))
-        fsutil.create_file(temp_path('a/b/f-3.txt'))
-        fsutil.copy_dir_content(temp_path('a/b'), temp_path('z'))
-        filepaths = fsutil.list_files(temp_path('z'))
+        fsutil.create_file(self.temp_path('a/b/f-1.txt'))
+        fsutil.create_file(self.temp_path('a/b/f-2.txt'))
+        fsutil.create_file(self.temp_path('a/b/f-3.txt'))
+        fsutil.copy_dir_content(self.temp_path('a/b'), self.temp_path('z'))
+        filepaths = fsutil.list_files(self.temp_path('z'))
         filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
         self.assertEqual(len(filepaths), 3)
         self.assertEqual(filenames, ['f-1.txt', 'f-2.txt', 'f-3.txt'])
 
-    @temp_context
     def test_create_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         self.assertFalse(fsutil.exists(path))
         fsutil.create_file(path, content='hello world')
         self.assertTrue(fsutil.exists(path))
         self.assertTrue(fsutil.is_file(path))
         self.assertEqual(fsutil.read_file(path), 'hello world')
 
-    @temp_context
     def test_create_file_with_overwrite(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='hello world')
         with self.assertRaises(OSError):
             fsutil.create_file(path, content='hello world')
         fsutil.create_file(path, content='hello moon', overwrite=True)
         self.assertEqual(fsutil.read_file(path), 'hello moon')
 
-    @temp_context
     def test_delete_dir(self):
-        fsutil.create_file(temp_path('a/b/c/d.txt'))
-        fsutil.create_file(temp_path('a/b/c/e.txt'))
-        fsutil.create_file(temp_path('a/b/c/f.txt'))
-        deleted = fsutil.delete_dir(temp_path('a/c/'))
+        fsutil.create_file(self.temp_path('a/b/c/d.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/e.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/f.txt'))
+        deleted = fsutil.delete_dir(self.temp_path('a/c/'))
         self.assertFalse(deleted)
-        deleted = fsutil.delete_dir(temp_path('a/b/'))
+        deleted = fsutil.delete_dir(self.temp_path('a/b/'))
         self.assertTrue(deleted)
-        self.assertTrue(fsutil.exists(temp_path('a')))
-        self.assertFalse(fsutil.exists(temp_path('a/b')))
+        self.assertTrue(fsutil.exists(self.temp_path('a')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b')))
 
-    @temp_context
     def test_delete_dirs(self):
-        fsutil.create_file(temp_path('a/b/c/document.txt'))
-        fsutil.create_file(temp_path('a/b/d/document.txt'))
-        fsutil.create_file(temp_path('a/b/e/document.txt'))
-        fsutil.create_file(temp_path('a/b/f/document.txt'))
-        path1 = temp_path('a/b/c/')
-        path2 = temp_path('a/b/d/')
-        path3 = temp_path('a/b/e/')
-        path4 = temp_path('a/b/f/')
+        fsutil.create_file(self.temp_path('a/b/c/document.txt'))
+        fsutil.create_file(self.temp_path('a/b/d/document.txt'))
+        fsutil.create_file(self.temp_path('a/b/e/document.txt'))
+        fsutil.create_file(self.temp_path('a/b/f/document.txt'))
+        path1 = self.temp_path('a/b/c/')
+        path2 = self.temp_path('a/b/d/')
+        path3 = self.temp_path('a/b/e/')
+        path4 = self.temp_path('a/b/f/')
         self.assertTrue(fsutil.exists(path1))
         self.assertTrue(fsutil.exists(path2))
         self.assertTrue(fsutil.exists(path3))
@@ -232,23 +213,21 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path3))
         self.assertFalse(fsutil.exists(path4))
 
-    @temp_context
     def test_delete_file(self):
-        path = temp_path('a/b/c.txt')
-        fsutil.create_file(temp_path('a/b/c.txt'))
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(self.temp_path('a/b/c.txt'))
         self.assertTrue(fsutil.exists(path))
-        deleted = fsutil.delete_file(temp_path('a/b/d.txt'))
+        deleted = fsutil.delete_file(self.temp_path('a/b/d.txt'))
         self.assertFalse(deleted)
         deleted = fsutil.delete_file(path)
         self.assertTrue(deleted)
         self.assertFalse(fsutil.exists(path))
 
-    @temp_context
     def test_delete_files(self):
-        path1 = temp_path('a/b/c/document.txt')
-        path2 = temp_path('a/b/d/document.txt')
-        path3 = temp_path('a/b/e/document.txt')
-        path4 = temp_path('a/b/f/document.txt')
+        path1 = self.temp_path('a/b/c/document.txt')
+        path2 = self.temp_path('a/b/d/document.txt')
+        path3 = self.temp_path('a/b/e/document.txt')
+        path4 = self.temp_path('a/b/f/document.txt')
         fsutil.create_file(path1)
         fsutil.create_file(path2)
         fsutil.create_file(path3)
@@ -263,13 +242,12 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path3))
         self.assertFalse(fsutil.exists(path4))
 
-    @temp_context
     def test_exists(self):
-        path = temp_path('a/b/')
+        path = self.temp_path('a/b/')
         self.assertFalse(fsutil.exists(path))
         fsutil.create_dir(path)
         self.assertTrue(fsutil.exists(path))
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         self.assertFalse(fsutil.exists(path))
         fsutil.create_file(path)
         self.assertTrue(fsutil.exists(path))
@@ -311,29 +289,27 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(2136746229)), 2136746229)
         self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1099511627776)), 1099511627776)
 
-    @temp_context
     def test_get_dir_size(self):
-        temp_file_size(temp_path('a/a-1.txt'), '1.05 MB') # 1101004
-        temp_file_size(temp_path('a/b/b-1.txt'), '2 MB') # 2097152
-        temp_file_size(temp_path('a/b/b-2.txt'), '2.25 MB') # 2359296
-        temp_file_size(temp_path('a/b/c/c-1.txt'), '3.75 MB') # 3932160
-        temp_file_size(temp_path('a/b/c/c-2.txt'), '500 KB') # 512000
-        temp_file_size(temp_path('a/b/c/c-3.txt'), '200 KB') # 204800
-        self.assertEqual(fsutil.get_dir_size(temp_path('a')), 10206412)
-        self.assertEqual(fsutil.get_dir_size(temp_path('a/b')), 9105408)
-        self.assertEqual(fsutil.get_dir_size(temp_path('a/b/c')), 4648960)
+        self.temp_file_of_size(self.temp_path('a/a-1.txt'), '1.05 MB') # 1101004
+        self.temp_file_of_size(self.temp_path('a/b/b-1.txt'), '2 MB') # 2097152
+        self.temp_file_of_size(self.temp_path('a/b/b-2.txt'), '2.25 MB') # 2359296
+        self.temp_file_of_size(self.temp_path('a/b/c/c-1.txt'), '3.75 MB') # 3932160
+        self.temp_file_of_size(self.temp_path('a/b/c/c-2.txt'), '500 KB') # 512000
+        self.temp_file_of_size(self.temp_path('a/b/c/c-3.txt'), '200 KB') # 204800
+        self.assertEqual(fsutil.get_dir_size(self.temp_path('a')), 10206412)
+        self.assertEqual(fsutil.get_dir_size(self.temp_path('a/b')), 9105408)
+        self.assertEqual(fsutil.get_dir_size(self.temp_path('a/b/c')), 4648960)
 
-    @temp_context
     def test_get_dir_size_formatted(self):
-        temp_file_size(temp_path('a/a-1.txt'), '1.05 MB') # 1101004
-        temp_file_size(temp_path('a/b/b-1.txt'), '2 MB') # 2097152
-        temp_file_size(temp_path('a/b/b-2.txt'), '2.25 MB') # 2359296
-        temp_file_size(temp_path('a/b/c/c-1.txt'), '3.75 MB') # 3932160
-        temp_file_size(temp_path('a/b/c/c-2.txt'), '500 KB') # 512000
-        temp_file_size(temp_path('a/b/c/c-3.txt'), '200 KB') # 204800
-        self.assertEqual(fsutil.get_dir_size_formatted(temp_path('a')), '9.73 MB')
-        self.assertEqual(fsutil.get_dir_size_formatted(temp_path('a/b')), '8.68 MB')
-        self.assertEqual(fsutil.get_dir_size_formatted(temp_path('a/b/c')), '4.43 MB')
+        self.temp_file_of_size(self.temp_path('a/a-1.txt'), '1.05 MB') # 1101004
+        self.temp_file_of_size(self.temp_path('a/b/b-1.txt'), '2 MB') # 2097152
+        self.temp_file_of_size(self.temp_path('a/b/b-2.txt'), '2.25 MB') # 2359296
+        self.temp_file_of_size(self.temp_path('a/b/c/c-1.txt'), '3.75 MB') # 3932160
+        self.temp_file_of_size(self.temp_path('a/b/c/c-2.txt'), '500 KB') # 512000
+        self.temp_file_of_size(self.temp_path('a/b/c/c-3.txt'), '200 KB') # 204800
+        self.assertEqual(fsutil.get_dir_size_formatted(self.temp_path('a')), '9.73 MB')
+        self.assertEqual(fsutil.get_dir_size_formatted(self.temp_path('a/b')), '8.68 MB')
+        self.assertEqual(fsutil.get_dir_size_formatted(self.temp_path('a/b/c')), '4.43 MB')
 
     def test_get_file_basename(self):
         s = 'Document'
@@ -359,24 +335,21 @@ class fsutil_test_case(unittest.TestCase):
         s = 'https://domain-name.com/Document.txt?p=1'
         self.assertEqual(fsutil.get_file_extension(s), 'txt')
 
-    @temp_context
     def test_get_file_hash(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='Hello World')
         hash = fsutil.get_file_hash(path)
         self.assertEqual(hash, 'b10a8db164e0754105b7a99be72e3fe5')
 
-    @temp_context
     def test_get_file_size(self):
-        path = temp_path('a/b/c.txt')
-        temp_file_size(path, '1.75 MB')
+        path = self.temp_path('a/b/c.txt')
+        self.temp_file_of_size(path, '1.75 MB')
         size = fsutil.get_file_size(path)
         self.assertEqual(size, fsutil.convert_size_string_to_bytes('1.75 MB'))
 
-    @temp_context
     def test_get_file_size_formatted(self):
-        path = temp_path('a/b/c.txt')
-        temp_file_size(path, '1.75 MB')
+        path = self.temp_path('a/b/c.txt')
+        self.temp_file_of_size(path, '1.75 MB')
         size = fsutil.get_file_size_formatted(path)
         self.assertEqual(size, '1.75 MB')
 
@@ -392,49 +365,44 @@ class fsutil_test_case(unittest.TestCase):
         s = 'https://domain-name.com/Document.txt?p=1'
         self.assertEqual(fsutil.get_filename(s), 'Document.txt')
 
-    @temp_context
     def test_is_dir(self):
-        path = temp_path('a/b/')
+        path = self.temp_path('a/b/')
         self.assertFalse(fsutil.is_dir(path))
         fsutil.create_dir(path)
         self.assertTrue(fsutil.is_dir(path))
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         self.assertFalse(fsutil.is_dir(path))
         fsutil.create_file(path)
         self.assertFalse(fsutil.is_dir(path))
 
-    @temp_context
     def test_is_empty(self):
-        fsutil.create_file(temp_path('a/b/c.txt'))
-        fsutil.create_file(temp_path('a/b/d.txt'), content='1')
-        fsutil.create_dir(temp_path('a/b/e'))
-        self.assertTrue(fsutil.is_empty(temp_path('a/b/c.txt')))
-        self.assertFalse(fsutil.is_empty(temp_path('a/b/d.txt')))
-        self.assertTrue(fsutil.is_empty(temp_path('a/b/e')))
-        self.assertFalse(fsutil.is_empty(temp_path('a/b')))
+        fsutil.create_file(self.temp_path('a/b/c.txt'))
+        fsutil.create_file(self.temp_path('a/b/d.txt'), content='1')
+        fsutil.create_dir(self.temp_path('a/b/e'))
+        self.assertTrue(fsutil.is_empty(self.temp_path('a/b/c.txt')))
+        self.assertFalse(fsutil.is_empty(self.temp_path('a/b/d.txt')))
+        self.assertTrue(fsutil.is_empty(self.temp_path('a/b/e')))
+        self.assertFalse(fsutil.is_empty(self.temp_path('a/b')))
 
-    @temp_context
     def test_is_empty_dir(self):
-        path = temp_path('a/b/')
+        path = self.temp_path('a/b/')
         fsutil.create_dir(path)
         self.assertTrue(fsutil.is_empty_dir(path))
-        filepath = temp_path('a/b/c.txt')
+        filepath = self.temp_path('a/b/c.txt')
         fsutil.create_file(filepath)
         self.assertTrue(fsutil.is_file(filepath))
         self.assertFalse(fsutil.is_empty_dir(path))
 
-    @temp_context
     def test_is_empty_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path)
         self.assertTrue(fsutil.is_empty_file(path))
-        path = temp_path('a/b/d.txt')
+        path = self.temp_path('a/b/d.txt')
         fsutil.create_file(path, content='hello world')
         self.assertFalse(fsutil.is_empty_file(path))
 
-    @temp_context
     def test_is_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         self.assertFalse(fsutil.is_file(path))
         fsutil.create_file(path)
         self.assertTrue(fsutil.is_file(path))
@@ -452,176 +420,162 @@ class fsutil_test_case(unittest.TestCase):
     def test_join_filepath(self):
         self.assertEqual(fsutil.join_filepath('a/b/c', 'Document.txt'), 'a/b/c/Document.txt')
 
-    @temp_context
     def test_list_dirs(self):
         for i in range(0, 5):
-            fsutil.create_dir(temp_path('a/b/c/d-{}'.format(i)))
-            fsutil.create_file(temp_path('a/b/c/f-{}'.format(i)), content='{}'.format(i))
-        dirpaths = fsutil.list_dirs(temp_path('a/b/c'))
+            fsutil.create_dir(self.temp_path('a/b/c/d-{}'.format(i)))
+            fsutil.create_file(self.temp_path('a/b/c/f-{}'.format(i)), content='{}'.format(i))
+        dirpaths = fsutil.list_dirs(self.temp_path('a/b/c'))
         dirnames = [fsutil.split_path(dirpath)[-1] for dirpath in dirpaths]
         self.assertEqual(len(dirpaths), 5)
         self.assertEqual(dirnames, ['d-0', 'd-1', 'd-2', 'd-3', 'd-4'])
 
-    @temp_context
     def test_list_files(self):
         for i in range(0, 5):
-            fsutil.create_dir(temp_path('a/b/c/d-{}'.format(i)))
-            fsutil.create_file(temp_path('a/b/c/f-{}.txt'.format(i)), content='{}'.format(i))
-        filepaths = fsutil.list_files(temp_path('a/b/c'))
+            fsutil.create_dir(self.temp_path('a/b/c/d-{}'.format(i)))
+            fsutil.create_file(self.temp_path('a/b/c/f-{}.txt'.format(i)), content='{}'.format(i))
+        filepaths = fsutil.list_files(self.temp_path('a/b/c'))
         filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
         self.assertEqual(len(filepaths), 5)
         self.assertEqual(filenames, ['f-0.txt', 'f-1.txt', 'f-2.txt', 'f-3.txt', 'f-4.txt'])
 
-    @temp_context
     def test_make_dirs(self):
-        path = temp_path('a/b/c/')
+        path = self.temp_path('a/b/c/')
         fsutil.make_dirs(path)
         self.assertTrue(fsutil.is_dir(path))
 
     def test_make_dirs_race_condition(self):
-        path = temp_path('a/b/c/')
-        for i in range(0, 10):
+        path = self.temp_path('a/b/c/')
+        for i in range(0, 20):
             t = threading.Thread(target=fsutil.make_dirs, args=[path], kwargs={})
             t.start()
         t.join()
         self.assertTrue(fsutil.is_dir(path))
 
-    @temp_context
     def test_make_dirs_with_existing_dir(self):
-        path = temp_path('a/b/c/')
+        path = self.temp_path('a/b/c/')
         fsutil.create_dir(path)
         fsutil.make_dirs(path)
         self.assertTrue(fsutil.is_dir(path))
 
-    @temp_context
     def test_make_dirs_with_existing_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path)
         with self.assertRaises(OSError):
             fsutil.make_dirs(path)
 
-    @temp_context
     def test_make_dirs_for_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.make_dirs_for_file(path)
-        self.assertTrue(fsutil.is_dir(temp_path('a/b/')))
+        self.assertTrue(fsutil.is_dir(self.temp_path('a/b/')))
         self.assertFalse(fsutil.is_dir(path))
         self.assertFalse(fsutil.is_file(path))
 
-    @temp_context
     def test_make_dirs_for_file_with_existing_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path)
         fsutil.make_dirs_for_file(path)
-        self.assertTrue(fsutil.is_dir(temp_path('a/b/')))
+        self.assertTrue(fsutil.is_dir(self.temp_path('a/b/')))
         self.assertFalse(fsutil.is_dir(path))
         self.assertTrue(fsutil.is_file(path))
 
-    @temp_context
     def test_make_dirs_for_file_with_existing_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_dir(path)
         with self.assertRaises(OSError):
             fsutil.make_dirs_for_file(path)
 
-    @temp_context
     def test_move_dir(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='Hello World')
-        fsutil.move_dir(temp_path('a/b'), temp_path('x/y'))
+        fsutil.move_dir(self.temp_path('a/b'), self.temp_path('x/y'))
         self.assertFalse(fsutil.exists(path))
-        self.assertTrue(fsutil.is_file(temp_path('x/y/b/c.txt')))
+        self.assertTrue(fsutil.is_file(self.temp_path('x/y/b/c.txt')))
 
-    @temp_context
     def test_move_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='Hello World')
-        dest = temp_path('a')
+        dest = self.temp_path('a')
         fsutil.move_file(path, dest)
         self.assertFalse(fsutil.exists(path))
-        self.assertTrue(fsutil.is_file(temp_path('a/c.txt')))
+        self.assertTrue(fsutil.is_file(self.temp_path('a/c.txt')))
 
-    @temp_context
     def test_read_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.write_file(path, content='Hello World')
         self.assertEqual(fsutil.read_file(path), 'Hello World')
 
-    @temp_context
+    def test_read_file(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.write_file(path, content='Hello World')
+        self.assertEqual(fsutil.read_file(path), 'Hello World')
+
     def test_rename_dir(self):
-        path = temp_path('a/b/c')
+        path = self.temp_path('a/b/c')
         fsutil.make_dirs(path)
         fsutil.rename_dir(path, 'd')
         self.assertFalse(fsutil.exists(path))
-        path = temp_path('a/b/d')
+        path = self.temp_path('a/b/d')
         self.assertTrue(fsutil.exists(path))
 
-    @temp_context
     def test_rename_dir_with_existing_name(self):
-        path = temp_path('a/b/c')
+        path = self.temp_path('a/b/c')
         fsutil.make_dirs(path)
-        fsutil.make_dirs(temp_path('a/b/d'))
+        fsutil.make_dirs(self.temp_path('a/b/d'))
         with self.assertRaises(OSError):
             fsutil.rename_dir(path, 'd')
 
-    @temp_context
     def test_rename_file(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path)
         fsutil.rename_file(path, 'd.txt.backup')
         self.assertFalse(fsutil.exists(path))
-        path = temp_path('a/b/d.txt.backup')
+        path = self.temp_path('a/b/d.txt.backup')
         self.assertTrue(fsutil.exists(path))
 
-    @temp_context
     def test_rename_file_with_existing_name(self):
-        path = temp_path('a/b/c')
+        path = self.temp_path('a/b/c')
         fsutil.create_file(path)
-        path = temp_path('a/b/d')
+        path = self.temp_path('a/b/d')
         fsutil.create_file(path)
         with self.assertRaises(OSError):
             fsutil.rename_file(path, 'c')
 
-    @temp_context
     def test_rename_file_basename(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path)
         fsutil.rename_file_basename(path, 'd')
         self.assertFalse(fsutil.exists(path))
-        path = temp_path('a/b/d.txt')
+        path = self.temp_path('a/b/d.txt')
         self.assertTrue(fsutil.exists(path))
 
-    @temp_context
     def test_rename_file_extension(self):
-        path = temp_path('a/b/c.txt')
+        path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path)
         fsutil.rename_file_extension(path, 'json')
         self.assertFalse(fsutil.exists(path))
-        path = temp_path('a/b/c.json')
+        path = self.temp_path('a/b/c.json')
         self.assertTrue(fsutil.exists(path))
 
-    @temp_context
     def test_remove_dir(self):
-        fsutil.create_file(temp_path('a/b/c/d.txt'))
-        fsutil.create_file(temp_path('a/b/c/e.txt'))
-        fsutil.create_file(temp_path('a/b/c/f.txt'))
-        removed = fsutil.remove_dir(temp_path('a/c/'))
+        fsutil.create_file(self.temp_path('a/b/c/d.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/e.txt'))
+        fsutil.create_file(self.temp_path('a/b/c/f.txt'))
+        removed = fsutil.remove_dir(self.temp_path('a/c/'))
         self.assertFalse(removed)
-        removed = fsutil.remove_dir(temp_path('a/b/'))
+        removed = fsutil.remove_dir(self.temp_path('a/b/'))
         self.assertTrue(removed)
-        self.assertTrue(fsutil.exists(temp_path('a')))
-        self.assertFalse(fsutil.exists(temp_path('a/b')))
+        self.assertTrue(fsutil.exists(self.temp_path('a')))
+        self.assertFalse(fsutil.exists(self.temp_path('a/b')))
 
-    @temp_context
     def test_remove_dirs(self):
-        fsutil.create_file(temp_path('a/b/c/document.txt'))
-        fsutil.create_file(temp_path('a/b/d/document.txt'))
-        fsutil.create_file(temp_path('a/b/e/document.txt'))
-        fsutil.create_file(temp_path('a/b/f/document.txt'))
-        path1 = temp_path('a/b/c/')
-        path2 = temp_path('a/b/d/')
-        path3 = temp_path('a/b/e/')
-        path4 = temp_path('a/b/f/')
+        fsutil.create_file(self.temp_path('a/b/c/document.txt'))
+        fsutil.create_file(self.temp_path('a/b/d/document.txt'))
+        fsutil.create_file(self.temp_path('a/b/e/document.txt'))
+        fsutil.create_file(self.temp_path('a/b/f/document.txt'))
+        path1 = self.temp_path('a/b/c/')
+        path2 = self.temp_path('a/b/d/')
+        path3 = self.temp_path('a/b/e/')
+        path4 = self.temp_path('a/b/f/')
         self.assertTrue(fsutil.exists(path1))
         self.assertTrue(fsutil.exists(path2))
         self.assertTrue(fsutil.exists(path3))
@@ -632,23 +586,21 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path3))
         self.assertFalse(fsutil.exists(path4))
 
-    @temp_context
     def test_remove_file(self):
-        path = temp_path('a/b/c.txt')
-        fsutil.create_file(temp_path('a/b/c.txt'))
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(self.temp_path('a/b/c.txt'))
         self.assertTrue(fsutil.exists(path))
-        removed = fsutil.remove_file(temp_path('a/b/d.txt'))
+        removed = fsutil.remove_file(self.temp_path('a/b/d.txt'))
         self.assertFalse(removed)
         removed = fsutil.remove_file(path)
         self.assertTrue(removed)
         self.assertFalse(fsutil.exists(path))
 
-    @temp_context
     def test_remove_files(self):
-        path1 = temp_path('a/b/c/document.txt')
-        path2 = temp_path('a/b/d/document.txt')
-        path3 = temp_path('a/b/e/document.txt')
-        path4 = temp_path('a/b/f/document.txt')
+        path1 = self.temp_path('a/b/c/document.txt')
+        path2 = self.temp_path('a/b/d/document.txt')
+        path3 = self.temp_path('a/b/e/document.txt')
+        path4 = self.temp_path('a/b/f/document.txt')
         fsutil.create_file(path1)
         fsutil.create_file(path2)
         fsutil.create_file(path3)
@@ -663,37 +615,35 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path3))
         self.assertFalse(fsutil.exists(path4))
 
-    @temp_context
     def test_search_files(self):
-        fsutil.create_file(temp_path('a/b/c/IMG_1000.jpg'))
-        fsutil.create_file(temp_path('a/b/c/IMG_1001.jpg'))
-        fsutil.create_file(temp_path('a/b/c/IMG_1002.png'))
-        fsutil.create_file(temp_path('a/b/c/IMG_1003.jpg'))
-        fsutil.create_file(temp_path('a/b/c/IMG_1004.jpg'))
-        fsutil.create_file(temp_path('a/x/c/IMG_1005.png'))
-        fsutil.create_file(temp_path('x/b/c/IMG_1006.png'))
-        fsutil.create_file(temp_path('a/b/c/DOC_1007.png'))
-        results = fsutil.search_files(temp_path('a/'), '**/c/IMG_*.png')
+        fsutil.create_file(self.temp_path('a/b/c/IMG_1000.jpg'))
+        fsutil.create_file(self.temp_path('a/b/c/IMG_1001.jpg'))
+        fsutil.create_file(self.temp_path('a/b/c/IMG_1002.png'))
+        fsutil.create_file(self.temp_path('a/b/c/IMG_1003.jpg'))
+        fsutil.create_file(self.temp_path('a/b/c/IMG_1004.jpg'))
+        fsutil.create_file(self.temp_path('a/x/c/IMG_1005.png'))
+        fsutil.create_file(self.temp_path('x/b/c/IMG_1006.png'))
+        fsutil.create_file(self.temp_path('a/b/c/DOC_1007.png'))
+        results = fsutil.search_files(self.temp_path('a/'), '**/c/IMG_*.png')
         expected_results = [
-            temp_path('a/b/c/IMG_1002.png'),
-            temp_path('a/x/c/IMG_1005.png'),
+            self.temp_path('a/b/c/IMG_1002.png'),
+            self.temp_path('a/x/c/IMG_1005.png'),
         ]
         self.assertEqual(results, expected_results)
 
     @unittest.skipIf(fsutil.PY2, 'In python 2 glob recursive pattern ** was not supported yet.')
-    @temp_context
     def test_search_dirs(self):
-        fsutil.create_file(temp_path('a/b/c/IMG_1000.jpg'))
-        fsutil.create_file(temp_path('x/y/z/c/IMG_1001.jpg'))
-        fsutil.create_file(temp_path('a/c/IMG_1002.png'))
-        fsutil.create_file(temp_path('c/b/c/IMG_1003.jpg'))
-        results = fsutil.search_dirs(temp_path(''), '**/c')
+        fsutil.create_file(self.temp_path('a/b/c/IMG_1000.jpg'))
+        fsutil.create_file(self.temp_path('x/y/z/c/IMG_1001.jpg'))
+        fsutil.create_file(self.temp_path('a/c/IMG_1002.png'))
+        fsutil.create_file(self.temp_path('c/b/c/IMG_1003.jpg'))
+        results = fsutil.search_dirs(self.temp_path(''), '**/c')
         expected_results = [
-            temp_path('a/b/c'),
-            temp_path('a/c'),
-            temp_path('c'),
-            temp_path('c/b/c'),
-            temp_path('x/y/z/c'),
+            self.temp_path('a/b/c'),
+            self.temp_path('a/c'),
+            self.temp_path('c'),
+            self.temp_path('c/b/c'),
+            self.temp_path('x/y/z/c'),
         ]
         self.assertEqual(results, expected_results)
 
@@ -721,20 +671,18 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.split_path(
             s), ['root', 'a', 'b', 'c', 'Document.txt'])
 
-    @temp_context
     def test_write_file(self):
-        path = temp_path('a/b/c.txt')
-        fsutil.write_file(temp_path('a/b/c.txt'), content='Hello World')
+        path = self.temp_path('a/b/c.txt')
+        fsutil.write_file(self.temp_path('a/b/c.txt'), content='Hello World')
         self.assertEqual(fsutil.read_file(path), 'Hello World')
-        fsutil.write_file(temp_path('a/b/c.txt'), content='Hello Jupiter')
+        fsutil.write_file(self.temp_path('a/b/c.txt'), content='Hello Jupiter')
         self.assertEqual(fsutil.read_file(path), 'Hello Jupiter')
 
-    @temp_context
     def test_write_file_with_append(self):
-        path = temp_path('a/b/c.txt')
-        fsutil.write_file(temp_path('a/b/c.txt'), content='Hello World')
+        path = self.temp_path('a/b/c.txt')
+        fsutil.write_file(self.temp_path('a/b/c.txt'), content='Hello World')
         self.assertEqual(fsutil.read_file(path), 'Hello World')
-        fsutil.write_file(temp_path('a/b/c.txt'), content=' - Hello Sun', append=True)
+        fsutil.write_file(self.temp_path('a/b/c.txt'), content=' - Hello Sun', append=True)
         self.assertEqual(fsutil.read_file(path), 'Hello World - Hello Sun')
 
 
