@@ -11,6 +11,7 @@ import hashlib
 import os
 import shutil
 import sys
+import zipfile
 
 try:
     # python 2
@@ -201,6 +202,33 @@ def create_file(path, content='', overwrite=False):
     write_file(path, content)
 
 
+def create_zip_file(path, content_paths, overwrite=True, compression=zipfile.ZIP_DEFLATED):
+    """
+    Create zip file at path compressing directories/files listed in content_paths.
+    If overwrite is allowed and dest zip already exists, it will be overwritten.
+    """
+    assert_not_dir(path)
+    if not overwrite:
+        assert_not_exists(path)
+    make_dirs_for_file(path)
+
+    def _write_content_to_zip_file(file, path, basedir=''):
+        assert_exists(path)
+        if is_file(path):
+            filename = get_filename(path)
+            filepath = join_path(basedir, filename)
+            file.write(path, filepath)
+        elif is_dir(path):
+            for item_name in os.listdir(path):
+                item_path = join_path(path, item_name)
+                if is_dir(item_path):
+                    basedir = join_path(basedir, item_name)
+                _write_content_to_zip_file(file, item_path, basedir)
+
+    with zipfile.ZipFile(path, 'w', compression) as file:
+        for content_path in content_paths:
+            _write_content_to_zip_file(file, content_path)
+
 def delete_dir(path):
     """
     Alias for remove_dir.
@@ -236,6 +264,20 @@ def exists(path):
     Check if a directory of a file exists at the given path.
     """
     return os.path.exists(path)
+
+
+def extract_zip_file(path, dest, autodelete=False, content_paths=None):
+    """
+    Extract zip file at path to dest path.
+    If autodelete, the archive will be deleted after extraction.
+    If content_paths list is defined, only listed items will be extracted, otherwise all.
+    """
+    assert_file(path)
+    make_dirs(dest)
+    with zipfile.ZipFile(path, 'r') as file:
+        file.extractall(dest, members=content_paths)
+    if autodelete:
+        remove_file(path)
 
 
 def _filter_paths(basepath, relpaths, predicate=None):

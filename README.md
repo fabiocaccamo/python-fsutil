@@ -57,11 +57,13 @@ import fsutil
 -   [`copy_file`](#copy_file)
 -   [`create_dir`](#create_dir)
 -   [`create_file`](#create_file)
+-   [`create_zip_file`](#create_zip_file)
 -   [`delete_dir`](#delete_dir)
 -   [`delete_dirs`](#delete_dirs)
 -   [`delete_file`](#delete_file)
 -   [`delete_files`](#delete_files)
 -   [`exists`](#exists)
+-   [`extract_zip_file`](#extract_zip_file)
 -   [`get_dir_creation_date`](#get_dir_creation_date)
 -   [`get_dir_creation_date_formatted`](#get_dir_creation_date_formatted)
 -   [`get_dir_last_modified_date`](#get_dir_last_modified_date)
@@ -218,6 +220,14 @@ fsutil.create_dir(path, overwrite=False)
 fsutil.create_file(path, content='', overwrite=False)
 ```
 
+#### `create_zip_file`
+
+```python
+# Create zip file at path compressing directories/files listed in content_paths.
+# If overwrite is allowed and dest zip already exists, it will be overwritten.
+fsutil.create_zip_file(path, content_paths, overwrite=True, compression=zipfile.ZIP_DEFLATED)
+```
+
 #### `delete_dir`
 
 ```python
@@ -251,6 +261,15 @@ fsutil.delete_files(*paths)
 ```python
 # Check if a directory of a file exists at the given path.
 value = fsutil.exists(path)
+```
+
+#### `extract_zip_file`
+
+```python
+# Extract zip file at path to dest path.
+# If autodelete, the archive will be deleted after extraction.
+# If content_paths list is defined, only listed items will be extracted, otherwise all.
+fsutil.extract_zip_file(path, dest, content_paths=None, autodelete=False)
 ```
 
 #### `get_dir_creation_date`
