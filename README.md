@@ -85,6 +85,7 @@ import fsutil
 -   [`move_dir`](#move_dir)
 -   [`move_file`](#move_file)
 -   [`read_file`](#read_file)
+-   [`read_file_lines`](#read_file_lines)
 -   [`remove_dir`](#remove_dir)
 -   [`remove_dirs`](#remove_dirs)
 -   [`remove_file`](#remove_file)
@@ -414,6 +415,13 @@ fsutil.move_file(path, dest, overwrite=False, **kwargs)
 ```python
 # Read the content of the file at the given path using the specified encoding.
 content = fsutil.read_file(path, encoding='utf-8')
+```
+
+#### `read_file_lines`
+
+```python
+# Read file content lines according to the given options.
+content = fsutil.read_file_lines(path, strip_white=True, skip_empty=True, encoding='utf-8')
 ```
 
 #### `remove_dir`
