@@ -4,6 +4,7 @@ from fsutil.metadata import (
     __author__, __copyright__, __description__,
     __email__, __license__, __title__, __version__, )
 
+import datetime as dt
 import errno
 import glob
 import hashlib
@@ -251,6 +252,51 @@ def _filter_paths(basepath, relpaths, predicate=None):
     return paths
 
 
+def get_dir_creation_date(path):
+    """
+    Get the directory creation date.
+    """
+    assert_dir(path)
+    creation_timestamp = os.path.getctime(path)
+    creation_date = dt.datetime.fromtimestamp(creation_timestamp)
+    return creation_date
+
+
+def get_dir_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S'):
+    """
+    Get the directory creation date formatted using the given format.
+    """
+    date = get_dir_creation_date(path)
+    return date.strftime(format)
+
+
+def get_dir_last_modified_date(path):
+    """
+    Get the directory last modification date.
+    """
+    assert_dir(path)
+    last_modified_timestamp = os.path.getmtime(path)
+    for basepath, dirnames, filenames in os.walk(path):
+        for dirname in dirnames:
+            dirpath = os.path.join(basepath, dirname)
+            last_modified_timestamp = max(
+                last_modified_timestamp, os.path.getmtime(dirpath))
+        for filename in filenames:
+            filepath = os.path.join(basepath, filename)
+            last_modified_timestamp = max(
+                last_modified_timestamp, os.path.getmtime(filepath))
+    last_modified_date = dt.datetime.fromtimestamp(last_modified_timestamp)
+    return last_modified_date
+
+
+def get_dir_last_modified_date_formatted(path, format='%Y-%m-%d %H:%M:%S'):
+    """
+    Get the directory last modification date formatted using the given format.
+    """
+    date = get_dir_last_modified_date(path)
+    return date.strftime(format)
+
+
 def get_dir_size(path):
     """
     Get the directory size in bytes.
@@ -282,6 +328,24 @@ def get_file_basename(path):
     return basename
 
 
+def get_file_creation_date(path):
+    """
+    Get the file creation date.
+    """
+    assert_file(path)
+    creation_timestamp = os.path.getctime(path)
+    creation_date = dt.datetime.fromtimestamp(creation_timestamp)
+    return creation_date
+
+
+def get_file_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S'):
+    """
+    Get the file creation date formatted using the given format.
+    """
+    date = get_file_creation_date(path)
+    return date.strftime(format)
+
+
 def get_file_extension(path):
     """
     Get the file extension from the given path/url.
@@ -302,6 +366,24 @@ def get_file_hash(path, func='md5'):
             hash.update(chunk)
     hash_hex = hash.hexdigest()
     return hash_hex
+
+
+def get_file_last_modified_date(path):
+    """
+    Get the file last modification date.
+    """
+    assert_file(path)
+    last_modified_timestamp = os.path.getmtime(path)
+    last_modified_date = dt.datetime.fromtimestamp(last_modified_timestamp)
+    return last_modified_date
+
+
+def get_file_last_modified_date_formatted(path, format='%Y-%m-%d %H:%M:%S'):
+    """
+    Get the file last modification date formatted using the given format.
+    """
+    date = get_file_last_modified_date(path)
+    return date.strftime(format)
 
 
 def get_file_size(path):

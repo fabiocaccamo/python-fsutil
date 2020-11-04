@@ -62,11 +62,19 @@ import fsutil
 -   [`delete_file`](#delete_file)
 -   [`delete_files`](#delete_files)
 -   [`exists`](#exists)
+-   [`get_dir_creation_date`](#get_dir_creation_date)
+-   [`get_dir_creation_date_formatted`](#get_dir_creation_date_formatted)
+-   [`get_dir_last_modified_date`](#get_dir_last_modified_date)
+-   [`get_dir_last_modified_date_formatted`](#get_dir_last_modified_date_formatted)
 -   [`get_dir_size`](#get_dir_size)
 -   [`get_dir_size_formatted`](#get_dir_size_formatted)
 -   [`get_file_basename`](#get_file_basename)
+-   [`get_file_creation_date`](#get_file_creation_date)
+-   [`get_file_creation_date_formatted`](#get_file_creation_date_formatted)
 -   [`get_file_extension`](#get_file_extension)
 -   [`get_file_hash`](#get_file_hash)
+-   [`get_file_last_modified_date`](#get_file_last_modified_date)
+-   [`get_file_last_modified_date_formatted`](#get_file_last_modified_date_formatted)
 -   [`get_file_size`](#get_file_size)
 -   [`get_file_size_formatted`](#get_file_size_formatted)
 -   [`get_filename`](#get_filename)
@@ -245,6 +253,34 @@ fsutil.delete_files(*paths)
 value = fsutil.exists(path)
 ```
 
+#### `get_dir_creation_date`
+
+```python
+# Get the directory creation date.
+date = fsutil.get_dir_creation_date(path)
+```
+
+#### `get_dir_creation_date_formatted`
+
+```python
+# Get the directory creation date formatted using the given format.
+date_str = fsutil.get_dir_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
+```
+
+#### `get_dir_last_modified_date`
+
+```python
+# Get the directory last modification date.
+date = fsutil.get_dir_last_modified_date(path)
+```
+
+#### `get_dir_last_modified_date_formatted`
+
+```python
+# Get the directory last modification date formatted using the given format.
+date_str = fsutil.get_dir_last_modified_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
+```
+
 #### `get_dir_size`
 
 ```python
@@ -266,6 +302,20 @@ size_str = fsutil.get_dir_size_formatted(path)
 basename = fsutil.get_file_basename(path)
 ```
 
+#### `get_file_creation_date`
+
+```python
+# Get the file creation date.
+date = fsutil.get_file_creation_date(path)
+```
+
+#### `get_file_creation_date_formatted`
+
+```python
+# Get the file creation date formatted using the given format.
+date_str = fsutil.get_file_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
+```
+
 #### `get_file_extension`
 
 ```python
@@ -279,6 +329,20 @@ extension = fsutil.get_file_extension(path)
 # Get the hash of the file at the given path using
 # the specified algorithm function (md5 by default).
 filehash = fsutil.get_file_hash(path, func='md5')
+```
+
+#### `get_file_last_modified_date`
+
+```python
+# Get the file last modification date.
+date = fsutil.get_file_last_modified_date(path)
+```
+
+#### `get_file_last_modified_date_formatted`
+
+```python
+# Get the file last modification date formatted using the given format.
+date_str = fsutil.get_file_last_modified_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
 ```
 
 #### `get_file_size`
