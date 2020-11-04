@@ -756,7 +756,7 @@ def split_filename(path):
 
 def split_filepath(path):
     """
-    Split a filename and returns its directory-path and filename.
+    Split a filepath and returns its directory-path and filename.
     """
     dirpath = os.path.dirname(path)
     filename = get_filename(path)
