@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import datetime as dt
 import fsutil
+import re
 import threading
+import time
 import unittest
 
 
@@ -124,6 +127,43 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(self.temp_path('a/b')))
         self.assertTrue(fsutil.exists(self.temp_path('a')))
 
+    def test_convert_size_bytes_to_string(self):
+        self.assertEqual(fsutil.convert_size_bytes_to_string(1023), '1023 bytes')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(1024), '1 KB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(1048576), '1.00 MB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(1572864), '1.50 MB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(1073741824), '1.00 GB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(1879048192), '1.75 GB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(1099511627776), '1.00 TB')
+
+    def test_convert_size_bytes_to_string_and_convert_size_string_to_bytes(self):
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1023 bytes')), '1023 bytes')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1 KB')), '1 KB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 MB')), '1.00 MB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.25 MB')), '1.25 MB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('2.50 MB')), '2.50 MB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 GB')), '1.00 GB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.09 GB')), '1.09 GB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.99 GB')), '1.99 GB')
+        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 TB')), '1.00 TB')
+
+    def test_convert_size_string_to_bytes(self):
+        self.assertEqual(fsutil.convert_size_string_to_bytes('1 KB'), 1024)
+        self.assertEqual(fsutil.convert_size_string_to_bytes('1.00 MB'), 1048576)
+        self.assertEqual(fsutil.convert_size_string_to_bytes('1.00 GB'), 1073741824)
+        self.assertEqual(fsutil.convert_size_string_to_bytes('1.00 TB'), 1099511627776)
+
+    def test_convert_size_string_to_bytes_and_convert_size_bytes_to_string(self):
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1023)), 1023)
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1024)), 1024)
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1048576)), 1048576)
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1310720)), 1310720)
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(2621440)), 2621440)
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1073741824)), 1073741824)
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1170378588)), 1170378588)
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(2136746229)), 2136746229)
+        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1099511627776)), 1099511627776)
+
     def test_copy_file(self):
         path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='hello world')
@@ -182,6 +222,26 @@ class fsutil_test_case(unittest.TestCase):
             fsutil.create_file(path, content='hello world')
         fsutil.create_file(path, content='hello moon', overwrite=True)
         self.assertEqual(fsutil.read_file(path), 'hello moon')
+
+    def test_create_zip_file(self):
+        zip_path = self.temp_path('archive.zip')
+        f1_path = self.temp_path('a/b/f1.txt')
+        f2_path = self.temp_path('a/b/f2.txt')
+        f3_path = self.temp_path('x/y/f3.txt')
+        f4_path = self.temp_path('x/y/f4.txt')
+        fsutil.create_file(f1_path, content='hello world 1')
+        fsutil.create_file(f2_path, content='hello world 2')
+        fsutil.create_file(f3_path, content='hello world 3')
+        fsutil.create_file(f4_path, content='hello world 4')
+        fsutil.create_zip_file(zip_path, [f1_path, f2_path, f3_path, f4_path])
+        with self.assertRaises(OSError):
+            fsutil.create_zip_file(zip_path, [f1_path, f2_path, f3_path, f4_path], overwrite=False)
+        self.assertTrue(fsutil.is_file(f1_path))
+        self.assertTrue(fsutil.is_file(f2_path))
+        self.assertTrue(fsutil.is_file(f3_path))
+        self.assertTrue(fsutil.is_file(f4_path))
+        self.assertTrue(fsutil.is_file(zip_path))
+        self.assertTrue(fsutil.get_file_size(zip_path) > 0)
 
     def test_delete_dir(self):
         fsutil.create_file(self.temp_path('a/b/c/d.txt'))
@@ -252,42 +312,79 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(path)
         self.assertTrue(fsutil.exists(path))
 
-    def test_convert_size_bytes_to_string(self):
-        self.assertEqual(fsutil.convert_size_bytes_to_string(1023), '1023 bytes')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(1024), '1 KB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(1048576), '1.00 MB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(1572864), '1.50 MB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(1073741824), '1.00 GB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(1879048192), '1.75 GB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(1099511627776), '1.00 TB')
+    def test_extract_zip_file(self):
+        zip_path = self.temp_path('archive.zip')
+        unzip_path = self.temp_path('unarchive/')
+        f1_path = self.temp_path('a/b/f1.txt')
+        f2_path = self.temp_path('a/b/f2.txt')
+        f3_path = self.temp_path('j/k/f3.txt')
+        f4_path = self.temp_path('j/k/f4.txt')
+        f5_path = self.temp_path('x/y/z/f5.txt')
+        f6_path = self.temp_path('x/y/z/f6.txt')
+        f5_f6_dir = self.temp_path('x')
+        fsutil.create_file(f1_path, content='hello world 1')
+        fsutil.create_file(f2_path, content='hello world 2')
+        fsutil.create_file(f3_path, content='hello world 3')
+        fsutil.create_file(f4_path, content='hello world 4')
+        fsutil.create_file(f5_path, content='hello world 5')
+        fsutil.create_file(f6_path, content='hello world 6')
+        fsutil.create_zip_file(zip_path, [f1_path, f2_path, f3_path, f4_path, f5_f6_dir])
+        fsutil.extract_zip_file(zip_path, unzip_path)
+        self.assertTrue(fsutil.is_dir(unzip_path))
+        self.assertTrue(fsutil.is_file(self.temp_path('unarchive/f1.txt')))
+        self.assertTrue(fsutil.is_file(self.temp_path('unarchive/f2.txt')))
+        self.assertTrue(fsutil.is_file(self.temp_path('unarchive/f3.txt')))
+        self.assertTrue(fsutil.is_file(self.temp_path('unarchive/f4.txt')))
+        self.assertTrue(fsutil.is_file(self.temp_path('unarchive/y/z/f5.txt')))
+        self.assertTrue(fsutil.is_file(self.temp_path('unarchive/y/z/f6.txt')))
+        self.assertTrue(fsutil.is_file(zip_path))
 
-    def test_convert_size_bytes_to_string_and_convert_size_string_to_bytes(self):
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1023 bytes')), '1023 bytes')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1 KB')), '1 KB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 MB')), '1.00 MB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.25 MB')), '1.25 MB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('2.50 MB')), '2.50 MB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 GB')), '1.00 GB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.09 GB')), '1.09 GB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.99 GB')), '1.99 GB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 TB')), '1.00 TB')
+    def test_extract_zip_file_with_autodelete(self):
+        zip_path = self.temp_path('archive.zip')
+        unzip_path = self.temp_path('unarchive/')
+        path = self.temp_path('f1.txt')
+        fsutil.create_file(path, content='hello world 1')
+        fsutil.create_zip_file(zip_path, [path])
+        fsutil.extract_zip_file(zip_path, unzip_path, autodelete=True)
+        self.assertTrue(fsutil.is_dir(unzip_path))
+        self.assertTrue(fsutil.is_file(self.temp_path('unarchive/f1.txt')))
+        self.assertFalse(fsutil.is_file(zip_path))
 
-    def test_convert_size_string_to_bytes(self):
-        self.assertEqual(fsutil.convert_size_string_to_bytes('1 KB'), 1024)
-        self.assertEqual(fsutil.convert_size_string_to_bytes('1.00 MB'), 1048576)
-        self.assertEqual(fsutil.convert_size_string_to_bytes('1.00 GB'), 1073741824)
-        self.assertEqual(fsutil.convert_size_string_to_bytes('1.00 TB'), 1099511627776)
+    def test_get_dir_creation_date(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello World')
+        creation_date = fsutil.get_dir_creation_date(self.temp_path('a/b'))
+        now = dt.datetime.now()
+        self.assertTrue((now - creation_date) < dt.timedelta(seconds=0.1))
+        time.sleep(0.2)
+        creation_date = fsutil.get_dir_creation_date(self.temp_path('a/b'))
+        now = dt.datetime.now()
+        self.assertFalse((now - creation_date) < dt.timedelta(seconds=0.1))
 
-    def test_convert_size_string_to_bytes_and_convert_size_bytes_to_string(self):
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1023)), 1023)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1024)), 1024)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1048576)), 1048576)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1310720)), 1310720)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(2621440)), 2621440)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1073741824)), 1073741824)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1170378588)), 1170378588)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(2136746229)), 2136746229)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1099511627776)), 1099511627776)
+    def test_get_dir_creation_date_formatted(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello World')
+        creation_date_str = fsutil.get_dir_creation_date_formatted(self.temp_path('a/b'), format='%Y/%m/%d')
+        creation_date_re = re.compile(r'^[\d]{4}\/[\d]{2}\/[\d]{2}$')
+        self.assertTrue(creation_date_re.match(creation_date_str))
+
+    def test_get_dir_last_modified_date(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello')
+        creation_date = fsutil.get_dir_creation_date(self.temp_path('a'))
+        time.sleep(0.2)
+        fsutil.write_file(path, content='Goodbye')
+        now = dt.datetime.now()
+        lastmod_date = fsutil.get_dir_last_modified_date(self.temp_path('a'))
+        self.assertTrue((now - lastmod_date) < dt.timedelta(seconds=0.1))
+        self.assertTrue((lastmod_date - creation_date) >= dt.timedelta(seconds=0.2))
+
+    def test_get_dir_last_modified_date_formatted(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello World')
+        lastmod_date_str = fsutil.get_dir_last_modified_date_formatted(self.temp_path('a'))
+        lastmod_date_re = re.compile(r'^[\d]{4}\-[\d]{2}\-[\d]{2}[\s]{1}[\d]{2}\:[\d]{2}\:[\d]{2}$')
+        self.assertTrue(lastmod_date_re.match(lastmod_date_str))
 
     def test_get_dir_size(self):
         self.temp_file_of_size(self.temp_path('a/a-1.txt'), '1.05 MB') # 1101004
@@ -323,6 +420,24 @@ class fsutil_test_case(unittest.TestCase):
         s = 'https://domain-name.com/Document.txt?p=1'
         self.assertEqual(fsutil.get_file_basename(s), 'Document')
 
+    def test_get_file_creation_date(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello World')
+        creation_date = fsutil.get_file_creation_date(path)
+        now = dt.datetime.now()
+        self.assertTrue((now - creation_date) < dt.timedelta(seconds=0.1))
+        time.sleep(0.2)
+        creation_date = fsutil.get_file_creation_date(path)
+        now = dt.datetime.now()
+        self.assertFalse((now - creation_date) < dt.timedelta(seconds=0.1))
+
+    def test_get_file_creation_date_formatted(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello World')
+        creation_date_str = fsutil.get_file_creation_date_formatted(path, format='%Y/%m/%d')
+        creation_date_re = re.compile(r'^[\d]{4}\/[\d]{2}\/[\d]{2}$')
+        self.assertTrue(creation_date_re.match(creation_date_str))
+
     def test_get_file_extension(self):
         s = 'Document'
         self.assertEqual(fsutil.get_file_extension(s), '')
@@ -340,6 +455,24 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(path, content='Hello World')
         hash = fsutil.get_file_hash(path)
         self.assertEqual(hash, 'b10a8db164e0754105b7a99be72e3fe5')
+
+    def test_get_file_last_modified_date(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello')
+        creation_date = fsutil.get_file_creation_date(path)
+        time.sleep(0.2)
+        fsutil.write_file(path, content='Goodbye')
+        now = dt.datetime.now()
+        lastmod_date = fsutil.get_file_last_modified_date(path)
+        self.assertTrue((now - lastmod_date) < dt.timedelta(seconds=0.1))
+        self.assertTrue((lastmod_date - creation_date) >= dt.timedelta(seconds=0.2))
+
+    def test_get_file_last_modified_date_formatted(self):
+        path = self.temp_path('a/b/c.txt')
+        fsutil.create_file(path, content='Hello World')
+        lastmod_date_str = fsutil.get_file_last_modified_date_formatted(path)
+        lastmod_date_re = re.compile(r'^[\d]{4}\-[\d]{2}\-[\d]{2}[\s]{1}[\d]{2}\:[\d]{2}\:[\d]{2}$')
+        self.assertTrue(lastmod_date_re.match(lastmod_date_str))
 
     def test_get_file_size(self):
         path = self.temp_path('a/b/c.txt')
