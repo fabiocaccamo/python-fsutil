@@ -373,11 +373,11 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(path, content='Hello')
         creation_date = fsutil.get_dir_creation_date(self.temp_path('a'))
         time.sleep(0.2)
-        fsutil.write_file(path, content='Goodbye')
+        fsutil.write_file(path, content='Goodbye', append=True)
         now = dt.datetime.now()
         lastmod_date = fsutil.get_dir_last_modified_date(self.temp_path('a'))
         self.assertTrue((now - lastmod_date) < dt.timedelta(seconds=0.1))
-        self.assertTrue((lastmod_date - creation_date) >= dt.timedelta(seconds=0.2))
+        self.assertTrue((lastmod_date - creation_date) > dt.timedelta(seconds=0.15))
 
     def test_get_dir_last_modified_date_formatted(self):
         path = self.temp_path('a/b/c.txt')
@@ -461,11 +461,11 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(path, content='Hello')
         creation_date = fsutil.get_file_creation_date(path)
         time.sleep(0.2)
-        fsutil.write_file(path, content='Goodbye')
+        fsutil.write_file(path, content='Goodbye', append=True)
         now = dt.datetime.now()
         lastmod_date = fsutil.get_file_last_modified_date(path)
         self.assertTrue((now - lastmod_date) < dt.timedelta(seconds=0.1))
-        self.assertTrue((lastmod_date - creation_date) >= dt.timedelta(seconds=0.2))
+        self.assertTrue((lastmod_date - creation_date) > dt.timedelta(seconds=0.15))
 
     def test_get_file_last_modified_date_formatted(self):
         path = self.temp_path('a/b/c.txt')
