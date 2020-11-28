@@ -646,6 +646,15 @@ def remove_dir(path, **kwargs):
     return not exists(path)
 
 
+def remove_dir_content(path):
+    """
+    Removes all directory content (both sub-directories and files).
+    """
+    assert_dir(path)
+    remove_dirs(*list_dirs(path))
+    remove_files(*list_files(path))
+
+
 def remove_dirs(*paths):
     """
     Remove multiple directories at the given paths and all their content.

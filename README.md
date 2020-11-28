@@ -97,6 +97,7 @@ import fsutil
 -   [`read_file`](#read_file)
 -   [`read_file_lines`](#read_file_lines)
 -   [`remove_dir`](#remove_dir)
+-   [`remove_dir_content`](#remove_dir_content)
 -   [`remove_dirs`](#remove_dirs)
 -   [`remove_file`](#remove_file)
 -   [`remove_files`](#remove_files)
@@ -515,6 +516,13 @@ content = fsutil.read_file_lines(path, strip_white=True, skip_empty=True, encodi
 # More informations about kwargs supported options here:
 # https://docs.python.org/3/library/shutil.html#shutil.rmtree
 fsutil.remove_dir(path, **kwargs)
+```
+
+#### `remove_dir_content`
+
+```python
+# Removes all directory content (both sub-directories and files).
+fsutil.remove_dir_content(path)
 ```
 
 #### `remove_dirs`
