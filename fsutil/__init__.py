@@ -237,6 +237,13 @@ def delete_dir(path):
     return removed
 
 
+def delete_dir_content(path):
+    """
+    Alias for remove_dir_content.
+    """
+    remove_dir_content(path)
+
+
 def delete_dirs(*paths):
     """
     Alias for delete_dirs.

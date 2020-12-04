@@ -254,6 +254,14 @@ class fsutil_test_case(unittest.TestCase):
         self.assertTrue(fsutil.exists(self.temp_path('a')))
         self.assertFalse(fsutil.exists(self.temp_path('a/b')))
 
+    def test_delete_dir_content(self):
+        fsutil.create_file(self.temp_path('a/b/c/d.txt'))
+        fsutil.create_file(self.temp_path('a/b/e.txt'))
+        fsutil.create_file(self.temp_path('a/b/f.txt'))
+        path = self.temp_path('a/b/')
+        fsutil.delete_dir_content(path)
+        self.assertTrue(fsutil.is_empty_dir(path))
+
     def test_delete_dirs(self):
         fsutil.create_file(self.temp_path('a/b/c/document.txt'))
         fsutil.create_file(self.temp_path('a/b/d/document.txt'))
@@ -750,7 +758,7 @@ class fsutil_test_case(unittest.TestCase):
         self.assertTrue(fsutil.exists(self.temp_path('a')))
         self.assertFalse(fsutil.exists(self.temp_path('a/b')))
 
-    def test_remove_dir(self):
+    def test_remove_dir_content(self):
         fsutil.create_file(self.temp_path('a/b/c/d.txt'))
         fsutil.create_file(self.temp_path('a/b/e.txt'))
         fsutil.create_file(self.temp_path('a/b/f.txt'))

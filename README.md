@@ -59,6 +59,7 @@ import fsutil
 -   [`create_file`](#create_file)
 -   [`create_zip_file`](#create_zip_file)
 -   [`delete_dir`](#delete_dir)
+-   [`delete_dir_content`](#delete_dir_content)
 -   [`delete_dirs`](#delete_dirs)
 -   [`delete_file`](#delete_file)
 -   [`delete_files`](#delete_files)
@@ -234,6 +235,13 @@ fsutil.create_zip_file(path, content_paths, overwrite=True, compression=zipfile.
 ```python
 # Alias for remove_dir.
 fsutil.delete_dir(path)
+```
+
+#### `delete_dir_content`
+
+```python
+# Alias for remove_dir_content.
+fsutil.delete_dir_content(path)
 ```
 
 #### `delete_dirs`
