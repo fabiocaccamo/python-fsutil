@@ -310,6 +310,16 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path3))
         self.assertFalse(fsutil.exists(path4))
 
+    def test_download_file(self):
+        url = 'https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md'
+        path = fsutil.download_file(url, __file__)
+        self.assertTrue(fsutil.exists(path))
+        lines = fsutil.read_file_lines(path, skip_empty=False)
+        lines_count = len(lines)
+        self.assertTrue(lines_count > 500 and lines_count < 1000)
+        fsutil.remove_file(path)
+        self.assertFalse(fsutil.exists(path))
+
     def test_exists(self):
         path = self.temp_path('a/b/')
         self.assertFalse(fsutil.exists(path))

@@ -62,6 +62,7 @@ import fsutil
 -   [`delete_dirs`](#delete_dirs)
 -   [`delete_file`](#delete_file)
 -   [`delete_files`](#delete_files)
+-   [`download_file`](#download_file)
 -   [`exists`](#exists)
 -   [`extract_zip_file`](#extract_zip_file)
 -   [`get_dir_creation_date`](#get_dir_creation_date)
@@ -263,6 +264,14 @@ fsutil.delete_file(path)
 ```python
 # Alias for delete_files.
 fsutil.delete_files(*paths)
+```
+
+#### `download_file`
+
+```python
+# Download a file from url to the given dirpath and return the filepath.
+# If filename is provided, the file will be named using filename.
+filepath = fsutil.download_file(url, dirpath, filename='archive.zip', chunk_size=8192)
 ```
 
 #### `exists`

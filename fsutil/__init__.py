@@ -267,6 +267,24 @@ def delete_files(*paths):
     remove_files(*paths)
 
 
+def download_file(url, dirpath, filename=None, chunk_size=8192):
+    """
+    Download a file from url to dirpath.
+    If filename is provided, the file will be named using filename.
+    """
+    # https://stackoverflow.com/a/16696317/2096218
+    filename = filename or get_filename(url) or 'download'
+    filepath = join_path(dirpath, filename)
+    make_dirs_for_file(filepath)
+    with requests.get(url, stream=True) as response:
+        response.raise_for_status()
+        with open(filepath, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=chunk_size):
+                if chunk:
+                    file.write(chunk)
+    return filepath
+
+
 def exists(path):
     """
     Check if a directory of a file exists at the given path.
