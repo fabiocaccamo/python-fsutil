@@ -9,6 +9,7 @@ import errno
 import glob
 import hashlib
 import os
+import requests
 import shutil
 import sys
 import zipfile
@@ -623,6 +624,16 @@ def read_file(path, encoding='utf-8'):
     options = {} if PY2 else {'encoding': encoding}
     with open(path, 'r', **options) as file:
         content = file.read()
+    return content
+
+
+def read_file_from_url(url, **kwargs):
+    """
+    Read the content of the file at the given url.
+    """
+    response = requests.get(url, **kwargs)
+    response.raise_for_status()
+    content = response.text
     return content
 
 

@@ -17,7 +17,6 @@ file-system utilities for lazy devs.
 
 ## Features
 -   Simple and intuitive.
--   Zero dependencies.
 -   Compatibile with python 2 and 3.
 -   Well tested.
 
@@ -96,6 +95,7 @@ import fsutil
 -   [`move_dir`](#move_dir)
 -   [`move_file`](#move_file)
 -   [`read_file`](#read_file)
+-   [`read_file_from_url`](#read_file_from_url)
 -   [`read_file_lines`](#read_file_lines)
 -   [`remove_dir`](#remove_dir)
 -   [`remove_dir_content`](#remove_dir_content)
@@ -507,6 +507,13 @@ fsutil.move_file(path, dest, overwrite=False, **kwargs)
 ```python
 # Read the content of the file at the given path using the specified encoding.
 content = fsutil.read_file(path, encoding='utf-8')
+```
+
+#### `read_file_from_url`
+
+```python
+# Read the content of the file at the given url.
+content = fsutil.read_file_from_url(url, **kwargs)
 ```
 
 #### `read_file_lines`

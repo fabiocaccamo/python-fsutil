@@ -645,6 +645,11 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.write_file(path, content='Hello World')
         self.assertEqual(fsutil.read_file(path), 'Hello World')
 
+    def test_read_file_from_url(self):
+        url = 'https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md'
+        content = fsutil.read_file_from_url(url)
+        self.assertTrue('python-fsutil' in content)
+
     def test_read_file_lines(self):
         path = self.temp_path('a/b/c.txt')
         lines = [

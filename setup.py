@@ -38,6 +38,7 @@ setup(
         'dir', 'directory', 'path', 'fs', 'os', 'shutil', 'glob',
     ],
     install_requires=[
+        'requests',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
