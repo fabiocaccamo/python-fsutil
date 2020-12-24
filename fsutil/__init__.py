@@ -247,14 +247,14 @@ def delete_dir_content(path):
 
 def delete_dirs(*paths):
     """
-    Alias for delete_dirs.
+    Alias for remove_dirs.
     """
     remove_dirs(*paths)
 
 
 def delete_file(path):
     """
-    Alias for delete_file.
+    Alias for remove_file.
     """
     removed = remove_file(path)
     return removed
@@ -262,7 +262,7 @@ def delete_file(path):
 
 def delete_files(*paths):
     """
-    Alias for delete_files.
+    Alias for remove_files.
     """
     remove_files(*paths)
 

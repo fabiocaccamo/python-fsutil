@@ -248,21 +248,21 @@ fsutil.delete_dir_content(path)
 #### `delete_dirs`
 
 ```python
-# Alias for delete_dirs.
+# Alias for remove_dirs.
 fsutil.delete_dirs(*paths)
 ```
 
 #### `delete_file`
 
 ```python
-# Alias for delete_file.
+# Alias for remove_file.
 fsutil.delete_file(path)
 ```
 
 #### `delete_files`
 
 ```python
-# Alias for delete_files.
+# Alias for remove_files.
 fsutil.delete_files(*paths)
 ```
 
