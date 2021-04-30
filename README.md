@@ -458,7 +458,7 @@ filepath = fsutil.join_filepath(dirpath, filename)
 # Create a path joining path and paths.
 # If path is __file__ (or a .py file), the resulting path will be relative
 # to the directory path of the module in which it's used.
-path = fsutil.get_path(basefile, path)
+path = fsutil.join_path(path, *paths)
 ```
 
 #### `list_dirs`
