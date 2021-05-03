@@ -542,6 +542,7 @@ def join_filepath(dirpath, filename):
     """
     Create a filepath joining the directory path and the filename.
     """
+    return join_path(dirpath, filename)
 
 
 def join_path(path, *paths):
