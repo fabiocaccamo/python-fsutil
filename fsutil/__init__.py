@@ -554,6 +554,7 @@ def join_path(path, *paths):
     basepath = path
     if get_file_extension(path) in ['py', 'pyc', 'pyo']:
         basepath = os.path.dirname(os.path.realpath(path))
+    paths = [path.lstrip(os.sep) for path in paths]
     return os.path.normpath(os.path.join(basepath, *paths))
 
 

@@ -589,6 +589,10 @@ class fsutil_test_case(unittest.TestCase):
     def test_join_filepath(self):
         self.assertEqual(fsutil.join_filepath('a/b/c', 'Document.txt'), 'a/b/c/Document.txt')
 
+    def test_join_path_with_absolute_path(self):
+        self.assertEqual(
+            fsutil.join_path('/a/b/c/', '/document.txt'), '/a/b/c/document.txt')
+
     def test_join_path_with_parent_dirs(self):
         self.assertEqual(
             fsutil.join_path('/a/b/c/', '../../document.txt'), '/a/document.txt')
