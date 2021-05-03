@@ -482,6 +482,13 @@ def get_filename(path):
     return filename
 
 
+def get_parent_dir(path, levels=1):
+    """
+    Get the parent directory for the given path going up N levels.
+    """
+    return join_path(path, *([os.pardir] * max(1, levels)))
+
+
 def is_dir(path):
     """
     Determine whether the specified path represents an existing directory.
@@ -535,8 +542,6 @@ def join_filepath(dirpath, filename):
     """
     Create a filepath joining the directory path and the filename.
     """
-    filepath = os.path.join(dirpath, filename)
-    return filepath
 
 
 def join_path(path, *paths):
@@ -548,7 +553,6 @@ def join_path(path, *paths):
     basepath = path
     if get_file_extension(path) in ['py', 'pyc', 'pyo']:
         basepath = os.path.dirname(os.path.realpath(path))
-    return os.path.join(basepath, *paths)
 
 
 def list_dirs(path):

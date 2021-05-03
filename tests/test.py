@@ -516,6 +516,24 @@ class fsutil_test_case(unittest.TestCase):
         s = 'https://domain-name.com/Document.txt?p=1'
         self.assertEqual(fsutil.get_filename(s), 'Document.txt')
 
+    def test_get_parent_dir(self):
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.get_parent_dir(s), '/root/a/b/c')
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.get_parent_dir(s, 0), '/root/a/b/c')
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.get_parent_dir(s, 1), '/root/a/b/c')
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.get_parent_dir(s, 2), '/root/a/b')
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.get_parent_dir(s, 3), '/root/a')
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.get_parent_dir(s, 4), '/root')
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.get_parent_dir(s, 5), '/')
+        s = '/root/a/b/c/Document.txt'
+        self.assertEqual(fsutil.get_parent_dir(s, 6), '/')
+
     def test_is_dir(self):
         path = self.temp_path('a/b/')
         self.assertFalse(fsutil.is_dir(path))

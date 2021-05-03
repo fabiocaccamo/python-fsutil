@@ -81,6 +81,7 @@ import fsutil
 -   [`get_file_size`](#get_file_size)
 -   [`get_file_size_formatted`](#get_file_size_formatted)
 -   [`get_filename`](#get_filename)
+-   [`get_parent_dir`](#get_parent_dir)
 -   [`is_dir`](#is_dir)
 -   [`is_empty`](#is_empty)
 -   [`is_empty_dir`](#is_empty_dir)
@@ -401,6 +402,13 @@ size_str = fsutil.get_file_size_formatted(path)
 ```python
 # Get the filename from the given path/url.
 filename = fsutil.get_filename(path)
+```
+
+#### `get_parent_dir`
+
+```python
+# Get the parent directory for the given path going up N levels.
+parent_dir = fsutil.get_parent_dir(path, levels=1)
 ```
 
 #### `is_dir`
