@@ -554,6 +554,7 @@ def join_path(path, *paths):
     basepath = path
     if get_file_extension(path) in ['py', 'pyc', 'pyo']:
         basepath = os.path.dirname(os.path.realpath(path))
+    return os.path.normpath(os.path.join(basepath, *paths))
 
 
 def list_dirs(path):
