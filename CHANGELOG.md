@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.5.0) - 2021-05-03
+-   Added `get_parent_dir` method.
+-   Updated `join_path` to force concatenation even with absolute paths.
+-   Updated `join_path` to return a normalized path.
+-   Updated `join_filepath` method to use `join_path`.
+
 ## [0.4.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.4.0) - 2020-12-23
 -   Added `delete_dir_content` method (alias for `remove_dir_content` method).
 -   Added `download_file` method.
