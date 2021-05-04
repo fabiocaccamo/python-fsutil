@@ -267,16 +267,18 @@ def delete_files(*paths):
     remove_files(*paths)
 
 
-def download_file(url, dirpath, filename=None, chunk_size=8192):
+def download_file(url, dirpath, filename=None, chunk_size=8192, **kwargs):
     """
     Download a file from url to dirpath.
     If filename is provided, the file will be named using filename.
+    It is possible to pass extra request options (eg. for authentication) using **kwargs.
     """
     # https://stackoverflow.com/a/16696317/2096218
     filename = filename or get_filename(url) or 'download'
     filepath = join_path(dirpath, filename)
     make_dirs_for_file(filepath)
-    with requests.get(url, stream=True) as response:
+    kwargs['stream'] = True
+    with requests.get(url, **kwargs) as response:
         response.raise_for_status()
         with open(filepath, 'wb') as file:
             for chunk in response.iter_content(chunk_size=chunk_size):

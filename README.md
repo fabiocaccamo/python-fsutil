@@ -272,7 +272,8 @@ fsutil.delete_files(*paths)
 ```python
 # Download a file from url to the given dirpath and return the filepath.
 # If filename is provided, the file will be named using filename.
-filepath = fsutil.download_file(url, dirpath, filename='archive.zip', chunk_size=8192)
+# It is possible to pass extra request options (eg. for authentication) using **kwargs.
+filepath = fsutil.download_file(url, dirpath, filename='archive.zip', chunk_size=8192, **kwargs)
 ```
 
 #### `exists`
