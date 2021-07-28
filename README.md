@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1b4843941e49472c828756b349e656de)](https://app.codacy.com/gh/fabiocaccamo/python-fsutil?utm_source=github.com&utm_medium=referral&utm_content=fabiocaccamo/python-fsutil&utm_campaign=Badge_Grade_Settings)
 [![](https://img.shields.io/pypi/pyversions/python-fsutil.svg?color=blue&logo=python&logoColor=white)](https://www.python.org/)
 [![](https://img.shields.io/pypi/v/python-fsutil.svg?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/python-fsutil/)
 [![](https://pepy.tech/badge/python-fsutil)](https://pepy.tech/project/python-fsutil)
