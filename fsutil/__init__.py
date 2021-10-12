@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from fsutil.metadata import (
-    __author__, __copyright__, __description__,
-    __email__, __license__, __title__, __version__, )
+    __author__,
+    __copyright__,
+    __description__,
+    __email__,
+    __license__,
+    __title__,
+    __version__,
+)
 
 import datetime as dt
 import errno
@@ -31,8 +37,7 @@ def assert_dir(path):
     Raise an OSError if the given path doesn't exist or it is not a directory.
     """
     if not is_dir(path):
-        raise OSError(
-            'Invalid directory path: {}'.format(path))
+        raise OSError('Invalid directory path: {}'.format(path))
 
 
 def assert_exists(path):
@@ -40,8 +45,7 @@ def assert_exists(path):
     Raise an OSError if the given path doesn't exist.
     """
     if not exists(path):
-        raise OSError(
-            'Invalid item path: {}'.format(path))
+        raise OSError('Invalid item path: {}'.format(path))
 
 
 def assert_file(path):
@@ -49,8 +53,7 @@ def assert_file(path):
     Raise an OSError if the given path doesn't exist or it is not a file.
     """
     if not is_file(path):
-        raise OSError(
-            'Invalid file path: {}'.format(path))
+        raise OSError('Invalid file path: {}'.format(path))
 
 
 def assert_not_dir(path):
@@ -58,8 +61,7 @@ def assert_not_dir(path):
     Raise an OSError if the given path is an existing directory.
     """
     if is_dir(path):
-        raise OSError(
-            'Invalid path, directory already exists: {}'.format(path))
+        raise OSError('Invalid path, directory already exists: {}'.format(path))
 
 
 def assert_not_exists(path):
@@ -67,8 +69,7 @@ def assert_not_exists(path):
     Raise an OSError if the given path already exists.
     """
     if exists(path):
-        raise OSError(
-            'Invalid path, item already exists: {}'.format(path))
+        raise OSError('Invalid path, item already exists: {}'.format(path))
 
 
 def assert_not_file(path):
@@ -112,7 +113,7 @@ def convert_size_bytes_to_string(size):
     size = float(size)
     units = SIZE_UNITS
     factor = 0
-    factor_limit = (len(units) - 1)
+    factor_limit = len(units) - 1
     while (size >= 1024) and (factor <= factor_limit):
         size /= 1024
         factor += 1
@@ -203,7 +204,9 @@ def create_file(path, content='', overwrite=False):
     write_file(path, content)
 
 
-def create_zip_file(path, content_paths, overwrite=True, compression=zipfile.ZIP_DEFLATED):
+def create_zip_file(
+    path, content_paths, overwrite=True, compression=zipfile.ZIP_DEFLATED
+):
     """
     Create zip file at path compressing directories/files listed in content_paths.
     If overwrite is allowed and dest zip already exists, it will be overwritten.
@@ -229,6 +232,7 @@ def create_zip_file(path, content_paths, overwrite=True, compression=zipfile.ZIP
     with zipfile.ZipFile(path, 'w', compression) as file:
         for content_path in content_paths:
             _write_content_to_zip_file(file, content_path)
+
 
 def delete_dir(path):
     """
@@ -273,7 +277,7 @@ def download_file(url, dirpath, filename=None, chunk_size=8192, **kwargs):
     If filename is provided, the file will be named using filename.
     It is possible to pass extra request options (eg. for authentication) using **kwargs.
     """
-    # https://stackoverflow.com/a/16696317/2096218
+    # https://stackoverflow.com/a/16696317/2096218
     filename = filename or get_filename(url) or 'download'
     filepath = join_path(dirpath, filename)
     make_dirs_for_file(filepath)
@@ -350,11 +354,13 @@ def get_dir_last_modified_date(path):
         for dirname in dirnames:
             dirpath = os.path.join(basepath, dirname)
             last_modified_timestamp = max(
-                last_modified_timestamp, os.path.getmtime(dirpath))
+                last_modified_timestamp, os.path.getmtime(dirpath)
+            )
         for filename in filenames:
             filepath = os.path.join(basepath, filename)
             last_modified_timestamp = max(
-                last_modified_timestamp, os.path.getmtime(filepath))
+                last_modified_timestamp, os.path.getmtime(filepath)
+            )
     last_modified_date = dt.datetime.fromtimestamp(last_modified_timestamp)
     return last_modified_date
 
@@ -786,16 +792,14 @@ def search_dirs(path, pattern):
     """
     Search for directories at path matching the given pattern.
     """
-    return _filter_paths(
-        path, _search_paths(path, pattern), predicate=is_dir)
+    return _filter_paths(path, _search_paths(path, pattern), predicate=is_dir)
 
 
 def search_files(path, pattern):
     """
     Search for files at path matching the given pattern.
     """
-    return _filter_paths(
-        path, _search_paths(path, pattern), predicate=is_file)
+    return _filter_paths(path, _search_paths(path, pattern), predicate=is_file)
 
 
 def split_filename(path):
@@ -805,7 +809,7 @@ def split_filename(path):
     filename = get_filename(path)
     basename, extension = os.path.splitext(filename)
     extension = extension.replace('.', '').strip()
-    return (basename, extension, )
+    return (basename, extension)
 
 
 def split_filepath(path):
@@ -814,7 +818,7 @@ def split_filepath(path):
     """
     dirpath = os.path.dirname(path)
     filename = get_filename(path)
-    return (dirpath, filename, )
+    return (dirpath, filename)
 
 
 def split_path(path):

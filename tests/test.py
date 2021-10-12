@@ -9,7 +9,6 @@ import unittest
 
 
 class fsutil_test_case(unittest.TestCase):
-
     def setUp(self):
         fsutil.remove_dir(self.temp_path())
 
@@ -137,15 +136,60 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.convert_size_bytes_to_string(1099511627776), '1.00 TB')
 
     def test_convert_size_bytes_to_string_and_convert_size_string_to_bytes(self):
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1023 bytes')), '1023 bytes')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1 KB')), '1 KB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 MB')), '1.00 MB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.25 MB')), '1.25 MB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('2.50 MB')), '2.50 MB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 GB')), '1.00 GB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.09 GB')), '1.09 GB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.99 GB')), '1.99 GB')
-        self.assertEqual(fsutil.convert_size_bytes_to_string(fsutil.convert_size_string_to_bytes('1.00 TB')), '1.00 TB')
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('1023 bytes')
+            ),
+            '1023 bytes',
+        )
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('1 KB')
+            ),
+            '1 KB',
+        )
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('1.00 MB')
+            ),
+            '1.00 MB',
+        )
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('1.25 MB')
+            ),
+            '1.25 MB',
+        )
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('2.50 MB')
+            ),
+            '2.50 MB',
+        )
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('1.00 GB')
+            ),
+            '1.00 GB',
+        )
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('1.09 GB')
+            ),
+            '1.09 GB',
+        )
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('1.99 GB')
+            ),
+            '1.99 GB',
+        )
+        self.assertEqual(
+            fsutil.convert_size_bytes_to_string(
+                fsutil.convert_size_string_to_bytes('1.00 TB')
+            ),
+            '1.00 TB',
+        )
 
     def test_convert_size_string_to_bytes(self):
         self.assertEqual(fsutil.convert_size_string_to_bytes('1 KB'), 1024)
@@ -154,15 +198,60 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.convert_size_string_to_bytes('1.00 TB'), 1099511627776)
 
     def test_convert_size_string_to_bytes_and_convert_size_bytes_to_string(self):
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1023)), 1023)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1024)), 1024)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1048576)), 1048576)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1310720)), 1310720)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(2621440)), 2621440)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1073741824)), 1073741824)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1170378588)), 1170378588)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(2136746229)), 2136746229)
-        self.assertEqual(fsutil.convert_size_string_to_bytes(fsutil.convert_size_bytes_to_string(1099511627776)), 1099511627776)
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(1023)
+            ),
+            1023,
+        )
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(1024)
+            ),
+            1024,
+        )
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(1048576)
+            ),
+            1048576,
+        )
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(1310720)
+            ),
+            1310720,
+        )
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(2621440)
+            ),
+            2621440,
+        )
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(1073741824)
+            ),
+            1073741824,
+        )
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(1170378588)
+            ),
+            1170378588,
+        )
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(2136746229)
+            ),
+            2136746229,
+        )
+        self.assertEqual(
+            fsutil.convert_size_string_to_bytes(
+                fsutil.convert_size_bytes_to_string(1099511627776)
+            ),
+            1099511627776,
+        )
 
     def test_copy_file(self):
         path = self.temp_path('a/b/c.txt')
@@ -194,7 +283,9 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(self.temp_path('x/y/z/f-0.txt'))
         fsutil.copy_dir(self.temp_path('a/b'), self.temp_path('x/y/z'), overwrite=False)
         with self.assertRaises(OSError):
-            fsutil.copy_dir(self.temp_path('a/b'), self.temp_path('x/y/z'), overwrite=False)
+            fsutil.copy_dir(
+                self.temp_path('a/b'), self.temp_path('x/y/z'), overwrite=False
+            )
         fsutil.copy_dir(self.temp_path('a/b'), self.temp_path('x/y/z'), overwrite=True)
 
     def test_copy_dir_content(self):
@@ -235,7 +326,9 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(f4_path, content='hello world 4')
         fsutil.create_zip_file(zip_path, [f1_path, f2_path, f3_path, f4_path])
         with self.assertRaises(OSError):
-            fsutil.create_zip_file(zip_path, [f1_path, f2_path, f3_path, f4_path], overwrite=False)
+            fsutil.create_zip_file(
+                zip_path, [f1_path, f2_path, f3_path, f4_path], overwrite=False
+            )
         self.assertTrue(fsutil.is_file(f1_path))
         self.assertTrue(fsutil.is_file(f2_path))
         self.assertTrue(fsutil.is_file(f3_path))
@@ -346,7 +439,9 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(f4_path, content='hello world 4')
         fsutil.create_file(f5_path, content='hello world 5')
         fsutil.create_file(f6_path, content='hello world 6')
-        fsutil.create_zip_file(zip_path, [f1_path, f2_path, f3_path, f4_path, f5_f6_dir])
+        fsutil.create_zip_file(
+            zip_path, [f1_path, f2_path, f3_path, f4_path, f5_f6_dir]
+        )
         fsutil.extract_zip_file(zip_path, unzip_path)
         self.assertTrue(fsutil.is_dir(unzip_path))
         self.assertTrue(fsutil.is_file(self.temp_path('unarchive/f1.txt')))
@@ -382,7 +477,9 @@ class fsutil_test_case(unittest.TestCase):
     def test_get_dir_creation_date_formatted(self):
         path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='Hello World')
-        creation_date_str = fsutil.get_dir_creation_date_formatted(self.temp_path('a/b'), format='%Y/%m/%d')
+        creation_date_str = fsutil.get_dir_creation_date_formatted(
+            self.temp_path('a/b'), format='%Y/%m/%d'
+        )
         creation_date_re = re.compile(r'^[\d]{4}\/[\d]{2}\/[\d]{2}$')
         self.assertTrue(creation_date_re.match(creation_date_str))
 
@@ -400,31 +497,39 @@ class fsutil_test_case(unittest.TestCase):
     def test_get_dir_last_modified_date_formatted(self):
         path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='Hello World')
-        lastmod_date_str = fsutil.get_dir_last_modified_date_formatted(self.temp_path('a'))
-        lastmod_date_re = re.compile(r'^[\d]{4}\-[\d]{2}\-[\d]{2}[\s]{1}[\d]{2}\:[\d]{2}\:[\d]{2}$')
+        lastmod_date_str = fsutil.get_dir_last_modified_date_formatted(
+            self.temp_path('a')
+        )
+        lastmod_date_re = re.compile(
+            r'^[\d]{4}\-[\d]{2}\-[\d]{2}[\s]{1}[\d]{2}\:[\d]{2}\:[\d]{2}$'
+        )
         self.assertTrue(lastmod_date_re.match(lastmod_date_str))
 
     def test_get_dir_size(self):
-        self.temp_file_of_size(self.temp_path('a/a-1.txt'), '1.05 MB') # 1101004
-        self.temp_file_of_size(self.temp_path('a/b/b-1.txt'), '2 MB') # 2097152
-        self.temp_file_of_size(self.temp_path('a/b/b-2.txt'), '2.25 MB') # 2359296
-        self.temp_file_of_size(self.temp_path('a/b/c/c-1.txt'), '3.75 MB') # 3932160
-        self.temp_file_of_size(self.temp_path('a/b/c/c-2.txt'), '500 KB') # 512000
-        self.temp_file_of_size(self.temp_path('a/b/c/c-3.txt'), '200 KB') # 204800
+        self.temp_file_of_size(self.temp_path('a/a-1.txt'), '1.05 MB')  # 1101004
+        self.temp_file_of_size(self.temp_path('a/b/b-1.txt'), '2 MB')  # 2097152
+        self.temp_file_of_size(self.temp_path('a/b/b-2.txt'), '2.25 MB')  # 2359296
+        self.temp_file_of_size(self.temp_path('a/b/c/c-1.txt'), '3.75 MB')  # 3932160
+        self.temp_file_of_size(self.temp_path('a/b/c/c-2.txt'), '500 KB')  # 512000
+        self.temp_file_of_size(self.temp_path('a/b/c/c-3.txt'), '200 KB')  # 204800
         self.assertEqual(fsutil.get_dir_size(self.temp_path('a')), 10206412)
         self.assertEqual(fsutil.get_dir_size(self.temp_path('a/b')), 9105408)
         self.assertEqual(fsutil.get_dir_size(self.temp_path('a/b/c')), 4648960)
 
     def test_get_dir_size_formatted(self):
-        self.temp_file_of_size(self.temp_path('a/a-1.txt'), '1.05 MB') # 1101004
-        self.temp_file_of_size(self.temp_path('a/b/b-1.txt'), '2 MB') # 2097152
-        self.temp_file_of_size(self.temp_path('a/b/b-2.txt'), '2.25 MB') # 2359296
-        self.temp_file_of_size(self.temp_path('a/b/c/c-1.txt'), '3.75 MB') # 3932160
-        self.temp_file_of_size(self.temp_path('a/b/c/c-2.txt'), '500 KB') # 512000
-        self.temp_file_of_size(self.temp_path('a/b/c/c-3.txt'), '200 KB') # 204800
+        self.temp_file_of_size(self.temp_path('a/a-1.txt'), '1.05 MB')  # 1101004
+        self.temp_file_of_size(self.temp_path('a/b/b-1.txt'), '2 MB')  # 2097152
+        self.temp_file_of_size(self.temp_path('a/b/b-2.txt'), '2.25 MB')  # 2359296
+        self.temp_file_of_size(self.temp_path('a/b/c/c-1.txt'), '3.75 MB')  # 3932160
+        self.temp_file_of_size(self.temp_path('a/b/c/c-2.txt'), '500 KB')  # 512000
+        self.temp_file_of_size(self.temp_path('a/b/c/c-3.txt'), '200 KB')  # 204800
         self.assertEqual(fsutil.get_dir_size_formatted(self.temp_path('a')), '9.73 MB')
-        self.assertEqual(fsutil.get_dir_size_formatted(self.temp_path('a/b')), '8.68 MB')
-        self.assertEqual(fsutil.get_dir_size_formatted(self.temp_path('a/b/c')), '4.43 MB')
+        self.assertEqual(
+            fsutil.get_dir_size_formatted(self.temp_path('a/b')), '8.68 MB'
+        )
+        self.assertEqual(
+            fsutil.get_dir_size_formatted(self.temp_path('a/b/c')), '4.43 MB'
+        )
 
     def test_get_file_basename(self):
         s = 'Document'
@@ -452,7 +557,9 @@ class fsutil_test_case(unittest.TestCase):
     def test_get_file_creation_date_formatted(self):
         path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='Hello World')
-        creation_date_str = fsutil.get_file_creation_date_formatted(path, format='%Y/%m/%d')
+        creation_date_str = fsutil.get_file_creation_date_formatted(
+            path, format='%Y/%m/%d'
+        )
         creation_date_re = re.compile(r'^[\d]{4}\/[\d]{2}\/[\d]{2}$')
         self.assertTrue(creation_date_re.match(creation_date_str))
 
@@ -489,7 +596,9 @@ class fsutil_test_case(unittest.TestCase):
         path = self.temp_path('a/b/c.txt')
         fsutil.create_file(path, content='Hello World')
         lastmod_date_str = fsutil.get_file_last_modified_date_formatted(path)
-        lastmod_date_re = re.compile(r'^[\d]{4}\-[\d]{2}\-[\d]{2}[\s]{1}[\d]{2}\:[\d]{2}\:[\d]{2}$')
+        lastmod_date_re = re.compile(
+            r'^[\d]{4}\-[\d]{2}\-[\d]{2}[\s]{1}[\d]{2}\:[\d]{2}\:[\d]{2}$'
+        )
         self.assertTrue(lastmod_date_re.match(lastmod_date_str))
 
     def test_get_file_size(self):
@@ -577,30 +686,32 @@ class fsutil_test_case(unittest.TestCase):
         self.assertTrue(fsutil.is_file(path))
 
     def test_join_filename(self):
-        self.assertEqual(
-            fsutil.join_filename('Document', 'txt'), 'Document.txt')
-        self.assertEqual(
-            fsutil.join_filename('Document', '.txt'), 'Document.txt')
-        self.assertEqual(
-            fsutil.join_filename(' Document ', ' txt '), 'Document.txt')
-        self.assertEqual(
-            fsutil.join_filename('Document', ' .txt '), 'Document.txt')
+        self.assertEqual(fsutil.join_filename('Document', 'txt'), 'Document.txt')
+        self.assertEqual(fsutil.join_filename('Document', '.txt'), 'Document.txt')
+        self.assertEqual(fsutil.join_filename(' Document ', ' txt '), 'Document.txt')
+        self.assertEqual(fsutil.join_filename('Document', ' .txt '), 'Document.txt')
 
     def test_join_filepath(self):
-        self.assertEqual(fsutil.join_filepath('a/b/c', 'Document.txt'), 'a/b/c/Document.txt')
+        self.assertEqual(
+            fsutil.join_filepath('a/b/c', 'Document.txt'), 'a/b/c/Document.txt'
+        )
 
     def test_join_path_with_absolute_path(self):
         self.assertEqual(
-            fsutil.join_path('/a/b/c/', '/document.txt'), '/a/b/c/document.txt')
+            fsutil.join_path('/a/b/c/', '/document.txt'), '/a/b/c/document.txt'
+        )
 
     def test_join_path_with_parent_dirs(self):
         self.assertEqual(
-            fsutil.join_path('/a/b/c/', '../../document.txt'), '/a/document.txt')
+            fsutil.join_path('/a/b/c/', '../../document.txt'), '/a/document.txt'
+        )
 
     def test_list_dirs(self):
         for i in range(0, 5):
             fsutil.create_dir(self.temp_path('a/b/c/d-{}'.format(i)))
-            fsutil.create_file(self.temp_path('a/b/c/f-{}'.format(i)), content='{}'.format(i))
+            fsutil.create_file(
+                self.temp_path('a/b/c/f-{}'.format(i)), content='{}'.format(i)
+            )
         dirpaths = fsutil.list_dirs(self.temp_path('a/b/c'))
         dirnames = [fsutil.split_path(dirpath)[-1] for dirpath in dirpaths]
         self.assertEqual(len(dirpaths), 5)
@@ -609,11 +720,15 @@ class fsutil_test_case(unittest.TestCase):
     def test_list_files(self):
         for i in range(0, 5):
             fsutil.create_dir(self.temp_path('a/b/c/d-{}'.format(i)))
-            fsutil.create_file(self.temp_path('a/b/c/f-{}.txt'.format(i)), content='{}'.format(i))
+            fsutil.create_file(
+                self.temp_path('a/b/c/f-{}.txt'.format(i)), content='{}'.format(i)
+            )
         filepaths = fsutil.list_files(self.temp_path('a/b/c'))
         filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
         self.assertEqual(len(filepaths), 5)
-        self.assertEqual(filenames, ['f-0.txt', 'f-1.txt', 'f-2.txt', 'f-3.txt', 'f-4.txt'])
+        self.assertEqual(
+            filenames, ['f-0.txt', 'f-1.txt', 'f-2.txt', 'f-3.txt', 'f-4.txt']
+        )
 
     def test_make_dirs(self):
         path = self.temp_path('a/b/c/')
@@ -688,56 +803,22 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_read_file_lines(self):
         path = self.temp_path('a/b/c.txt')
-        lines = [
-            '',
-            '1 ',
-            ' 2',
-            '',
-            '',
-            ' 3 ',
-            '  4  ',
-            '',
-            '',
-            '5',
-        ]
+        lines = ['', '1 ', ' 2', '', '', ' 3 ', '  4  ', '', '', '5']
         fsutil.write_file(path, content='\n'.join(lines))
 
         expected_lines = list(lines)
         lines = fsutil.read_file_lines(path, strip_white=False, skip_empty=False)
         self.assertEqual(lines, expected_lines)
 
-        expected_lines = [
-            '',
-            '1',
-            '2',
-            '',
-            '',
-            '3',
-            '4',
-            '',
-            '',
-            '5',
-        ]
+        expected_lines = ['', '1', '2', '', '', '3', '4', '', '', '5']
         lines = fsutil.read_file_lines(path, strip_white=True, skip_empty=False)
         self.assertEqual(lines, expected_lines)
 
-        expected_lines = [
-            '1 ',
-            ' 2',
-            ' 3 ',
-            '  4  ',
-            '5',
-        ]
+        expected_lines = ['1 ', ' 2', ' 3 ', '  4  ', '5']
         lines = fsutil.read_file_lines(path, strip_white=False, skip_empty=True)
         self.assertEqual(lines, expected_lines)
 
-        expected_lines = [
-            '1',
-            '2',
-            '3',
-            '4',
-            '5',
-        ]
+        expected_lines = ['1', '2', '3', '4', '5']
         lines = fsutil.read_file_lines(path, strip_white=True, skip_empty=True)
         self.assertEqual(lines, expected_lines)
 
@@ -871,7 +952,9 @@ class fsutil_test_case(unittest.TestCase):
         ]
         self.assertEqual(results, expected_results)
 
-    @unittest.skipIf(fsutil.PY2, 'In python 2 glob recursive pattern ** was not supported yet.')
+    @unittest.skipIf(
+        fsutil.PY2, 'In python 2 glob recursive pattern ** was not supported yet.'
+    )
     def test_search_dirs(self):
         fsutil.create_file(self.temp_path('a/b/c/IMG_1000.jpg'))
         fsutil.create_file(self.temp_path('x/y/z/c/IMG_1001.jpg'))
@@ -889,27 +972,25 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_split_filename(self):
         s = 'Document'
-        self.assertEqual(fsutil.split_filename(s), ('Document', '', ))
+        self.assertEqual(fsutil.split_filename(s), ('Document', ''))
         s = '.Document'
-        self.assertEqual(fsutil.split_filename(s), ('.Document', '', ))
+        self.assertEqual(fsutil.split_filename(s), ('.Document', ''))
         s = 'Document.txt'
-        self.assertEqual(fsutil.split_filename(s), ('Document', 'txt', ))
+        self.assertEqual(fsutil.split_filename(s), ('Document', 'txt'))
         s = '.Document.txt'
-        self.assertEqual(fsutil.split_filename(s), ('.Document', 'txt', ))
+        self.assertEqual(fsutil.split_filename(s), ('.Document', 'txt'))
         s = '/root/a/b/c/Document.txt'
-        self.assertEqual(fsutil.split_filename(s), ('Document', 'txt', ))
+        self.assertEqual(fsutil.split_filename(s), ('Document', 'txt'))
         s = 'https://domain-name.com/Document.txt?p=1'
-        self.assertEqual(fsutil.split_filename(s), ('Document', 'txt', ))
+        self.assertEqual(fsutil.split_filename(s), ('Document', 'txt'))
 
     def test_split_filepath(self):
         s = '/root/a/b/c/Document.txt'
-        self.assertEqual(fsutil.split_filepath(
-            s), ('/root/a/b/c', 'Document.txt', ))
+        self.assertEqual(fsutil.split_filepath(s), ('/root/a/b/c', 'Document.txt'))
 
     def test_split_path(self):
         s = '/root/a/b/c/Document.txt'
-        self.assertEqual(fsutil.split_path(
-            s), ['root', 'a', 'b', 'c', 'Document.txt'])
+        self.assertEqual(fsutil.split_path(s), ['root', 'a', 'b', 'c', 'Document.txt'])
 
     def test_write_file(self):
         path = self.temp_path('a/b/c.txt')
@@ -922,7 +1003,9 @@ class fsutil_test_case(unittest.TestCase):
         path = self.temp_path('a/b/c.txt')
         fsutil.write_file(self.temp_path('a/b/c.txt'), content='Hello World')
         self.assertEqual(fsutil.read_file(path), 'Hello World')
-        fsutil.write_file(self.temp_path('a/b/c.txt'), content=' - Hello Sun', append=True)
+        fsutil.write_file(
+            self.temp_path('a/b/c.txt'), content=' - Hello Sun', append=True
+        )
         self.assertEqual(fsutil.read_file(path), 'Hello World - Hello Sun')
 
 
