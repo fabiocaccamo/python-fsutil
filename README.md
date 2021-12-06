@@ -5,6 +5,7 @@
 [![](https://badges.pufler.dev/visits/fabiocaccamo/python-fsutil?label=visitors&color=blue)](https://badges.pufler.dev)
 [![](https://img.shields.io/pypi/l/python-fsutil.svg?color=blue)](https://github.com/fabiocaccamo/python-fsutil/blob/master/LICENSE.txt)
 
+[![](https://img.shields.io/github/workflow/status/fabiocaccamo/python-fsutil/Python%20package?label=build&logo=github)](https://github.com/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/circleci/build/gh/fabiocaccamo/python-fsutil?logo=circleci&label=build)](https://circleci.com/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codecov/c/gh/fabiocaccamo/python-fsutil?logo=codecov)](https://codecov.io/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codacy/grade/fc40788ae7d74d1fb34a38934113c4e5?logo=codacy)](https://www.codacy.com/app/fabiocaccamo/python-fsutil)
@@ -665,6 +666,7 @@ git clone https://github.com/fabiocaccamo/python-fsutil.git src && cd src
 # install requirements
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install -r requirements-test.txt
 
 # run tests using tox
 tox
