@@ -5,7 +5,6 @@
 [![](https://badges.pufler.dev/visits/fabiocaccamo/python-fsutil?label=visitors&color=blue)](https://badges.pufler.dev)
 [![](https://img.shields.io/pypi/l/python-fsutil.svg?color=blue)](https://github.com/fabiocaccamo/python-fsutil/blob/master/LICENSE.txt)
 
-[![](https://img.shields.io/travis/fabiocaccamo/python-fsutil?logo=travis&label=build)](https://travis-ci.org/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/circleci/build/gh/fabiocaccamo/python-fsutil?logo=circleci&label=build)](https://circleci.com/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codecov/c/gh/fabiocaccamo/python-fsutil?logo=codecov)](https://codecov.io/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codacy/grade/fc40788ae7d74d1fb34a38934113c4e5?logo=codacy)](https://www.codacy.com/app/fabiocaccamo/python-fsutil)
