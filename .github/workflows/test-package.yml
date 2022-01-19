@@ -31,7 +31,7 @@ jobs:
 
     - name: Run tests
       run: |
-        coverage run --append -m unittest
+        coverage run --append --source=fsutil -m unittest
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
