@@ -31,7 +31,7 @@ jobs:
 
     - name: Run tests
       run: |
-        coverage run -a -p -m unittest
+        coverage run -p -m unittest
       # coverage xml -o ./coverage.xml
 
     - name: Upload coverage to Codecov
