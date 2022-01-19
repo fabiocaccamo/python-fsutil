@@ -32,12 +32,12 @@ jobs:
     - name: Run tests
       run: |
         coverage run -a -m unittest
-        coverage xml -o ./coverage.xml
+      # coverage xml -o ./coverage.xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         fail_ci_if_error: false
-        files: ./coverage.xml
+        # files: ./coverage.xml
         flags: unittests
         verbose: true
