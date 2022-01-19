@@ -32,13 +32,10 @@ jobs:
     - name: Run tests
       run: |
         coverage run --append -m unittest
-        coverage report -m
-      # coverage xml -o ./coverage.xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         fail_ci_if_error: false
-        # files: ./coverage.xml
         flags: unittests
         verbose: true
