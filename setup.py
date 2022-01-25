@@ -61,7 +61,6 @@ setup(
         "glob",
     ],
     install_requires=[
-        "requests",
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",

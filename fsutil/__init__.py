@@ -15,7 +15,14 @@ import errno
 import glob
 import hashlib
 import os
-import requests
+
+try:
+    import requests
+
+    requests_installed = True
+except ImportError:
+    requests_installed = False
+
 import shutil
 import sys
 import zipfile
@@ -30,6 +37,14 @@ except ImportError:
 
 PY2 = bool(sys.version_info.major == 2)
 SIZE_UNITS = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+
+
+def _require_requests_installed():
+    if not requests_installed:
+        raise ModuleNotFoundError(
+            "'requests' module is not installed, "
+            "it can be installed by running: 'pip install requests'"
+        )
 
 
 def assert_dir(path):
@@ -277,6 +292,7 @@ def download_file(url, dirpath, filename=None, chunk_size=8192, **kwargs):
     If filename is provided, the file will be named using filename.
     It is possible to pass extra request options (eg. for authentication) using **kwargs.
     """
+    _require_requests_installed()
     # https://stackoverflow.com/a/16696317/2096218
     filename = filename or get_filename(url) or "download"
     filepath = join_path(dirpath, filename)
@@ -664,6 +680,7 @@ def read_file_from_url(url, **kwargs):
     """
     Read the content of the file at the given url.
     """
+    _require_requests_installed()
     response = requests.get(url, **kwargs)
     response.raise_for_status()
     content = response.text
