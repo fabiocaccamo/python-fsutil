@@ -29,7 +29,7 @@ except ImportError:
 
 
 PY2 = bool(sys.version_info.major == 2)
-SIZE_UNITS = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+SIZE_UNITS = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
 
 def assert_dir(path):
@@ -37,7 +37,7 @@ def assert_dir(path):
     Raise an OSError if the given path doesn't exist or it is not a directory.
     """
     if not is_dir(path):
-        raise OSError('Invalid directory path: {}'.format(path))
+        raise OSError("Invalid directory path: {}".format(path))
 
 
 def assert_exists(path):
@@ -45,7 +45,7 @@ def assert_exists(path):
     Raise an OSError if the given path doesn't exist.
     """
     if not exists(path):
-        raise OSError('Invalid item path: {}'.format(path))
+        raise OSError("Invalid item path: {}".format(path))
 
 
 def assert_file(path):
@@ -53,7 +53,7 @@ def assert_file(path):
     Raise an OSError if the given path doesn't exist or it is not a file.
     """
     if not is_file(path):
-        raise OSError('Invalid file path: {}'.format(path))
+        raise OSError("Invalid file path: {}".format(path))
 
 
 def assert_not_dir(path):
@@ -61,7 +61,7 @@ def assert_not_dir(path):
     Raise an OSError if the given path is an existing directory.
     """
     if is_dir(path):
-        raise OSError('Invalid path, directory already exists: {}'.format(path))
+        raise OSError("Invalid path, directory already exists: {}".format(path))
 
 
 def assert_not_exists(path):
@@ -69,7 +69,7 @@ def assert_not_exists(path):
     Raise an OSError if the given path already exists.
     """
     if exists(path):
-        raise OSError('Invalid path, item already exists: {}'.format(path))
+        raise OSError("Invalid path, item already exists: {}".format(path))
 
 
 def assert_not_file(path):
@@ -77,7 +77,7 @@ def assert_not_file(path):
     Raise an OSError if the given path is an existing file.
     """
     if is_file(path):
-        raise OSError('Invalid path, file already exists: {}'.format(path))
+        raise OSError("Invalid path, file already exists: {}".format(path))
 
 
 def _clean_dir_empty_dirs(path):
@@ -117,7 +117,7 @@ def convert_size_bytes_to_string(size):
     while (size >= 1024) and (factor <= factor_limit):
         size /= 1024
         factor += 1
-    s_format = '{:.2f} {}' if (factor > 1) else '{:.0f} {}'
+    s_format = "{:.2f} {}" if (factor > 1) else "{:.0f} {}"
     s = s_format.format(size, units[factor])
     return s
 
@@ -127,7 +127,7 @@ def convert_size_string_to_bytes(size):
     Convert the given size string to bytes.
     """
     units = [item.lower() for item in SIZE_UNITS]
-    parts = size.strip().replace('  ', ' ').split(' ')
+    parts = size.strip().replace("  ", " ").split(" ")
     amount = float(parts[0])
     unit = parts[1]
     factor = units.index(unit.lower())
@@ -166,7 +166,7 @@ def copy_dir_content(path, dest, **kwargs):
     # only if python >= 3.8
     if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
         make_dirs(dest)
-        kwargs.setdefault('dirs_exist_ok', True)
+        kwargs.setdefault("dirs_exist_ok", True)
     shutil.copytree(path, dest, **kwargs)
 
 
@@ -194,7 +194,7 @@ def create_dir(path, overwrite=False):
     make_dirs(path)
 
 
-def create_file(path, content='', overwrite=False):
+def create_file(path, content="", overwrite=False):
     """
     Create file with the specified content at the given path.
     If overwrite is not allowed and path exists, an OSError is raised.
@@ -216,7 +216,7 @@ def create_zip_file(
         assert_not_exists(path)
     make_dirs_for_file(path)
 
-    def _write_content_to_zip_file(file, path, basedir=''):
+    def _write_content_to_zip_file(file, path, basedir=""):
         assert_exists(path)
         if is_file(path):
             filename = get_filename(path)
@@ -229,7 +229,7 @@ def create_zip_file(
                     basedir = join_path(basedir, item_name)
                 _write_content_to_zip_file(file, item_path, basedir)
 
-    with zipfile.ZipFile(path, 'w', compression) as file:
+    with zipfile.ZipFile(path, "w", compression) as file:
         for content_path in content_paths:
             _write_content_to_zip_file(file, content_path)
 
@@ -278,13 +278,13 @@ def download_file(url, dirpath, filename=None, chunk_size=8192, **kwargs):
     It is possible to pass extra request options (eg. for authentication) using **kwargs.
     """
     # https://stackoverflow.com/a/16696317/2096218
-    filename = filename or get_filename(url) or 'download'
+    filename = filename or get_filename(url) or "download"
     filepath = join_path(dirpath, filename)
     make_dirs_for_file(filepath)
-    kwargs['stream'] = True
+    kwargs["stream"] = True
     with requests.get(url, **kwargs) as response:
         response.raise_for_status()
-        with open(filepath, 'wb') as file:
+        with open(filepath, "wb") as file:
             for chunk in response.iter_content(chunk_size=chunk_size):
                 if chunk:
                     file.write(chunk)
@@ -306,7 +306,7 @@ def extract_zip_file(path, dest, autodelete=False, content_paths=None):
     """
     assert_file(path)
     make_dirs(dest)
-    with zipfile.ZipFile(path, 'r') as file:
+    with zipfile.ZipFile(path, "r") as file:
         file.extractall(dest, members=content_paths)
     if autodelete:
         remove_file(path)
@@ -336,7 +336,7 @@ def get_dir_creation_date(path):
     return creation_date
 
 
-def get_dir_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S'):
+def get_dir_creation_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
     """
     Get the directory creation date formatted using the given format.
     """
@@ -365,7 +365,7 @@ def get_dir_last_modified_date(path):
     return last_modified_date
 
 
-def get_dir_last_modified_date_formatted(path, format='%Y-%m-%d %H:%M:%S'):
+def get_dir_last_modified_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
     """
     Get the directory last modification date formatted using the given format.
     """
@@ -414,7 +414,7 @@ def get_file_creation_date(path):
     return creation_date
 
 
-def get_file_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S'):
+def get_file_creation_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
     """
     Get the file creation date formatted using the given format.
     """
@@ -430,15 +430,15 @@ def get_file_extension(path):
     return extension
 
 
-def get_file_hash(path, func='md5'):
+def get_file_hash(path, func="md5"):
     """
     Get the hash of the file at the gived path using
     the specified algorithm function (md5 by default).
     """
     assert_file(path)
     hash = hashlib.new(func)
-    with open(path, 'rb') as file:
-        for chunk in iter(lambda: file.read(4096), b''):
+    with open(path, "rb") as file:
+        for chunk in iter(lambda: file.read(4096), b""):
             hash.update(chunk)
     hash_hex = hash.hexdigest()
     return hash_hex
@@ -454,7 +454,7 @@ def get_file_last_modified_date(path):
     return last_modified_date
 
 
-def get_file_last_modified_date_formatted(path, format='%Y-%m-%d %H:%M:%S'):
+def get_file_last_modified_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
     """
     Get the file last modification date formatted using the given format.
     """
@@ -540,9 +540,9 @@ def join_filename(basename, extension):
     """
     Create a filename joining the file basename and the extension.
     """
-    basename = basename.rstrip('.').strip()
-    extension = extension.replace('.', '').strip()
-    filename = '{}.{}'.format(basename, extension)
+    basename = basename.rstrip(".").strip()
+    extension = extension.replace(".", "").strip()
+    filename = "{}.{}".format(basename, extension)
     return filename
 
 
@@ -560,7 +560,7 @@ def join_path(path, *paths):
     to the directory path of the module in which it's used.
     """
     basepath = path
-    if get_file_extension(path) in ['py', 'pyc', 'pyo']:
+    if get_file_extension(path) in ["py", "pyc", "pyo"]:
         basepath = os.path.dirname(os.path.realpath(path))
     paths = [path.lstrip(os.sep) for path in paths]
     return os.path.normpath(os.path.join(basepath, *paths))
@@ -648,14 +648,14 @@ def move_file(path, dest, overwrite=False, **kwargs):
     shutil.move(path, dest, **kwargs)
 
 
-def read_file(path, encoding='utf-8'):
+def read_file(path, encoding="utf-8"):
     """
     Read the content of the file at the given path using the specified encoding.
     """
     assert_file(path)
-    content = ''
-    options = {} if PY2 else {'encoding': encoding}
-    with open(path, 'r', **options) as file:
+    content = ""
+    options = {} if PY2 else {"encoding": encoding}
+    with open(path, "r", **options) as file:
         content = file.read()
     return content
 
@@ -670,7 +670,7 @@ def read_file_from_url(url, **kwargs):
     return content
 
 
-def read_file_lines(path, strip_white=True, skip_empty=True, encoding='utf-8'):
+def read_file_lines(path, strip_white=True, skip_empty=True, encoding="utf-8"):
     """
     Read file content lines according to the given options.
     """
@@ -783,7 +783,7 @@ def _search_paths(path, pattern):
     """
     assert_dir(path)
     pathname = os.path.join(path, pattern)
-    options = {} if PY2 else {'recursive': True}
+    options = {} if PY2 else {"recursive": True}
     paths = glob.glob(pathname, **options)
     return paths
 
@@ -808,7 +808,7 @@ def split_filename(path):
     """
     filename = get_filename(path)
     basename, extension = os.path.splitext(filename)
-    extension = extension.replace('.', '').strip()
+    extension = extension.replace(".", "").strip()
     return (basename, extension)
 
 
@@ -831,12 +831,12 @@ def split_path(path):
     return names
 
 
-def write_file(path, content, append=False, encoding='utf-8'):
+def write_file(path, content, append=False, encoding="utf-8"):
     """
     Write file with the specified content at the given path.
     """
     make_dirs_for_file(path)
-    mode = 'a' if append else 'w'
-    options = {} if PY2 else {'encoding': encoding}
+    mode = "a" if append else "w"
+    options = {} if PY2 else {"encoding": encoding}
     with open(path, mode, **options) as file:
         file.write(content)
