@@ -14,6 +14,7 @@ import datetime as dt
 import errno
 import glob
 import hashlib
+import json
 import os
 
 try:
@@ -687,6 +688,31 @@ def read_file_from_url(url, **kwargs):
     return content
 
 
+def read_file_json(
+    path,
+    cls=None,
+    object_hook=None,
+    parse_float=None,
+    parse_int=None,
+    parse_constant=None,
+    object_pairs_hook=None,
+):
+    """
+    Read and decode a json encoded file at the given path.
+    """
+    content = read_file(path)
+    data = json.loads(
+        content,
+        cls=cls,
+        object_hook=object_hook,
+        parse_float=parse_float,
+        parse_int=parse_int,
+        parse_constant=parse_constant,
+        object_pairs_hook=object_pairs_hook,
+    )
+    return data
+
+
 def read_file_lines(path, strip_white=True, skip_empty=True, encoding="utf-8"):
     """
     Read file content lines according to the given options.
@@ -857,3 +883,34 @@ def write_file(path, content, append=False, encoding="utf-8"):
     options = {} if PY2 else {"encoding": encoding}
     with open(path, mode, **options) as file:
         file.write(content)
+
+
+def write_file_json(
+    path,
+    data,
+    skipkeys=False,
+    ensure_ascii=True,
+    check_circular=True,
+    allow_nan=True,
+    cls=None,
+    indent=None,
+    separators=None,
+    default=None,
+    sort_keys=False,
+):
+    """
+    Write a json file at the given path with the specified data encoded in json format.
+    """
+    content = json.dumps(
+        data,
+        skipkeys=skipkeys,
+        ensure_ascii=ensure_ascii,
+        check_circular=check_circular,
+        allow_nan=allow_nan,
+        cls=cls,
+        indent=indent,
+        separators=separators,
+        default=default,
+        sort_keys=sort_keys,
+    )
+    write_file(path, content)

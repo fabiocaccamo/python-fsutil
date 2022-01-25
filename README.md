@@ -97,6 +97,7 @@ import fsutil
 -   [`move_file`](#move_file)
 -   [`read_file`](#read_file)
 -   [`read_file_from_url`](#read_file_from_url) *(requires `requests` to be installed)*
+-   [`read_file_json`](#read_file_json)
 -   [`read_file_lines`](#read_file_lines)
 -   [`remove_dir`](#remove_dir)
 -   [`remove_dir_content`](#remove_dir_content)
@@ -113,6 +114,7 @@ import fsutil
 -   [`split_filepath`](#split_filepath)
 -   [`split_path`](#split_path)
 -   [`write_file`](#write_file)
+-   [`write_file_json`](#write_file_json)
 
 
 #### `assert_dir`
@@ -533,6 +535,13 @@ content = fsutil.read_file(path, encoding='utf-8')
 content = fsutil.read_file_from_url(url, **kwargs)
 ```
 
+#### `read_file_json`
+
+```python
+# Read and decode a json encoded file at the given path.
+data = fsutil.read_file_json(path)
+```
+
 #### `read_file_lines`
 
 ```python
@@ -649,6 +658,13 @@ path_names = fsutil.split_path(path)
 ```python
 # Write file with the specified content at the given path.
 fsutil.write_file(path, content, append=False, encoding='utf-8')
+```
+
+#### `write_file_json`
+
+```python
+# Write a json file at the given path with the specified data encoded in json format.
+fsutil.write_file_json(path, data)
 ```
 
 ## Testing
