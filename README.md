@@ -1,11 +1,11 @@
 [![](https://img.shields.io/pypi/pyversions/python-fsutil.svg?color=blue&logo=python&logoColor=white)](https://www.python.org/)
 [![](https://img.shields.io/pypi/v/python-fsutil.svg?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/python-fsutil/)
-[![](https://pepy.tech/badge/python-fsutil)](https://pepy.tech/project/python-fsutil)
+[![](https://pepy.tech/badge/python-fsutil/month)](https://pepy.tech/project/python-fsutil)
 [![](https://img.shields.io/github/stars/fabiocaccamo/python-fsutil?logo=github)](https://github.com/fabiocaccamo/python-fsutil/)
 [![](https://badges.pufler.dev/visits/fabiocaccamo/python-fsutil?label=visitors&color=blue)](https://badges.pufler.dev)
 [![](https://img.shields.io/pypi/l/python-fsutil.svg?color=blue)](https://github.com/fabiocaccamo/python-fsutil/blob/master/LICENSE.txt)
 
-[![](https://img.shields.io/github/workflow/status/fabiocaccamo/python-fsutil/Python%20package?label=build&logo=github)](https://github.com/fabiocaccamo/python-fsutil)
+[![](https://img.shields.io/github/workflow/status/fabiocaccamo/python-fsutil/Test%20package?label=build&logo=github)](https://github.com/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codecov/c/gh/fabiocaccamo/python-fsutil?logo=codecov)](https://codecov.io/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codacy/grade/fc40788ae7d74d1fb34a38934113c4e5?logo=codacy)](https://www.codacy.com/app/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codeclimate/maintainability/fabiocaccamo/python-fsutil?logo=code-climate)](https://codeclimate.com/github/fabiocaccamo/python-fsutil/)
