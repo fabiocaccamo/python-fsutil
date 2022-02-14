@@ -38,7 +38,7 @@ jobs:
 
     - name: Run tests
       run: |
-        coverage run --append --source=fsutil -m unittest
+        coverage run --append --source=fsutil setup.py test
         coverage report -m
         coverage xml -o ./coverage.xml
 
