@@ -32,7 +32,7 @@ jobs:
 
     - name: Run tests
       run: |
-        coverage run --append -m unittest --source=fsutil
+        coverage run --append --source=fsutil -m unittest
         coverage xml -o ./coverage.xml
 
     - name: Upload coverage to Codecov
