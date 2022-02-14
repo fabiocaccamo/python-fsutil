@@ -30,9 +30,15 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-test.txt
 
+    # # fails on python 2.7
+    # - name: Run tests
+    #   run: |
+    #     coverage run --append -m unittest
+    #     coverage xml -o ./coverage.xml
+
     - name: Run tests
       run: |
-        coverage run --append -m unittest
+        coverage run --append --source=fsutil -m unittest
         coverage xml -o ./coverage.xml
 
     - name: Upload coverage to Codecov
