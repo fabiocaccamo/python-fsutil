@@ -36,6 +36,16 @@ except ImportError:
     from urllib.parse import urlsplit
 
 
+__all__ = [
+    "__author__",
+    "__copyright__",
+    "__description__",
+    "__email__",
+    "__license__",
+    "__title__",
+    "__version__",
+]
+
 PY2 = bool(sys.version_info.major == 2)
 SIZE_UNITS = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
@@ -149,7 +159,7 @@ def convert_size_string_to_bytes(size):
     factor = units.index(unit.lower())
     if not factor:
         return amount
-    return int((1024 ** factor) * amount)
+    return int((1024**factor) * amount)
 
 
 def copy_dir(path, dest, overwrite=False, **kwargs):
