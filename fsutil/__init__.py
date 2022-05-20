@@ -325,9 +325,10 @@ def create_zip_file(
         elif is_dir(path):
             for item_name in os.listdir(path):
                 item_path = join_path(path, item_name)
-                if is_dir(item_path):
-                    basedir = join_path(basedir, item_name)
-                _write_content_to_zip_file(file, item_path, basedir)
+                item_basedir = (
+                    join_path(basedir, item_name) if is_dir(item_path) else basedir
+                )
+                _write_content_to_zip_file(file, item_path, item_basedir)
 
     with zipfile.ZipFile(path, "w", compression) as file:
         for content_path in content_paths:
