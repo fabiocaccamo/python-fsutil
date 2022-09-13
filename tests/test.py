@@ -413,6 +413,14 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.remove_file(path)
         self.assertFalse(fsutil.exists(path))
 
+    def test_download_file_without_requests_installed(self):
+        requests_installed = fsutil.requests_installed
+        fsutil.requests_installed = False
+        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
+        with self.assertRaises(ModuleNotFoundError):
+            fsutil.download_file(url, __file__)
+        fsutil.requests_installed = requests_installed
+
     def test_exists(self):
         path = self.temp_path("a/b/")
         self.assertFalse(fsutil.exists(path))
@@ -846,7 +854,7 @@ class fsutil_test_case(unittest.TestCase):
         # multiple lines not stripped
         expected_lines = ["1\n", "2\n", "3\n"]
         lines = fsutil.read_file_lines(
-            path, line_start=1, line_end=3, strip_white=False
+            path, line_start=1, line_end=3, strip_white=False, skip_empty=False
         )
         self.assertEqual(lines, expected_lines)
 
