@@ -99,6 +99,7 @@ import fsutil
 -   [`read_file_from_url`](#read_file_from_url) *(requires `requests` to be installed)*
 -   [`read_file_json`](#read_file_json)
 -   [`read_file_lines`](#read_file_lines)
+-   [`read_file_lines_count`](#read_file_lines_count)
 -   [`remove_dir`](#remove_dir)
 -   [`remove_dir_content`](#remove_dir_content)
 -   [`remove_dirs`](#remove_dirs)
@@ -545,8 +546,17 @@ data = fsutil.read_file_json(path)
 #### `read_file_lines`
 
 ```python
-# Read file content lines according to the given options.
-content = fsutil.read_file_lines(path, strip_white=True, skip_empty=True, encoding='utf-8')
+# Read file content lines.
+# It is possible to specify the line indexes (negative indexes too),
+# very useful especially when reading large files.
+content = fsutil.read_file_lines(path, line_start=0, line_end=-1, strip_white=True, skip_empty=True, encoding='utf-8')
+```
+
+#### `read_file_lines_count`
+
+```python
+# Read file lines count.
+lines_count = fsutil.read_file_lines_count(path)
 ```
 
 #### `remove_dir`
