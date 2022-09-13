@@ -798,16 +798,48 @@ def read_file_json(
     return data
 
 
-def read_file_lines(path, strip_white=True, skip_empty=True, encoding="utf-8"):
+def _read_file_lines_in_range(path, line_start=0, line_end=-1, encoding="utf-8"):
+    line_start_negative = line_start < 0
+    line_end_negative = line_end < 0
+    if line_start_negative or line_end_negative:
+        # pre-calculate lines count only if using negative line indexes
+        lines_count = read_file_lines_count(path)
+        # normalize negative indexes
+        if line_start_negative:
+            line_start += lines_count
+        if line_end_negative:
+            line_end += lines_count
+    with open(path, "rb") as file:
+        file.seek(0)
+        line_index = 0
+        for line in file:
+            if line_index >= line_start and line_index <= line_end:
+                yield line.decode(encoding)
+            line_index += 1
+
+
+def read_file_lines(
+    path, line_start=0, line_end=-1, strip_white=True, skip_empty=True, encoding="utf-8"
+):
     """
-    Read file content lines according to the given options.
+    Read file content lines.
+    It is possible to specify the line indexes (negative indexes too),
+    very useful especially when reading large files.
     """
-    content = read_file(path, encoding)
-    lines = content.splitlines()
+    assert_file(path)
+    if line_start == 0 and line_end == -1:
+        content = read_file(path, encoding=encoding)
+        lines = content.splitlines()
+    else:
+        lines = _read_file_lines_in_range(
+            path, line_start=line_start, line_end=line_end, encoding=encoding
+        )
     if strip_white:
         lines = [line.strip() for line in lines]
     if skip_empty:
         lines = [line for line in lines if line]
+    if not isinstance(lines, list):
+        lines = list(lines)
     return lines
 
 

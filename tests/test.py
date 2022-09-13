@@ -828,6 +828,38 @@ class fsutil_test_case(unittest.TestCase):
         lines = fsutil.read_file_lines(path, strip_white=True, skip_empty=True)
         self.assertEqual(lines, expected_lines)
 
+    def test_read_file_lines_with_lines_range(self):
+        path = self.temp_path("a/b/c.txt")
+        lines = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        fsutil.write_file(path, content="\n".join(lines))
+
+        # single line
+        expected_lines = ["1"]
+        lines = fsutil.read_file_lines(path, line_start=1, line_end=1)
+        self.assertEqual(lines, expected_lines)
+
+        # multiple lines
+        expected_lines = ["1", "2", "3"]
+        lines = fsutil.read_file_lines(path, line_start=1, line_end=3)
+        self.assertEqual(lines, expected_lines)
+
+        # multiple lines not stripped
+        expected_lines = ["1\n", "2\n", "3\n"]
+        lines = fsutil.read_file_lines(
+            path, line_start=1, line_end=3, strip_white=False
+        )
+        self.assertEqual(lines, expected_lines)
+
+        # last line
+        expected_lines = ["9"]
+        lines = fsutil.read_file_lines(path, line_start=-1)
+        self.assertEqual(lines, expected_lines)
+
+        # last 3 lines
+        expected_lines = ["7", "8", "9"]
+        lines = fsutil.read_file_lines(path, line_start=-3)
+        self.assertEqual(lines, expected_lines)
+
     def test_read_file_lines_count(self):
         path = self.temp_path("a/b/c.txt")
         lines = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
