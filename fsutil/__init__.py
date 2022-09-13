@@ -811,6 +811,18 @@ def read_file_lines(path, strip_white=True, skip_empty=True, encoding="utf-8"):
     return lines
 
 
+def read_file_lines_count(path):
+    """
+    Read file lines count.
+    """
+    assert_file(path)
+    lines_count = 0
+    with open(path, "rb") as file:
+        file.seek(0)
+        lines_count = sum(1 for line in file)
+    return lines_count
+
+
 def remove_dir(path, **kwargs):
     """
     Remove a directory at the given path and all its content.

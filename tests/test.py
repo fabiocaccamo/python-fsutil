@@ -828,6 +828,14 @@ class fsutil_test_case(unittest.TestCase):
         lines = fsutil.read_file_lines(path, strip_white=True, skip_empty=True)
         self.assertEqual(lines, expected_lines)
 
+    def test_read_file_lines_count(self):
+        path = self.temp_path("a/b/c.txt")
+        lines = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        fsutil.write_file(path, content="\n".join(lines))
+
+        lines_count = fsutil.read_file_lines_count(path)
+        self.assertEqual(lines_count, 10)
+
     def test_rename_dir(self):
         path = self.temp_path("a/b/c")
         fsutil.make_dirs(path)
