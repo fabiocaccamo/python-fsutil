@@ -24,6 +24,12 @@ try:
 except ImportError:
     requests_installed = False
 
+try:
+    RequestsNotInstalledError = ModuleNotFoundError
+except NameError:
+    # python < 3.6
+    RequestsNotInstalledError = ImportError
+
 import shutil
 import sys
 import zipfile
@@ -127,7 +133,7 @@ SIZE_UNITS = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
 def _require_requests_installed():
     if not requests_installed:
-        raise ModuleNotFoundError(
+        raise RequestsNotInstalledError(
             "'requests' module is not installed, "
             "it can be installed by running: 'pip install requests'"
         )

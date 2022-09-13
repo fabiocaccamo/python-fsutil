@@ -417,7 +417,7 @@ class fsutil_test_case(unittest.TestCase):
         requests_installed = fsutil.requests_installed
         fsutil.requests_installed = False
         url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
-        with self.assertRaises(ModuleNotFoundError):
+        with self.assertRaises(fsutil.RequestsNotInstalledError):
             fsutil.download_file(url, __file__)
         fsutil.requests_installed = requests_installed
 
