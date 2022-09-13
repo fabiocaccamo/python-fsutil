@@ -102,6 +102,7 @@ __all__ = [
     "read_file_from_url",
     "read_file_json",
     "read_file_lines",
+    "read_file_lines_count",
     "remove_dir",
     "remove_dir_content",
     "remove_dirs",

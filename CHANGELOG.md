@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.6.1) - 2022-05-20
+-   Add `read_file_lines_count` method.
+-   Update `read_file_lines` method with two new arguments: `line_start` and `line_end` *(for specifying the lines-range to read)*.
+
 ## [0.6.1](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.6.1) - 2022-05-20
 -   Fixed `create_zip_file` content directory structure.
 
