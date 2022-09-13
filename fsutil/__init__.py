@@ -813,9 +813,9 @@ def _read_file_lines_in_range(path, line_start=0, line_end=-1, encoding="utf-8")
         lines_count = read_file_lines_count(path)
         # normalize negative indexes
         if line_start_negative:
-            line_start += lines_count
+            line_start = max(0, line_start + lines_count)
         if line_end_negative:
-            line_end += lines_count
+            line_end = min(line_end + lines_count, lines_count - 1)
     with open(path, "rb") as file:
         file.seek(0)
         line_index = 0

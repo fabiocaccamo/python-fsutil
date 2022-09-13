@@ -868,6 +868,12 @@ class fsutil_test_case(unittest.TestCase):
         lines = fsutil.read_file_lines(path, line_start=-3)
         self.assertEqual(lines, expected_lines)
 
+        # empty file
+        fsutil.write_file(path, content="")
+        expected_lines = []
+        lines = fsutil.read_file_lines(path, line_start=-2)
+        self.assertEqual(lines, expected_lines)
+
     def test_read_file_lines_count(self):
         path = self.temp_path("a/b/c.txt")
         lines = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
