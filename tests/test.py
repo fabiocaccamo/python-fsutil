@@ -803,9 +803,7 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_read_file_json(self):
         path = self.temp_path("a/b/c.json")
-        data = {
-            "test": "Hello World"
-        }
+        data = {"test": "Hello World"}
         fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
         self.assertEqual(fsutil.read_file_json(path), data)
 
@@ -1009,11 +1007,9 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_write_file_json(self):
         path = self.temp_path("a/b/c.json")
-        data = {
-            "test": "Hello World"
-        }
+        data = {"test": "Hello World"}
         fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
-        self.assertEqual(fsutil.read_file(path), "{\"test\": \"Hello World\"}")
+        self.assertEqual(fsutil.read_file(path), '{"test": "Hello World"}')
 
     def test_write_file_with_append(self):
         path = self.temp_path("a/b/c.txt")
