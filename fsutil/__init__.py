@@ -32,6 +32,7 @@ except NameError:
 
 import shutil
 import sys
+import tempfile
 import zipfile
 
 try:
@@ -379,7 +380,7 @@ def delete_files(*paths):
     remove_files(*paths)
 
 
-def download_file(url, dirpath, filename=None, chunk_size=8192, **kwargs):
+def download_file(url, dirpath=None, filename=None, chunk_size=8192, **kwargs):
     """
     Download a file from url to dirpath.
     If filename is provided, the file will be named using filename.
@@ -387,6 +388,7 @@ def download_file(url, dirpath, filename=None, chunk_size=8192, **kwargs):
     """
     _require_requests_installed()
     # https://stackoverflow.com/a/16696317/2096218
+    dirpath = dirpath or tempfile.gettempdir()
     filename = filename or get_filename(url) or "download"
     filepath = join_path(dirpath, filename)
     make_dirs_for_file(filepath)
