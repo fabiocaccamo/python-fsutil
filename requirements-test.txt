@@ -1,5 +1,5 @@
-codecov
-coverage
-flake8
-requests
-tox
+codecov == 2.1.12
+coverage == 6.5.0
+flake8 == 5.0.4
+requests == 2.28.1
+tox == 3.26.0
