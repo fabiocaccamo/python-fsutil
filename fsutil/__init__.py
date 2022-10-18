@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import datetime as dt
+import errno
+import glob
+import hashlib
+import json
+import os
+
 from fsutil.metadata import (
     __author__,
     __copyright__,
@@ -9,13 +16,6 @@ from fsutil.metadata import (
     __title__,
     __version__,
 )
-
-import datetime as dt
-import errno
-import glob
-import hashlib
-import json
-import os
 
 try:
     import requests

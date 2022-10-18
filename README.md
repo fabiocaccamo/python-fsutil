@@ -4,6 +4,7 @@
 [![](https://img.shields.io/github/stars/fabiocaccamo/python-fsutil?logo=github)](https://github.com/fabiocaccamo/python-fsutil/)
 [![](https://img.shields.io/pypi/l/python-fsutil.svg?color=blue)](https://github.com/fabiocaccamo/python-fsutil/blob/master/LICENSE.txt)
 
+[![](https://results.pre-commit.ci/badge/github/fabiocaccamo/python-fsutil/master.svg)](https://results.pre-commit.ci/latest/github/fabiocaccamo/python-fsutil/master)
 [![](https://img.shields.io/github/workflow/status/fabiocaccamo/python-fsutil/Test%20package?label=build&logo=github)](https://github.com/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codecov/c/gh/fabiocaccamo/python-fsutil?logo=codecov)](https://codecov.io/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codacy/grade/fc40788ae7d74d1fb34a38934113c4e5?logo=codacy)](https://www.codacy.com/app/fabiocaccamo/python-fsutil)

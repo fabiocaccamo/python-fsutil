@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import datetime as dt
-import fsutil
 import re
 import threading
 import time
 import unittest
+
+import fsutil
 
 
 class fsutil_test_case(unittest.TestCase):
