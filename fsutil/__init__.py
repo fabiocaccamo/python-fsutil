@@ -1,11 +1,21 @@
-# -*- coding: utf-8 -*-
-
-import datetime as dt
 import errno
 import glob
 import hashlib
 import json
 import os
+import shutil
+import sys
+import tempfile
+import zipfile
+from datetime import datetime
+from urllib.parse import urlsplit
+
+try:
+    import requests
+
+    requests_installed = True
+except ImportError:
+    requests_installed = False
 
 from fsutil.metadata import (
     __author__,
@@ -16,32 +26,6 @@ from fsutil.metadata import (
     __title__,
     __version__,
 )
-
-try:
-    import requests
-
-    requests_installed = True
-except ImportError:
-    requests_installed = False
-
-try:
-    RequestsNotInstalledError = ModuleNotFoundError
-except NameError:
-    # python < 3.6
-    RequestsNotInstalledError = ImportError
-
-import shutil
-import sys
-import tempfile
-import zipfile
-
-try:
-    # python 2
-    from urlparse import urlsplit
-except ImportError:
-    # python 3
-    from urllib.parse import urlsplit
-
 
 __all__ = [
     "__author__",
@@ -128,13 +112,12 @@ __all__ = [
     "write_file_json",
 ]
 
-PY2 = bool(sys.version_info.major == 2)
 SIZE_UNITS = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
 
 def _require_requests_installed():
     if not requests_installed:
-        raise RequestsNotInstalledError(
+        raise ModuleNotFoundError(
             "'requests' module is not installed, "
             "it can be installed by running: 'pip install requests'"
         )
@@ -443,7 +426,7 @@ def get_dir_creation_date(path):
     """
     assert_dir(path)
     creation_timestamp = os.path.getctime(path)
-    creation_date = dt.datetime.fromtimestamp(creation_timestamp)
+    creation_date = datetime.fromtimestamp(creation_timestamp)
     return creation_date
 
 
@@ -472,7 +455,7 @@ def get_dir_last_modified_date(path):
             last_modified_timestamp = max(
                 last_modified_timestamp, os.path.getmtime(filepath)
             )
-    last_modified_date = dt.datetime.fromtimestamp(last_modified_timestamp)
+    last_modified_date = datetime.fromtimestamp(last_modified_timestamp)
     return last_modified_date
 
 
@@ -521,7 +504,7 @@ def get_file_creation_date(path):
     """
     assert_file(path)
     creation_timestamp = os.path.getctime(path)
-    creation_date = dt.datetime.fromtimestamp(creation_timestamp)
+    creation_date = datetime.fromtimestamp(creation_timestamp)
     return creation_date
 
 
@@ -561,7 +544,7 @@ def get_file_last_modified_date(path):
     """
     assert_file(path)
     last_modified_timestamp = os.path.getmtime(path)
-    last_modified_date = dt.datetime.fromtimestamp(last_modified_timestamp)
+    last_modified_date = datetime.fromtimestamp(last_modified_timestamp)
     return last_modified_date
 
 
@@ -691,16 +674,6 @@ def list_files(path):
     return _filter_paths(path, os.listdir(path), predicate=is_file)
 
 
-def _make_dirs_py2(path):
-    # https://stackoverflow.com/questions/12517451/automatically-creating-directories-with-file-output
-    try:
-        os.makedirs(path)
-    except OSError as e:
-        # Guard against race condition
-        if e.errno != errno.EEXIST:
-            raise e
-
-
 def make_dirs(path):
     """
     Create the directories needed to ensure that the given path exists.
@@ -709,9 +682,6 @@ def make_dirs(path):
     if is_dir(path):
         return
     assert_not_file(path)
-    if PY2:
-        _make_dirs_py2(path)
-        return
     os.makedirs(path, exist_ok=True)
 
 
@@ -765,8 +735,7 @@ def read_file(path, encoding="utf-8"):
     """
     assert_file(path)
     content = ""
-    options = {} if PY2 else {"encoding": encoding}
-    with open(path, "r", **options) as file:
+    with open(path, "r", encoding=encoding) as file:
         content = file.read()
     return content
 
@@ -964,8 +933,7 @@ def _search_paths(path, pattern):
     """
     assert_dir(path)
     pathname = os.path.join(path, pattern)
-    options = {} if PY2 else {"recursive": True}
-    paths = glob.glob(pathname, **options)
+    paths = glob.glob(pathname, recursive=True)
     return paths
 
 
@@ -1018,8 +986,7 @@ def write_file(path, content, append=False, encoding="utf-8"):
     """
     make_dirs_for_file(path)
     mode = "a" if append else "w"
-    options = {} if PY2 else {"encoding": encoding}
-    with open(path, mode, **options) as file:
+    with open(path, mode, encoding=encoding) as file:
         file.write(content)
 
 

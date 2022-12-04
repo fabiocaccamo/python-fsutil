@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-
-import datetime as dt
 import re
 import threading
 import time
 import unittest
+from datetime import datetime, timedelta
 
 import fsutil
 
@@ -418,7 +416,7 @@ class fsutil_test_case(unittest.TestCase):
         requests_installed = fsutil.requests_installed
         fsutil.requests_installed = False
         url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
-        with self.assertRaises(fsutil.RequestsNotInstalledError):
+        with self.assertRaises(ModuleNotFoundError):
             fsutil.download_file(url, __file__)
         fsutil.requests_installed = requests_installed
 
@@ -476,12 +474,12 @@ class fsutil_test_case(unittest.TestCase):
         path = self.temp_path("a/b/c.txt")
         fsutil.create_file(path, content="Hello World")
         creation_date = fsutil.get_dir_creation_date(self.temp_path("a/b"))
-        now = dt.datetime.now()
-        self.assertTrue((now - creation_date) < dt.timedelta(seconds=0.1))
+        now = datetime.now()
+        self.assertTrue((now - creation_date) < timedelta(seconds=0.1))
         time.sleep(0.2)
         creation_date = fsutil.get_dir_creation_date(self.temp_path("a/b"))
-        now = dt.datetime.now()
-        self.assertFalse((now - creation_date) < dt.timedelta(seconds=0.1))
+        now = datetime.now()
+        self.assertFalse((now - creation_date) < timedelta(seconds=0.1))
 
     def test_get_dir_creation_date_formatted(self):
         path = self.temp_path("a/b/c.txt")
@@ -498,10 +496,10 @@ class fsutil_test_case(unittest.TestCase):
         creation_date = fsutil.get_dir_creation_date(self.temp_path("a"))
         time.sleep(0.2)
         fsutil.write_file(path, content="Goodbye", append=True)
-        now = dt.datetime.now()
+        now = datetime.now()
         lastmod_date = fsutil.get_dir_last_modified_date(self.temp_path("a"))
-        self.assertTrue((now - lastmod_date) < dt.timedelta(seconds=0.1))
-        self.assertTrue((lastmod_date - creation_date) > dt.timedelta(seconds=0.15))
+        self.assertTrue((now - lastmod_date) < timedelta(seconds=0.1))
+        self.assertTrue((lastmod_date - creation_date) > timedelta(seconds=0.15))
 
     def test_get_dir_last_modified_date_formatted(self):
         path = self.temp_path("a/b/c.txt")
@@ -556,12 +554,12 @@ class fsutil_test_case(unittest.TestCase):
         path = self.temp_path("a/b/c.txt")
         fsutil.create_file(path, content="Hello World")
         creation_date = fsutil.get_file_creation_date(path)
-        now = dt.datetime.now()
-        self.assertTrue((now - creation_date) < dt.timedelta(seconds=0.1))
+        now = datetime.now()
+        self.assertTrue((now - creation_date) < timedelta(seconds=0.1))
         time.sleep(0.2)
         creation_date = fsutil.get_file_creation_date(path)
-        now = dt.datetime.now()
-        self.assertFalse((now - creation_date) < dt.timedelta(seconds=0.1))
+        now = datetime.now()
+        self.assertFalse((now - creation_date) < timedelta(seconds=0.1))
 
     def test_get_file_creation_date_formatted(self):
         path = self.temp_path("a/b/c.txt")
@@ -596,10 +594,10 @@ class fsutil_test_case(unittest.TestCase):
         creation_date = fsutil.get_file_creation_date(path)
         time.sleep(0.2)
         fsutil.write_file(path, content="Goodbye", append=True)
-        now = dt.datetime.now()
+        now = datetime.now()
         lastmod_date = fsutil.get_file_last_modified_date(path)
-        self.assertTrue((now - lastmod_date) < dt.timedelta(seconds=0.1))
-        self.assertTrue((lastmod_date - creation_date) > dt.timedelta(seconds=0.15))
+        self.assertTrue((now - lastmod_date) < timedelta(seconds=0.1))
+        self.assertTrue((lastmod_date - creation_date) > timedelta(seconds=0.15))
 
     def test_get_file_last_modified_date_formatted(self):
         path = self.temp_path("a/b/c.txt")
@@ -1013,9 +1011,6 @@ class fsutil_test_case(unittest.TestCase):
         ]
         self.assertEqual(results, expected_results)
 
-    @unittest.skipIf(
-        fsutil.PY2, "In python 2 glob recursive pattern ** was not supported yet."
-    )
     def test_search_dirs(self):
         fsutil.create_file(self.temp_path("a/b/c/IMG_1000.jpg"))
         fsutil.create_file(self.temp_path("x/y/z/c/IMG_1001.jpg"))

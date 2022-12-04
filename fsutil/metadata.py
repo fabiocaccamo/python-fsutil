@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 __author__ = "Fabio Caccamo"
 __copyright__ = "Copyright (c) 2020-present Fabio Caccamo"
 __description__ = "file-system utilities for lazy devs."
