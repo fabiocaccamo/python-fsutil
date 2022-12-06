@@ -16,7 +16,7 @@ class fsutil_test_case(unittest.TestCase):
 
     @staticmethod
     def temp_path(filepath=""):
-        return fsutil.join_path(__file__, "temp/{}".format(filepath))
+        return fsutil.join_path(__file__, f"temp/{filepath}")
 
     @staticmethod
     def temp_file_of_size(path, size):
@@ -715,10 +715,8 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_list_dirs(self):
         for i in range(0, 5):
-            fsutil.create_dir(self.temp_path("a/b/c/d-{}".format(i)))
-            fsutil.create_file(
-                self.temp_path("a/b/c/f-{}".format(i)), content="{}".format(i)
-            )
+            fsutil.create_dir(self.temp_path(f"a/b/c/d-{i}"))
+            fsutil.create_file(self.temp_path(f"a/b/c/f-{i}"), content=f"{i}")
         dirpaths = fsutil.list_dirs(self.temp_path("a/b/c"))
         dirnames = [fsutil.split_path(dirpath)[-1] for dirpath in dirpaths]
         self.assertEqual(len(dirpaths), 5)
@@ -726,10 +724,8 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_list_files(self):
         for i in range(0, 5):
-            fsutil.create_dir(self.temp_path("a/b/c/d-{}".format(i)))
-            fsutil.create_file(
-                self.temp_path("a/b/c/f-{}.txt".format(i)), content="{}".format(i)
-            )
+            fsutil.create_dir(self.temp_path(f"a/b/c/d-{i}"))
+            fsutil.create_file(self.temp_path(f"a/b/c/f-{i}.txt"), content=f"{i}")
         filepaths = fsutil.list_files(self.temp_path("a/b/c"))
         filenames = [fsutil.get_filename(filepath) for filepath in filepaths]
         self.assertEqual(len(filepaths), 5)

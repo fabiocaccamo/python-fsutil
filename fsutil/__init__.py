@@ -128,7 +128,7 @@ def assert_dir(path):
     Raise an OSError if the given path doesn't exist or it is not a directory.
     """
     if not is_dir(path):
-        raise OSError("Invalid directory path: {}".format(path))
+        raise OSError(f"Invalid directory path: {path}")
 
 
 def assert_exists(path):
@@ -136,7 +136,7 @@ def assert_exists(path):
     Raise an OSError if the given path doesn't exist.
     """
     if not exists(path):
-        raise OSError("Invalid item path: {}".format(path))
+        raise OSError(f"Invalid item path: {path}")
 
 
 def assert_file(path):
@@ -144,7 +144,7 @@ def assert_file(path):
     Raise an OSError if the given path doesn't exist or it is not a file.
     """
     if not is_file(path):
-        raise OSError("Invalid file path: {}".format(path))
+        raise OSError(f"Invalid file path: {path}")
 
 
 def assert_not_dir(path):
@@ -152,7 +152,7 @@ def assert_not_dir(path):
     Raise an OSError if the given path is an existing directory.
     """
     if is_dir(path):
-        raise OSError("Invalid path, directory already exists: {}".format(path))
+        raise OSError(f"Invalid path, directory already exists: {path}")
 
 
 def assert_not_exists(path):
@@ -160,7 +160,7 @@ def assert_not_exists(path):
     Raise an OSError if the given path already exists.
     """
     if exists(path):
-        raise OSError("Invalid path, item already exists: {}".format(path))
+        raise OSError(f"Invalid path, item already exists: {path}")
 
 
 def assert_not_file(path):
@@ -168,7 +168,7 @@ def assert_not_file(path):
     Raise an OSError if the given path is an existing file.
     """
     if is_file(path):
-        raise OSError("Invalid path, file already exists: {}".format(path))
+        raise OSError(f"Invalid path, file already exists: {path}")
 
 
 def _clean_dir_empty_dirs(path):
@@ -208,9 +208,10 @@ def convert_size_bytes_to_string(size):
     while (size >= 1024) and (factor <= factor_limit):
         size /= 1024
         factor += 1
-    s_format = "{:.2f} {}" if (factor > 1) else "{:.0f} {}"
-    s = s_format.format(size, units[factor])
-    return s
+    size_units = units[factor]
+    size_str = f"{size:.2f}" if (factor > 1) else f"{size:.0f}"
+    size_str = f"{size_str} {size_units}"
+    return size_str
 
 
 def convert_size_string_to_bytes(size):
@@ -636,7 +637,7 @@ def join_filename(basename, extension):
     """
     basename = basename.rstrip(".").strip()
     extension = extension.replace(".", "").strip()
-    filename = "{}.{}".format(basename, extension)
+    filename = f"{basename}.{extension}"
     return filename
 
 
