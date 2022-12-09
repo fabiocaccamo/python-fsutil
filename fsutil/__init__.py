@@ -1007,6 +1007,14 @@ def write_file_json(
     """
     Write a json file at the given path with the specified data encoded in json format.
     """
+
+    def default_encoder(obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, set):
+            return list(obj)
+        return str(obj)
+
     content = json.dumps(
         data,
         skipkeys=skipkeys,
@@ -1016,7 +1024,7 @@ def write_file_json(
         cls=cls,
         indent=indent,
         separators=separators,
-        default=default,
+        default=default or default_encoder,
         sort_keys=sort_keys,
     )
     write_file(path, content)

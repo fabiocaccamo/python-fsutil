@@ -806,9 +806,17 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_read_file_json(self):
         path = self.temp_path("a/b/c.json")
-        data = {"test": "Hello World"}
+        now = datetime.now()
+        data = {
+            "test": "Hello World",
+            "test_datetime": now,
+            "test_set": set([1, 1, 2, 2, 3, 3]),
+        }
         fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
-        self.assertEqual(fsutil.read_file_json(path), data)
+        expected_data = data.copy()
+        expected_data["test_datetime"] = now.isoformat()
+        expected_data["test_set"] = list(expected_data["test_set"])
+        self.assertEqual(fsutil.read_file_json(path), expected_data)
 
     def test_read_file_lines(self):
         path = self.temp_path("a/b/c.txt")
@@ -1053,9 +1061,13 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_write_file_json(self):
         path = self.temp_path("a/b/c.json")
-        data = {"test": "Hello World"}
+        now = datetime.now()
+        data = {"test": "Hello World", "test_datetime": now}
         fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
-        self.assertEqual(fsutil.read_file(path), '{"test": "Hello World"}')
+        self.assertEqual(
+            fsutil.read_file(path),
+            f"""{{"test": "Hello World", "test_datetime": "{now.isoformat()}"}}""",
+        )
 
     def test_write_file_with_append(self):
         path = self.temp_path("a/b/c.txt")
