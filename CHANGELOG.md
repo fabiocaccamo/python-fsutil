@@ -4,7 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.7.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.6.1) - 2022-05-20
+## [0.8.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.8.0) - 2022-12-09
+-   Add `Python 3.11` support.
+-   Drop `Python < 3.8` support. #17
+-   Add `pypy` to CI.
+-   Add `pre-commit`.
+-   Add default json encoder to `write_file_json` for encoding also `datetime` and `set` objects by default.
+-   Replace `str.format` with `f-strings`.
+-   Make `dirpath` argument optional in `download_file` method.
+-   Fix `download_file` `NameError` when `requests` is not installed.
+-   Increase tests coverage.
+-   Bump requirements and GitHub actions versions.
+
+## [0.7.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.7.0) - 2022-09-13
 -   Add `read_file_lines_count` method.
 -   Update `read_file_lines` method with two new arguments: `line_start` and `line_end` *(for specifying the lines-range to read)*.
 
