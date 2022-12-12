@@ -81,6 +81,5 @@ setup(
         "Topic :: System :: Filesystems",
         "Topic :: Utilities",
     ],
-    license=__license__,
     test_suite="tests",
 )
