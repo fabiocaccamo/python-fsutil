@@ -696,9 +696,6 @@ tox
 
 # or run tests using unittest
 python -m unittest
-
-# or run tests using setuptools
-python setup.py test
 ```
 
 ## License

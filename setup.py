@@ -81,5 +81,4 @@ setup(
         "Topic :: System :: Filesystems",
         "Topic :: Utilities",
     ],
-    test_suite="tests",
 )
