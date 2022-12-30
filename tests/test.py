@@ -3,6 +3,7 @@ import threading
 import time
 import unittest
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 import fsutil
 
@@ -666,6 +667,21 @@ class fsutil_test_case(unittest.TestCase):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(fsutil.get_parent_dir(s, 6), "/")
 
+    def test_get_unique_name(self):
+        path = self.temp_path("a/b/c")
+        fsutil.create_dir(path)
+        name = fsutil.get_unique_name(
+            path,
+            prefix="custom-prefix",
+            suffix="custom-suffix",
+            extension="txt",
+            separator="_",
+        )
+        basename, extension = fsutil.split_filename(name)
+        self.assertTrue(basename.startswith("custom-prefix_"))
+        self.assertTrue(basename.endswith("_custom-suffix"))
+        self.assertEqual(extension, "txt")
+
     def test_is_dir(self):
         path = self.temp_path("a/b/")
         self.assertFalse(fsutil.is_dir(path))
@@ -1122,11 +1138,16 @@ class fsutil_test_case(unittest.TestCase):
     def test_write_file_json(self):
         path = self.temp_path("a/b/c.json")
         now = datetime.now()
-        data = {"test": "Hello World", "test_datetime": now}
+        dec = Decimal("3.33")
+        data = {
+            "test": "Hello World",
+            "test_datetime": now,
+            "test_decimal": dec,
+        }
         fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
         self.assertEqual(
             fsutil.read_file(path),
-            f"""{{"test": "Hello World", "test_datetime": "{now.isoformat()}"}}""",
+            f"""{{"test": "Hello World", "test_datetime": "{now.isoformat()}", "test_decimal": "{dec}"}}""",
         )
 
     def test_write_file_with_append(self):
