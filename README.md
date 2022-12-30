@@ -110,6 +110,7 @@ import fsutil
 -   [`rename_file`](#rename_file)
 -   [`rename_file_basename`](#rename_file_basename)
 -   [`rename_file_extension`](#rename_file_extension)
+-   [`replace_file`](#replace_file)
 -   [`search_dirs`](#search_dirs)
 -   [`search_files`](#search_files)
 -   [`split_filename`](#split_filename)
@@ -634,6 +635,15 @@ fsutil.rename_file_basename(path, basename)
 ```python
 # Rename a file extension with the given extension.
 fsutil.rename_file_extension(path, extension)
+```
+
+#### `replace_file`
+
+```python
+# Replace file at the specified path with the file located at src.
+# If autodelete, the src file will be removed at the end of the operation.
+# Optimized for large files.
+fsutil.replace_file(path, src, autodelete=False)
 ```
 
 #### `search_dirs`

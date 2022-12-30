@@ -999,6 +999,29 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path3))
         self.assertFalse(fsutil.exists(path4))
 
+    def test_replace_file(self):
+        dest = self.temp_path("a/b/c.txt")
+        src = self.temp_path("d/e/f.txt")
+        fsutil.create_file(dest, "old")
+        fsutil.create_file(src, "new")
+        fsutil.replace_file(dest, src)
+        content = fsutil.read_file(dest)
+        self.assertEqual(content, "new")
+        self.assertTrue(fsutil.exists(src))
+
+    def test_replace_file_with_autodelete(self):
+        dest = self.temp_path("a/b/c.txt")
+        src = self.temp_path("d/e/f.txt")
+        fsutil.create_file(dest, "old")
+        fsutil.create_file(src, "new")
+        fsutil.replace_file(dest, src, autodelete=True)
+        content = fsutil.read_file(dest)
+        self.assertEqual(content, "new")
+        self.assertFalse(fsutil.exists(src))
+
+    def test_replace_dir(self):
+        pass
+
     def test_search_files(self):
         fsutil.create_file(self.temp_path("a/b/c/IMG_1000.jpg"))
         fsutil.create_file(self.temp_path("a/b/c/IMG_1001.jpg"))
