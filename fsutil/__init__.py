@@ -4,7 +4,6 @@ import hashlib
 import json
 import os
 import shutil
-import sys
 import tempfile
 import zipfile
 from datetime import datetime
@@ -240,11 +239,6 @@ def copy_dir(path, dest, overwrite=False, **kwargs):
     dest = os.path.join(dest, dirname)
     if not overwrite:
         assert_not_exists(dest)
-    else:
-        # only if python < 3.8
-        if not (sys.version_info.major >= 3 and sys.version_info.minor >= 8):
-            if is_dir(dest):
-                remove_dir(dest)
     copy_dir_content(path, dest, **kwargs)
 
 
@@ -255,10 +249,8 @@ def copy_dir_content(path, dest, **kwargs):
     https://docs.python.org/3/library/shutil.html#shutil.copytree
     """
     assert_dir(path)
-    # only if python >= 3.8
-    if sys.version_info.major >= 3 and sys.version_info.minor >= 8:
-        make_dirs(dest)
-        kwargs.setdefault("dirs_exist_ok", True)
+    make_dirs(dest)
+    kwargs.setdefault("dirs_exist_ok", True)
     shutil.copytree(path, dest, **kwargs)
 
 
