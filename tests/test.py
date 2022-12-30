@@ -1010,17 +1010,38 @@ class fsutil_test_case(unittest.TestCase):
         self.assertTrue(fsutil.exists(src))
 
     def test_replace_file_with_autodelete(self):
-        dest = self.temp_path("a/b/c.txt")
-        src = self.temp_path("d/e/f.txt")
-        fsutil.create_file(dest, "old")
-        fsutil.create_file(src, "new")
-        fsutil.replace_file(dest, src, autodelete=True)
-        content = fsutil.read_file(dest)
+        dest_file = self.temp_path("a/b/c.txt")
+        src_file = self.temp_path("d/e/f.txt")
+        fsutil.create_file(dest_file, "old")
+        fsutil.create_file(src_file, "new")
+        fsutil.replace_file(dest_file, src_file, autodelete=True)
+        content = fsutil.read_file(dest_file)
         self.assertEqual(content, "new")
-        self.assertFalse(fsutil.exists(src))
+        self.assertFalse(fsutil.exists(src_file))
 
     def test_replace_dir(self):
-        pass
+        dest_dir = self.temp_path("a/b/")
+        dest_file = self.temp_path("a/b/c.txt")
+        src_dir = self.temp_path("d/e/")
+        src_file = self.temp_path("d/e/f.txt")
+        fsutil.create_file(dest_file, "old")
+        fsutil.create_file(src_file, "new")
+        fsutil.replace_dir(dest_dir, src_dir)
+        content = fsutil.read_file(self.temp_path("a/b/f.txt"))
+        self.assertEqual(content, "new")
+        self.assertTrue(fsutil.exists(src_dir))
+
+    def test_replace_dir_with_autodelete(self):
+        dest_dir = self.temp_path("a/b/")
+        dest_file = self.temp_path("a/b/c.txt")
+        src_dir = self.temp_path("d/e/")
+        src_file = self.temp_path("d/e/f.txt")
+        fsutil.create_file(dest_file, "old")
+        fsutil.create_file(src_file, "new")
+        fsutil.replace_dir(dest_dir, src_dir, autodelete=True)
+        content = fsutil.read_file(self.temp_path("a/b/f.txt"))
+        self.assertEqual(content, "new")
+        self.assertFalse(fsutil.exists(src_dir))
 
     def test_search_files(self):
         fsutil.create_file(self.temp_path("a/b/c/IMG_1000.jpg"))

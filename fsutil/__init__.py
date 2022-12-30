@@ -104,6 +104,7 @@ __all__ = [
     "rename_file",
     "rename_file_basename",
     "rename_file_extension",
+    "replace_dir",
     "replace_file",
     "search_dirs",
     "search_files",
@@ -943,6 +944,39 @@ def rename_file_extension(path, extension):
     basename = get_file_basename(path)
     filename = join_filename(basename, extension)
     rename_file(path, filename)
+
+
+def replace_dir(path, src, autodelete=False):
+    """
+    Replace directory at the specified path with the directory located at src.
+    If autodelete, the src directory will be removed at the end of the operation.
+    Optimized for large files.
+    """
+    assert_not_file(path)
+    assert_dir(src)
+
+    if path == src:
+        return
+
+    make_dirs(path)
+
+    dirpath, dirname = split_filepath(path)
+    # safe temporary name to avoid clashes with existing files/directories
+    temp_dirname = get_unique_name(dirpath)
+    temp_dest = join_path(dirpath, temp_dirname)
+    copy_dir_content(src, temp_dest)
+
+    if exists(path):
+        temp_dirname = get_unique_name(dirpath)
+        temp_path = join_path(dirpath, temp_dirname)
+        rename_dir(path=path, name=temp_dirname)
+        rename_dir(path=temp_dest, name=dirname)
+        remove_dir(path=temp_path)
+    else:
+        rename_dir(path=temp_dest, name=dirname)
+
+    if autodelete:
+        remove_dir(path=src)
 
 
 def replace_file(path, src, autodelete=False):
