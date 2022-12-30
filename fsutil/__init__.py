@@ -1022,14 +1022,14 @@ def _search_paths(path, pattern):
     return paths
 
 
-def search_dirs(path, pattern):
+def search_dirs(path, pattern="**/*"):
     """
     Search for directories at path matching the given pattern.
     """
     return _filter_paths(path, _search_paths(path, pattern), predicate=is_dir)
 
 
-def search_files(path, pattern):
+def search_files(path, pattern="**/*.*"):
     """
     Search for files at path matching the given pattern.
     """

@@ -660,14 +660,14 @@ fsutil.replace_file(path, src, autodelete=False)
 
 ```python
 # Search for directories at path matching the given pattern.
-dirs = fsutil.search_dirs(path, pattern)
+dirs = fsutil.search_dirs(path, pattern="**/*")
 ```
 
 #### `search_files`
 
 ```python
 # Search for files at path matching the given pattern.
-files = fsutil.search_files(path, pattern)
+files = fsutil.search_files(path, pattern="**/*.*")
 ```
 
 #### `split_filename`
