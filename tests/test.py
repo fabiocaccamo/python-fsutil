@@ -490,6 +490,22 @@ class fsutil_test_case(unittest.TestCase):
         creation_date_re = re.compile(r"^[\d]{4}\/[\d]{2}\/[\d]{2}$")
         self.assertTrue(creation_date_re.match(creation_date_str))
 
+    def test_get_dir_hash(self):
+        f1_path = self.temp_path("x/a/b/f1.txt")
+        f2_path = self.temp_path("x/a/b/f2.txt")
+        f3_path = self.temp_path("x/j/k/f3.txt")
+        f4_path = self.temp_path("x/j/k/f4.txt")
+        f5_path = self.temp_path("x/y/z/f5.txt")
+        f6_path = self.temp_path("x/y/z/f6.txt")
+        fsutil.create_file(f1_path, content="hello world 1")
+        fsutil.create_file(f2_path, content="hello world 2")
+        fsutil.create_file(f3_path, content="hello world 3")
+        fsutil.create_file(f4_path, content="hello world 4")
+        fsutil.create_file(f5_path, content="hello world 5")
+        fsutil.create_file(f6_path, content="hello world 6")
+        hash = fsutil.get_dir_hash(self.temp_path("x/"))
+        self.assertEqual(hash, "eabe619c41f0c4611b7b9746bededfcb")
+
     def test_get_dir_last_modified_date(self):
         path = self.temp_path("a/b/c.txt")
         fsutil.create_file(path, content="Hello")

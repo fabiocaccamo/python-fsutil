@@ -66,6 +66,7 @@ import fsutil
 -   [`extract_zip_file`](#extract_zip_file)
 -   [`get_dir_creation_date`](#get_dir_creation_date)
 -   [`get_dir_creation_date_formatted`](#get_dir_creation_date_formatted)
+-   [`get_dir_hash`](#get_dir_hash)
 -   [`get_dir_last_modified_date`](#get_dir_last_modified_date)
 -   [`get_dir_last_modified_date_formatted`](#get_dir_last_modified_date_formatted)
 -   [`get_dir_size`](#get_dir_size)
@@ -309,6 +310,14 @@ date = fsutil.get_dir_creation_date(path)
 ```python
 # Get the directory creation date formatted using the given format.
 date_str = fsutil.get_dir_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
+```
+
+#### `get_dir_hash`
+
+```python
+# Get the hash of the directory at the given path using
+# the specified algorithm function (md5 by default).
+hash = fsutil.get_dir_hash(path)
 ```
 
 #### `get_dir_last_modified_date`

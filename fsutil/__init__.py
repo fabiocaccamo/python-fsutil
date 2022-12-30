@@ -435,6 +435,22 @@ def get_dir_creation_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
     return date.strftime(format)
 
 
+def get_dir_hash(path, func="md5"):
+    """
+    Get the hash of the directory at the given path using
+    the specified algorithm function (md5 by default).
+    """
+    assert_dir(path)
+    hash = hashlib.new(func)
+    files = search_files(path)
+    for file in sorted(files):
+        file_hash = get_file_hash(file, func=func)
+        file_hash_b = bytes(file_hash, "utf-8")
+        hash.update(file_hash_b)
+    hash_hex = hash.hexdigest()
+    return hash_hex
+
+
 def get_dir_last_modified_date(path):
     """
     Get the directory last modification date.
@@ -523,7 +539,7 @@ def get_file_extension(path):
 
 def get_file_hash(path, func="md5"):
     """
-    Get the hash of the file at the gived path using
+    Get the hash of the file at the given path using
     the specified algorithm function (md5 by default).
     """
     assert_file(path)
