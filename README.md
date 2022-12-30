@@ -81,6 +81,7 @@ import fsutil
 -   [`get_file_size_formatted`](#get_file_size_formatted)
 -   [`get_filename`](#get_filename)
 -   [`get_parent_dir`](#get_parent_dir)
+-   [`get_unique_name`](#get_unique_name)
 -   [`is_dir`](#is_dir)
 -   [`is_empty`](#is_empty)
 -   [`is_empty_dir`](#is_empty_dir)
@@ -412,6 +413,13 @@ filename = fsutil.get_filename(path)
 ```python
 # Get the parent directory for the given path going up N levels.
 parent_dir = fsutil.get_parent_dir(path, levels=1)
+```
+
+#### `get_unique_name`
+
+```python
+# Gets a unique name for a directory/file ath the given directory path.
+unique_name = fsutil.get_unique_name(path, prefix="", suffix="", extension="", separator="-")
 ```
 
 #### `is_dir`

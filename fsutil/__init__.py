@@ -5,6 +5,7 @@ import json
 import os
 import shutil
 import tempfile
+import uuid
 import zipfile
 from datetime import datetime
 from urllib.parse import urlsplit
@@ -74,6 +75,7 @@ __all__ = [
     "get_file_size_formatted",
     "get_filename",
     "get_parent_dir",
+    "get_unique_name",
     "is_dir",
     "is_empty",
     "is_empty_dir",
@@ -582,6 +584,28 @@ def get_parent_dir(path, levels=1):
     Get the parent directory for the given path going up N levels.
     """
     return join_path(path, *([os.pardir] * max(1, levels)))
+
+
+def get_unique_name(path, prefix="", suffix="", extension="", separator="-"):
+    """
+    Gets a unique name for a directory/file ath the given directory path.
+    """
+    assert_dir(path)
+    name = ""
+    while True:
+        if prefix:
+            name += f"{prefix}{separator}"
+        uid = uuid.uuid4()
+        name += f"{uid}"
+        if suffix:
+            name += f"{separator}{suffix}"
+        if extension:
+            extension = extension.lstrip(".").lower()
+            name += f".{extension}"
+        if exists(join_path(path, name)):
+            continue
+        break
+    return name
 
 
 def is_dir(path):
