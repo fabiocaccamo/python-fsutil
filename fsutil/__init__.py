@@ -770,7 +770,7 @@ def read_file(path, encoding="utf-8"):
     """
     assert_file(path)
     content = ""
-    with open(path, "r", encoding=encoding) as file:
+    with open(path, encoding=encoding) as file:
         content = file.read()
     return content
 

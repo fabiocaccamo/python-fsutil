@@ -842,7 +842,7 @@ class fsutil_test_case(unittest.TestCase):
         data = {
             "test": "Hello World",
             "test_datetime": now,
-            "test_set": set([1, 1, 2, 2, 3, 3]),
+            "test_set": {1, 1, 2, 2, 3, 3},
         }
         fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
         expected_data = data.copy()
