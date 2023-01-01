@@ -805,7 +805,7 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.is_dir(path))
         self.assertTrue(fsutil.is_file(path))
 
-    def test_make_dirs_for_file_with_existing_file(self):
+    def test_make_dirs_for_file_with_existing_dir(self):
         path = self.temp_path("a/b/c.txt")
         fsutil.create_dir(path)
         with self.assertRaises(OSError):
