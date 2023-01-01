@@ -68,7 +68,6 @@ class fsutil_test_case(unittest.TestCase):
             fsutil.assert_file(path)
 
     def test_clean_dir_only_dirs(self):
-        path = self.temp_path("a/b/c.txt")
         fsutil.create_dir(self.temp_path("x/y/z/a"))
         fsutil.create_dir(self.temp_path("x/y/z/b"))
         fsutil.create_dir(self.temp_path("x/y/z/c"))
@@ -90,7 +89,6 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(self.temp_path("x/y/z/e")))
 
     def test_clean_dir_only_files(self):
-        path = self.temp_path("a/b/c.txt")
         fsutil.create_file(self.temp_path("a/b/c/f1.txt"), content="hello world")
         fsutil.create_file(self.temp_path("a/b/c/f2.txt"))
         fsutil.create_file(self.temp_path("a/b/c/f3.txt"), content="hello world")
@@ -110,7 +108,6 @@ class fsutil_test_case(unittest.TestCase):
         self.assertTrue(fsutil.exists(self.temp_path("a/b/c/f5.txt")))
 
     def test_clean_dir_dirs_and_files(self):
-        path = self.temp_path("a/b/c.txt")
         fsutil.create_file(self.temp_path("a/b/c/f1.txt"))
         fsutil.create_file(self.temp_path("a/b/c/f2.txt"))
         fsutil.create_file(self.temp_path("a/b/c/f3.txt"))
