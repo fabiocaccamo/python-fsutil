@@ -12,18 +12,7 @@
 [![](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # python-fsutil
-file-system utilities for lazy devs.
-
-## Features
--   Simple and intuitive.
--   Compatibile with python 2 and 3.
--   Well tested.
-
-## Index
--   [Installation](#installation)
--   [Usage](#usage)
--   [Testing](#testing)
--   [License](#license)
+high-level file-system operations for lazy devs.
 
 ## Installation
 
@@ -751,4 +740,4 @@ Released under [MIT License](LICENSE.txt).
 
 - [`python-benedict`](https://github.com/fabiocaccamo/python-benedict) - dict subclass with keylist/keypath support, I/O shortcuts (base64, csv, json, pickle, plist, query-string, toml, xml, yaml) and many utilities. 📘
 
-- [`python-fontbro`](https://github.com/fabiocaccamo/python-fontbro) - friendly font operations. 🧢
+- [`python-fontbro`](https://github.com/fabiocaccamo/python-fontbro) - friendly font operations on top of fontTools. 🧢
