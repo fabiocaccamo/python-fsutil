@@ -407,7 +407,6 @@ def download_file(url, dirpath=None, filename=None, chunk_size=8192, **kwargs):
     dirpath = _get_path(dirpath)
     filename = filename or get_filename(url) or "download"
     filepath = join_path(dirpath, filename)
-    assert_not_dir(dirpath)
     make_dirs_for_file(filepath)
     kwargs["stream"] = True
     with requests.get(url, **kwargs) as response:

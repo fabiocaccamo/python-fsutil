@@ -410,6 +410,17 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.remove_file(path)
         self.assertFalse(fsutil.exists(path))
 
+    def test_download_file_multiple_to_temp_dir(self):
+        for i in range(3):
+            url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
+            path = fsutil.download_file(url)
+            self.assertTrue(fsutil.exists(path))
+            lines = fsutil.read_file_lines(path, skip_empty=False)
+            lines_count = len(lines)
+            self.assertTrue(lines_count > 500 and lines_count < 1000)
+            fsutil.remove_file(path)
+            self.assertFalse(fsutil.exists(path))
+
     def test_download_file_without_requests_installed(self):
         requests_installed = fsutil.requests_installed
         fsutil.requests_installed = False
