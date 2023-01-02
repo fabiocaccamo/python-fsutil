@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.9.0) - 2023-01-02
+-   Drop old code targeting `Python < 3.8`.
+-   Add `get_unique_name` method.
+-   Add `replace_file` method.
+-   Add `replace_dir` method.
+-   Add `get_dir_hash` method. #10
+-   Add support to `pathlib.Path` path arguments. #14
+-   Add default value for `pattern` argument in `search_dirs` and `search_files` methods.
+-   Add more assertions on path args.
+-   Increase tests coverage.
+-   Add `setup.cfg` (`setuptools` declarative syntax) generated using `setuptools-py2cfg`.
+-   Add `pyupgrade` to `pre-commit` config.
+-   Fix duplicated test name.
+-   Remove unused variable in tests.
+
 ## [0.8.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.8.0) - 2022-12-09
 -   Add `Python 3.11` support.
 -   Drop `Python < 3.8` support. #17
