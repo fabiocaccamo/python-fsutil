@@ -194,6 +194,7 @@ def clean_dir(path, dirs=True, files=True):
     """
     Clean a directory by removing empty directories and/or empty files.
     """
+    assert_dir(path)
     if files:
         _clean_dir_empty_files(path)
     if dirs:
@@ -238,9 +239,10 @@ def copy_dir(path, dest, overwrite=False, **kwargs):
     More informations about kwargs supported options here:
     https://docs.python.org/3/library/shutil.html#shutil.copytree
     """
-    assert_not_file(path)
+    assert_dir(path)
     dirname = os.path.basename(os.path.normpath(path))
     dest = os.path.join(dest, dirname)
+    assert_not_file(dest)
     if not overwrite:
         assert_not_exists(dest)
     copy_dir_content(path, dest, **kwargs)
@@ -253,6 +255,7 @@ def copy_dir_content(path, dest, **kwargs):
     https://docs.python.org/3/library/shutil.html#shutil.copytree
     """
     assert_dir(path)
+    assert_not_file(dest)
     make_dirs(dest)
     kwargs.setdefault("dirs_exist_ok", True)
     shutil.copytree(path, dest, **kwargs)
@@ -266,6 +269,7 @@ def copy_file(path, dest, overwrite=False, **kwargs):
     https://docs.python.org/3/library/shutil.html#shutil.copy2
     """
     assert_file(path)
+    assert_not_dir(dest)
     if not overwrite:
         assert_not_exists(dest)
     make_dirs_for_file(dest)
@@ -277,6 +281,7 @@ def create_dir(path, overwrite=False):
     Create directory at the given path.
     If overwrite is not allowed and path exists, an OSError is raised.
     """
+    assert_not_file(path)
     if not overwrite:
         assert_not_exists(path)
     make_dirs(path)
@@ -287,6 +292,7 @@ def create_file(path, content="", overwrite=False):
     Create file with the specified content at the given path.
     If overwrite is not allowed and path exists, an OSError is raised.
     """
+    assert_not_dir(path)
     if not overwrite:
         assert_not_exists(path)
     write_file(path, content)
@@ -371,6 +377,7 @@ def download_file(url, dirpath=None, filename=None, chunk_size=8192, **kwargs):
     dirpath = dirpath or tempfile.gettempdir()
     filename = filename or get_filename(url) or "download"
     filepath = join_path(dirpath, filename)
+    assert_not_dir(dirpath)
     make_dirs_for_file(filepath)
     kwargs["stream"] = True
     with requests.get(url, **kwargs) as response:
@@ -396,6 +403,7 @@ def extract_zip_file(path, dest, autodelete=False, content_paths=None):
     If content_paths list is defined, only listed items will be extracted, otherwise all.
     """
     assert_file(path)
+    assert_not_file(dest)
     make_dirs(dest)
     with zipfile.ZipFile(path, "r") as file:
         file.extractall(dest, members=content_paths)
@@ -1085,6 +1093,7 @@ def write_file(path, content, append=False, encoding="utf-8"):
     """
     Write file with the specified content at the given path.
     """
+    assert_not_dir(path)
     make_dirs_for_file(path)
     mode = "a" if append else "w"
     with open(path, mode, encoding=encoding) as file:
