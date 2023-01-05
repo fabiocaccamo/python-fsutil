@@ -3,4 +3,4 @@ coverage == 7.0.1
 flake8 == 6.0.0
 pre-commit == 2.21.0
 requests == 2.28.1
-tox == 4.1.2
+tox == 4.2.3
