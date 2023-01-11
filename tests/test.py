@@ -819,6 +819,11 @@ class fsutil_test_case(unittest.TestCase):
         with self.assertRaises(OSError):
             fsutil.make_dirs_for_file(path)
 
+    def test_make_dirs_for_file_with_filename_only(self):
+        path = "document.txt"
+        fsutil.make_dirs_for_file(path)
+        self.assertFalse(fsutil.is_file(path))
+
     def test_move_dir(self):
         path = self.temp_path("a/b/c.txt")
         fsutil.create_file(path, content="Hello World")
@@ -1142,6 +1147,13 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.read_file(path), "Hello World")
         fsutil.write_file(self.temp_path("a/b/c.txt"), content="Hello Jupiter")
         self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
+
+    def test_write_file_with_filename_only(self):
+        path = "document.txt"
+        fsutil.write_file(path, content="Hello World")
+        self.assertTrue(fsutil.is_file(path))
+        # cleanup
+        fsutil.remove_file(path)
 
     def test_write_file_json(self):
         path = self.temp_path("a/b/c.json")

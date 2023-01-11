@@ -799,7 +799,8 @@ def make_dirs_for_file(path):
         return
     assert_not_dir(path)
     dirpath, _ = split_filepath(path)
-    make_dirs(dirpath)
+    if dirpath:
+        make_dirs(dirpath)
 
 
 def move_dir(path, dest, overwrite=False, **kwargs):
