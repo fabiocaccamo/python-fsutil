@@ -216,7 +216,7 @@ fsutil.create_dir(path, overwrite=False)
 ```python
 # Create file with the specified content at the given path.
 # If overwrite is not allowed and path exists, an OSError is raised.
-fsutil.create_file(path, content='', overwrite=False)
+fsutil.create_file(path, content="", overwrite=False)
 ```
 
 #### `create_zip_file`
@@ -266,9 +266,10 @@ fsutil.delete_files(*paths)
 
 ```python
 # Download a file from url to the given dirpath and return the filepath.
+# If dirpath is not provided, the file will be downloaded to a temp directory.
 # If filename is provided, the file will be named using filename.
 # It is possible to pass extra request options (eg. for authentication) using **kwargs.
-filepath = fsutil.download_file(url, dirpath, filename='archive.zip', chunk_size=8192, **kwargs)
+filepath = fsutil.download_file(url, dirpath=None, filename="archive.zip", chunk_size=8192, **kwargs)
 ```
 
 #### `exists`
@@ -306,7 +307,7 @@ date_str = fsutil.get_dir_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%
 ```python
 # Get the hash of the directory at the given path using
 # the specified algorithm function (md5 by default).
-hash = fsutil.get_dir_hash(path)
+hash = fsutil.get_dir_hash(path, func="md5")
 ```
 
 #### `get_dir_last_modified_date`
@@ -320,7 +321,7 @@ date = fsutil.get_dir_last_modified_date(path)
 
 ```python
 # Get the directory last modification date formatted using the given format.
-date_str = fsutil.get_dir_last_modified_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
+date_str = fsutil.get_dir_last_modified_date_formatted(path, format="%Y-%m-%d %H:%M:%S")
 ```
 
 #### `get_dir_size`
@@ -355,7 +356,7 @@ date = fsutil.get_file_creation_date(path)
 
 ```python
 # Get the file creation date formatted using the given format.
-date_str = fsutil.get_file_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
+date_str = fsutil.get_file_creation_date_formatted(path, format="%Y-%m-%d %H:%M:%S")
 ```
 
 #### `get_file_extension`
@@ -370,7 +371,7 @@ extension = fsutil.get_file_extension(path)
 ```python
 # Get the hash of the file at the given path using
 # the specified algorithm function (md5 by default).
-filehash = fsutil.get_file_hash(path, func='md5')
+filehash = fsutil.get_file_hash(path, func="md5")
 ```
 
 #### `get_file_last_modified_date`
@@ -384,7 +385,7 @@ date = fsutil.get_file_last_modified_date(path)
 
 ```python
 # Get the file last modification date formatted using the given format.
-date_str = fsutil.get_file_last_modified_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
+date_str = fsutil.get_file_last_modified_date_formatted(path, format="%Y-%m-%d %H:%M:%S")
 ```
 
 #### `get_file_size`
@@ -534,7 +535,7 @@ fsutil.move_file(path, dest, overwrite=False, **kwargs)
 
 ```python
 # Read the content of the file at the given path using the specified encoding.
-content = fsutil.read_file(path, encoding='utf-8')
+content = fsutil.read_file(path, encoding="utf-8")
 ```
 
 #### `read_file_from_url`
@@ -557,7 +558,7 @@ data = fsutil.read_file_json(path)
 # Read file content lines.
 # It is possible to specify the line indexes (negative indexes too),
 # very useful especially when reading large files.
-content = fsutil.read_file_lines(path, line_start=0, line_end=-1, strip_white=True, skip_empty=True, encoding='utf-8')
+content = fsutil.read_file_lines(path, line_start=0, line_end=-1, strip_white=True, skip_empty=True, encoding="utf-8")
 ```
 
 #### `read_file_lines_count`
@@ -693,7 +694,7 @@ path_names = fsutil.split_path(path)
 
 ```python
 # Write file with the specified content at the given path.
-fsutil.write_file(path, content, append=False, encoding='utf-8')
+fsutil.write_file(path, content, append=False, encoding="utf-8")
 ```
 
 #### `write_file_json`

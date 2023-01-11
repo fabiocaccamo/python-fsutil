@@ -398,6 +398,7 @@ def delete_files(*paths):
 def download_file(url, dirpath=None, filename=None, chunk_size=8192, **kwargs):
     """
     Download a file from url to dirpath.
+    If dirpath is not provided, the file will be downloaded to a temp directory.
     If filename is provided, the file will be named using filename.
     It is possible to pass extra request options (eg. for authentication) using **kwargs.
     """
