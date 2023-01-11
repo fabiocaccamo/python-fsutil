@@ -549,7 +549,7 @@ content = fsutil.read_file_from_url(url, **kwargs)
 
 ```python
 # Read and decode a json encoded file at the given path.
-data = fsutil.read_file_json(path)
+data = fsutil.read_file_json(path, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None)
 ```
 
 #### `read_file_lines`
@@ -701,7 +701,7 @@ fsutil.write_file(path, content, append=False, encoding="utf-8")
 
 ```python
 # Write a json file at the given path with the specified data encoded in json format.
-fsutil.write_file_json(path, data)
+fsutil.write_file_json(path, data, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False)
 ```
 
 ## Testing
