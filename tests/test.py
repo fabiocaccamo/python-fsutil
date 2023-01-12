@@ -1137,6 +1137,10 @@ class fsutil_test_case(unittest.TestCase):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(fsutil.split_filepath(s), ("/root/a/b/c", "Document.txt"))
 
+    def test_split_filepath_with_filename_only(self):
+        s = "Document.txt"
+        self.assertEqual(fsutil.split_filepath(s), ("", "Document.txt"))
+
     def test_split_path(self):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(fsutil.split_path(s), ["root", "a", "b", "c", "Document.txt"])
