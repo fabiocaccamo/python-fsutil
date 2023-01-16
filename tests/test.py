@@ -402,7 +402,7 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_download_file(self):
         url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
-        path = fsutil.download_file(url, __file__)
+        path = fsutil.download_file(url, dirpath=__file__)
         self.assertTrue(fsutil.exists(path))
         lines = fsutil.read_file_lines(path, skip_empty=False)
         lines_count = len(lines)
@@ -426,7 +426,7 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.requests_installed = False
         url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
         with self.assertRaises(ModuleNotFoundError):
-            fsutil.download_file(url, __file__)
+            fsutil.download_file(url, dirpath=__file__)
         fsutil.requests_installed = requests_installed
 
     def test_exists(self):
@@ -661,19 +661,19 @@ class fsutil_test_case(unittest.TestCase):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(fsutil.get_parent_dir(s), "/root/a/b/c")
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, 0), "/root/a/b/c")
+        self.assertEqual(fsutil.get_parent_dir(s, levels=0), "/root/a/b/c")
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, 1), "/root/a/b/c")
+        self.assertEqual(fsutil.get_parent_dir(s, levels=1), "/root/a/b/c")
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, 2), "/root/a/b")
+        self.assertEqual(fsutil.get_parent_dir(s, levels=2), "/root/a/b")
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, 3), "/root/a")
+        self.assertEqual(fsutil.get_parent_dir(s, levels=3), "/root/a")
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, 4), "/root")
+        self.assertEqual(fsutil.get_parent_dir(s, levels=4), "/root")
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, 5), "/")
+        self.assertEqual(fsutil.get_parent_dir(s, levels=5), "/")
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, 6), "/")
+        self.assertEqual(fsutil.get_parent_dir(s, levels=6), "/")
 
     def test_get_unique_name(self):
         path = self.temp_path("a/b/c")

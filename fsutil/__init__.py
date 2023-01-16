@@ -208,7 +208,7 @@ def _clean_dir_empty_files(path):
                 remove_file(filepath)
 
 
-def clean_dir(path, dirs=True, files=True):
+def clean_dir(path, *, dirs=True, files=True):
     """
     Clean a directory by removing empty directories and/or empty files.
     """
@@ -251,7 +251,7 @@ def convert_size_string_to_bytes(size):
     return int((1024**factor) * amount)
 
 
-def copy_dir(path, dest, overwrite=False, **kwargs):
+def copy_dir(path, dest, *, overwrite=False, **kwargs):
     """
     Copy the directory at the given path and all its content to dest path.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -284,7 +284,7 @@ def copy_dir_content(path, dest, **kwargs):
     shutil.copytree(path, dest, **kwargs)
 
 
-def copy_file(path, dest, overwrite=False, **kwargs):
+def copy_file(path, dest, *, overwrite=False, **kwargs):
     """
     Copy the file at the given path and its metadata to dest path.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -301,7 +301,7 @@ def copy_file(path, dest, overwrite=False, **kwargs):
     shutil.copy2(path, dest, **kwargs)
 
 
-def create_dir(path, overwrite=False):
+def create_dir(path, *, overwrite=False):
     """
     Create directory at the given path.
     If overwrite is not allowed and path exists, an OSError is raised.
@@ -313,7 +313,7 @@ def create_dir(path, overwrite=False):
     make_dirs(path)
 
 
-def create_file(path, content="", overwrite=False):
+def create_file(path, content="", *, overwrite=False):
     """
     Create file with the specified content at the given path.
     If overwrite is not allowed and path exists, an OSError is raised.
@@ -326,7 +326,7 @@ def create_file(path, content="", overwrite=False):
 
 
 def create_zip_file(
-    path, content_paths, overwrite=True, compression=zipfile.ZIP_DEFLATED
+    path, content_paths, *, overwrite=True, compression=zipfile.ZIP_DEFLATED
 ):
     """
     Create zip file at path compressing directories/files listed in content_paths.
@@ -395,7 +395,7 @@ def delete_files(*paths):
     remove_files(*paths)
 
 
-def download_file(url, dirpath=None, filename=None, chunk_size=8192, **kwargs):
+def download_file(url, *, dirpath=None, filename=None, chunk_size=8192, **kwargs):
     """
     Download a file from url to dirpath.
     If dirpath is not provided, the file will be downloaded to a temp directory.
@@ -427,7 +427,7 @@ def exists(path):
     return os.path.exists(path)
 
 
-def extract_zip_file(path, dest, autodelete=False, content_paths=None):
+def extract_zip_file(path, dest, *, autodelete=False, content_paths=None):
     """
     Extract zip file at path to dest path.
     If autodelete, the archive will be deleted after extraction.
@@ -444,7 +444,7 @@ def extract_zip_file(path, dest, autodelete=False, content_paths=None):
         remove_file(path)
 
 
-def _filter_paths(basepath, relpaths, predicate=None):
+def _filter_paths(basepath, relpaths, *, predicate=None):
     """
     Filter paths relative to basepath according to the optional predicate function.
     If predicate is defined, paths are filtered using it, otherwise all paths will be listed.
@@ -469,7 +469,7 @@ def get_dir_creation_date(path):
     return creation_date
 
 
-def get_dir_creation_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
+def get_dir_creation_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
     """
     Get the directory creation date formatted using the given format.
     """
@@ -478,7 +478,7 @@ def get_dir_creation_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
     return date.strftime(format)
 
 
-def get_dir_hash(path, func="md5"):
+def get_dir_hash(path, *, func="md5"):
     """
     Get the hash of the directory at the given path using
     the specified algorithm function (md5 by default).
@@ -517,7 +517,7 @@ def get_dir_last_modified_date(path):
     return last_modified_date
 
 
-def get_dir_last_modified_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
+def get_dir_last_modified_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
     """
     Get the directory last modification date formatted using the given format.
     """
@@ -570,7 +570,7 @@ def get_file_creation_date(path):
     return creation_date
 
 
-def get_file_creation_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
+def get_file_creation_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
     """
     Get the file creation date formatted using the given format.
     """
@@ -588,7 +588,7 @@ def get_file_extension(path):
     return extension
 
 
-def get_file_hash(path, func="md5"):
+def get_file_hash(path, *, func="md5"):
     """
     Get the hash of the file at the given path using
     the specified algorithm function (md5 by default).
@@ -614,7 +614,7 @@ def get_file_last_modified_date(path):
     return last_modified_date
 
 
-def get_file_last_modified_date_formatted(path, format="%Y-%m-%d %H:%M:%S"):
+def get_file_last_modified_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
     """
     Get the file last modification date formatted using the given format.
     """
@@ -654,7 +654,7 @@ def get_filename(path):
     return filename
 
 
-def get_parent_dir(path, levels=1):
+def get_parent_dir(path, *, levels=1):
     """
     Get the parent directory for the given path going up N levels.
     """
@@ -662,7 +662,7 @@ def get_parent_dir(path, levels=1):
     return join_path(path, *([os.pardir] * max(1, levels)))
 
 
-def get_unique_name(path, prefix="", suffix="", extension="", separator="-"):
+def get_unique_name(path, *, prefix="", suffix="", extension="", separator="-"):
     """
     Gets a unique name for a directory/file ath the given directory path.
     """
@@ -803,7 +803,7 @@ def make_dirs_for_file(path):
         make_dirs(dirpath)
 
 
-def move_dir(path, dest, overwrite=False, **kwargs):
+def move_dir(path, dest, *, overwrite=False, **kwargs):
     """
     Move an existing dir from path to dest directory.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -820,7 +820,7 @@ def move_dir(path, dest, overwrite=False, **kwargs):
     shutil.move(path, dest, **kwargs)
 
 
-def move_file(path, dest, overwrite=False, **kwargs):
+def move_file(path, dest, *, overwrite=False, **kwargs):
     """
     Move an existing file from path to dest directory.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -839,7 +839,7 @@ def move_file(path, dest, overwrite=False, **kwargs):
     shutil.move(path, dest, **kwargs)
 
 
-def read_file(path, encoding="utf-8"):
+def read_file(path, *, encoding="utf-8"):
     """
     Read the content of the file at the given path using the specified encoding.
     """
@@ -864,6 +864,7 @@ def read_file_from_url(url, **kwargs):
 
 def read_file_json(
     path,
+    *,
     cls=None,
     object_hook=None,
     parse_float=None,
@@ -888,7 +889,7 @@ def read_file_json(
     return data
 
 
-def _read_file_lines_in_range(path, line_start=0, line_end=-1, encoding="utf-8"):
+def _read_file_lines_in_range(path, *, line_start=0, line_end=-1, encoding="utf-8"):
     path = _get_path(path)
     line_start_negative = line_start < 0
     line_end_negative = line_end < 0
@@ -910,7 +911,13 @@ def _read_file_lines_in_range(path, line_start=0, line_end=-1, encoding="utf-8")
 
 
 def read_file_lines(
-    path, line_start=0, line_end=-1, strip_white=True, skip_empty=True, encoding="utf-8"
+    path,
+    *,
+    line_start=0,
+    line_end=-1,
+    strip_white=True,
+    skip_empty=True,
+    encoding="utf-8",
 ):
     """
     Read file content lines.
@@ -1049,7 +1056,7 @@ def rename_file_extension(path, extension):
     rename_file(path, filename)
 
 
-def replace_dir(path, src, autodelete=False):
+def replace_dir(path, src, *, autodelete=False):
     """
     Replace directory at the specified path with the directory located at src.
     If autodelete, the src directory will be removed at the end of the operation.
@@ -1084,7 +1091,7 @@ def replace_dir(path, src, autodelete=False):
         remove_dir(path=src)
 
 
-def replace_file(path, src, autodelete=False):
+def replace_file(path, src, *, autodelete=False):
     """
     Replace file at the specified path with the file located at src.
     If autodelete, the src file will be removed at the end of the operation.
@@ -1178,7 +1185,7 @@ def split_path(path):
     return names
 
 
-def write_file(path, content, append=False, encoding="utf-8"):
+def write_file(path, content, *, append=False, encoding="utf-8"):
     """
     Write file with the specified content at the given path.
     """
@@ -1193,6 +1200,7 @@ def write_file(path, content, append=False, encoding="utf-8"):
 def write_file_json(
     path,
     data,
+    *,
     skipkeys=False,
     ensure_ascii=True,
     check_circular=True,
