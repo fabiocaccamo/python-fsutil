@@ -401,7 +401,7 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path4))
 
     def test_download_file(self):
-        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
+        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
         path = fsutil.download_file(url, dirpath=__file__)
         self.assertTrue(fsutil.exists(path))
         lines = fsutil.read_file_lines(path, skip_empty=False)
@@ -412,7 +412,7 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_download_file_multiple_to_temp_dir(self):
         for i in range(3):
-            url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
+            url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
             path = fsutil.download_file(url)
             self.assertTrue(fsutil.exists(path))
             lines = fsutil.read_file_lines(path, skip_empty=False)
@@ -424,7 +424,7 @@ class fsutil_test_case(unittest.TestCase):
     def test_download_file_without_requests_installed(self):
         requests_installed = fsutil.requests_installed
         fsutil.requests_installed = False
-        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
+        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
         with self.assertRaises(ModuleNotFoundError):
             fsutil.download_file(url, dirpath=__file__)
         fsutil.requests_installed = requests_installed
@@ -845,7 +845,7 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.read_file(path), "Hello World")
 
     def test_read_file_from_url(self):
-        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/master/README.md"
+        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
         content = fsutil.read_file_from_url(url)
         self.assertTrue("python-fsutil" in content)
 

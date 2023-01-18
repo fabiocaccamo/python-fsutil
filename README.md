@@ -2,10 +2,10 @@
 [![](https://img.shields.io/pypi/v/python-fsutil.svg?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/python-fsutil/)
 [![](https://pepy.tech/badge/python-fsutil/month)](https://pepy.tech/project/python-fsutil)
 [![](https://img.shields.io/github/stars/fabiocaccamo/python-fsutil?logo=github)](https://github.com/fabiocaccamo/python-fsutil/)
-[![](https://img.shields.io/pypi/l/python-fsutil.svg?color=blue)](https://github.com/fabiocaccamo/python-fsutil/blob/master/LICENSE.txt)
+[![](https://img.shields.io/pypi/l/python-fsutil.svg?color=blue)](https://github.com/fabiocaccamo/python-fsutil/blob/main/LICENSE.txt)
 
-[![](https://results.pre-commit.ci/badge/github/fabiocaccamo/python-fsutil/master.svg)](https://results.pre-commit.ci/latest/github/fabiocaccamo/python-fsutil/master)
-[![](https://img.shields.io/github/actions/workflow/status/fabiocaccamo/python-fsutil/test-package.yml?branch=master&label=build&logo=github)](https://github.com/fabiocaccamo/python-fsutil)
+[![](https://results.pre-commit.ci/badge/github/fabiocaccamo/python-fsutil/main.svg)](https://results.pre-commit.ci/latest/github/fabiocaccamo/python-fsutil/main)
+[![](https://img.shields.io/github/actions/workflow/status/fabiocaccamo/python-fsutil/test-package.yml?branch=main&label=build&logo=github)](https://github.com/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codecov/c/gh/fabiocaccamo/python-fsutil?logo=codecov)](https://codecov.io/gh/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codacy/grade/fc40788ae7d74d1fb34a38934113c4e5?logo=codacy)](https://www.codacy.com/app/fabiocaccamo/python-fsutil)
 [![](https://img.shields.io/codeclimate/maintainability/fabiocaccamo/python-fsutil?logo=code-climate)](https://codeclimate.com/github/fabiocaccamo/python-fsutil/)
