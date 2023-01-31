@@ -8,6 +8,7 @@ import tempfile
 import uuid
 import zipfile
 from datetime import datetime
+from typing import Callable, Dict, Generator, Iterable, List, Optional, Tuple, Union
 from urllib.parse import urlsplit
 
 try:
@@ -115,10 +116,12 @@ __all__ = [
     "write_file_json",
 ]
 
+PathIn = Union[str, pathlib.Path]
+
 SIZE_UNITS = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
 
-def _require_requests_installed():
+def _require_requests_installed() -> None:
     if not requests_installed:
         raise ModuleNotFoundError(
             "'requests' module is not installed, "
@@ -126,16 +129,13 @@ def _require_requests_installed():
         )
 
 
-def _get_path(path):
+def _get_path(path: PathIn) -> str:
     if isinstance(path, str):
         return path
-    elif isinstance(path, pathlib.Path):
-        return str(path)
-    else:
-        return path
+    return str(path)
 
 
-def assert_dir(path):
+def assert_dir(path: PathIn) -> None:
     """
     Raise an OSError if the given path doesn't exist or it is not a directory.
     """
@@ -144,7 +144,7 @@ def assert_dir(path):
         raise OSError(f"Invalid directory path: {path}")
 
 
-def assert_exists(path):
+def assert_exists(path) -> None:
     """
     Raise an OSError if the given path doesn't exist.
     """
@@ -153,7 +153,7 @@ def assert_exists(path):
         raise OSError(f"Invalid item path: {path}")
 
 
-def assert_file(path):
+def assert_file(path) -> None:
     """
     Raise an OSError if the given path doesn't exist or it is not a file.
     """
@@ -162,7 +162,7 @@ def assert_file(path):
         raise OSError(f"Invalid file path: {path}")
 
 
-def assert_not_dir(path):
+def assert_not_dir(path: PathIn) -> None:
     """
     Raise an OSError if the given path is an existing directory.
     """
@@ -171,7 +171,7 @@ def assert_not_dir(path):
         raise OSError(f"Invalid path, directory already exists: {path}")
 
 
-def assert_not_exists(path):
+def assert_not_exists(path: PathIn) -> None:
     """
     Raise an OSError if the given path already exists.
     """
@@ -180,7 +180,7 @@ def assert_not_exists(path):
         raise OSError(f"Invalid path, item already exists: {path}")
 
 
-def assert_not_file(path):
+def assert_not_file(path: PathIn) -> None:
     """
     Raise an OSError if the given path is an existing file.
     """
@@ -189,7 +189,7 @@ def assert_not_file(path):
         raise OSError(f"Invalid path, file already exists: {path}")
 
 
-def _clean_dir_empty_dirs(path):
+def _clean_dir_empty_dirs(path: PathIn) -> None:
     path = _get_path(path)
     for basepath, dirnames, _ in os.walk(path, topdown=False):
         for dirname in dirnames:
@@ -198,7 +198,7 @@ def _clean_dir_empty_dirs(path):
                 remove_dir(dirpath)
 
 
-def _clean_dir_empty_files(path):
+def _clean_dir_empty_files(path: PathIn) -> None:
     path = _get_path(path)
     for basepath, _, filenames in os.walk(path, topdown=False):
         for filename in filenames:
@@ -207,7 +207,7 @@ def _clean_dir_empty_files(path):
                 remove_file(filepath)
 
 
-def clean_dir(path, *, dirs=True, files=True):
+def clean_dir(path: PathIn, *, dirs: bool = True, files: bool = True) -> None:
     """
     Clean a directory by removing empty directories and/or empty files.
     """
@@ -219,24 +219,24 @@ def clean_dir(path, *, dirs=True, files=True):
         _clean_dir_empty_dirs(path)
 
 
-def convert_size_bytes_to_string(size):
+def convert_size_bytes_to_string(size: int) -> str:
     """
     Convert the given size bytes to string using the right unit suffix.
     """
-    size = float(size)
+    size_num = float(size)
     units = SIZE_UNITS
     factor = 0
     factor_limit = len(units) - 1
-    while (size >= 1024) and (factor <= factor_limit):
-        size /= 1024
+    while (size_num >= 1024) and (factor <= factor_limit):
+        size_num /= 1024
         factor += 1
     size_units = units[factor]
-    size_str = f"{size:.2f}" if (factor > 1) else f"{size:.0f}"
+    size_str = f"{size_num:.2f}" if (factor > 1) else f"{size_num:.0f}"
     size_str = f"{size_str} {size_units}"
     return size_str
 
 
-def convert_size_string_to_bytes(size):
+def convert_size_string_to_bytes(size: str) -> Union[float, int]:
     """
     Convert the given size string to bytes.
     """
@@ -250,7 +250,7 @@ def convert_size_string_to_bytes(size):
     return int((1024**factor) * amount)
 
 
-def copy_dir(path, dest, *, overwrite=False, **kwargs):
+def copy_dir(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -> None:
     """
     Copy the directory at the given path and all its content to dest path.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -268,7 +268,7 @@ def copy_dir(path, dest, *, overwrite=False, **kwargs):
     copy_dir_content(path, dest, **kwargs)
 
 
-def copy_dir_content(path, dest, **kwargs):
+def copy_dir_content(path: PathIn, dest: PathIn, **kwargs) -> None:
     """
     Copy the content of the directory at the given path to dest path.
     More informations about kwargs supported options here:
@@ -283,7 +283,7 @@ def copy_dir_content(path, dest, **kwargs):
     shutil.copytree(path, dest, **kwargs)
 
 
-def copy_file(path, dest, *, overwrite=False, **kwargs):
+def copy_file(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -> None:
     """
     Copy the file at the given path and its metadata to dest path.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -300,7 +300,7 @@ def copy_file(path, dest, *, overwrite=False, **kwargs):
     shutil.copy2(path, dest, **kwargs)
 
 
-def create_dir(path, *, overwrite=False):
+def create_dir(path: PathIn, *, overwrite: bool = False) -> None:
     """
     Create directory at the given path.
     If overwrite is not allowed and path exists, an OSError is raised.
@@ -312,7 +312,7 @@ def create_dir(path, *, overwrite=False):
     make_dirs(path)
 
 
-def create_file(path, content="", *, overwrite=False):
+def create_file(path: PathIn, content: str = "", *, overwrite: bool = False) -> None:
     """
     Create file with the specified content at the given path.
     If overwrite is not allowed and path exists, an OSError is raised.
@@ -325,8 +325,12 @@ def create_file(path, content="", *, overwrite=False):
 
 
 def create_zip_file(
-    path, content_paths, *, overwrite=True, compression=zipfile.ZIP_DEFLATED
-):
+    path: PathIn,
+    content_paths: List[PathIn],
+    *,
+    overwrite: bool = True,
+    compression: int = zipfile.ZIP_DEFLATED,
+) -> None:
     """
     Create zip file at path compressing directories/files listed in content_paths.
     If overwrite is allowed and dest zip already exists, it will be overwritten.
@@ -337,8 +341,10 @@ def create_zip_file(
         assert_not_exists(path)
     make_dirs_for_file(path)
 
-    def _write_content_to_zip_file(file, path, basedir=""):
-        path = _get_path(path)
+    def _write_content_to_zip_file(
+        file: zipfile.ZipFile, content_path: PathIn, basedir: str = ""
+    ) -> None:
+        path = _get_path(content_path)
         assert_exists(path)
         if is_file(path):
             filename = get_filename(path)
@@ -357,7 +363,7 @@ def create_zip_file(
             _write_content_to_zip_file(file, content_path)
 
 
-def delete_dir(path):
+def delete_dir(path: PathIn) -> bool:
     """
     Alias for remove_dir.
     """
@@ -365,21 +371,21 @@ def delete_dir(path):
     return removed
 
 
-def delete_dir_content(path):
+def delete_dir_content(path: PathIn) -> None:
     """
     Alias for remove_dir_content.
     """
     remove_dir_content(path)
 
 
-def delete_dirs(*paths):
+def delete_dirs(*paths) -> None:
     """
     Alias for remove_dirs.
     """
     remove_dirs(*paths)
 
 
-def delete_file(path):
+def delete_file(path: PathIn) -> bool:
     """
     Alias for remove_file.
     """
@@ -387,14 +393,21 @@ def delete_file(path):
     return removed
 
 
-def delete_files(*paths):
+def delete_files(*paths) -> None:
     """
     Alias for remove_files.
     """
     remove_files(*paths)
 
 
-def download_file(url, *, dirpath=None, filename=None, chunk_size=8192, **kwargs):
+def download_file(
+    url: str,
+    *,
+    dirpath: Optional[PathIn] = None,
+    filename: Optional[str] = None,
+    chunk_size: int = 8192,
+    **kwargs,
+) -> str:
     """
     Download a file from url to dirpath.
     If dirpath is not provided, the file will be downloaded to a temp directory.
@@ -418,7 +431,7 @@ def download_file(url, *, dirpath=None, filename=None, chunk_size=8192, **kwargs
     return filepath
 
 
-def exists(path):
+def exists(path: PathIn) -> bool:
     """
     Check if a directory of a file exists at the given path.
     """
@@ -426,7 +439,13 @@ def exists(path):
     return os.path.exists(path)
 
 
-def extract_zip_file(path, dest, *, autodelete=False, content_paths=None):
+def extract_zip_file(
+    path: PathIn,
+    dest: PathIn,
+    *,
+    autodelete: bool = False,
+    content_paths: Optional[Iterable[Union[str, zipfile.ZipInfo]]] = None,
+) -> None:
     """
     Extract zip file at path to dest path.
     If autodelete, the archive will be deleted after extraction.
@@ -443,7 +462,9 @@ def extract_zip_file(path, dest, *, autodelete=False, content_paths=None):
         remove_file(path)
 
 
-def _filter_paths(basepath, relpaths, *, predicate=None):
+def _filter_paths(
+    basepath: str, relpaths: List[str], *, predicate: Optional[Callable] = None
+) -> List[str]:
     """
     Filter paths relative to basepath according to the optional predicate function.
     If predicate is defined, paths are filtered using it, otherwise all paths will be listed.
@@ -457,7 +478,7 @@ def _filter_paths(basepath, relpaths, *, predicate=None):
     return paths
 
 
-def get_dir_creation_date(path):
+def get_dir_creation_date(path: PathIn) -> datetime:
     """
     Get the directory creation date.
     """
@@ -468,7 +489,9 @@ def get_dir_creation_date(path):
     return creation_date
 
 
-def get_dir_creation_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
+def get_dir_creation_date_formatted(
+    path: PathIn, *, format: str = "%Y-%m-%d %H:%M:%S"
+) -> str:
     """
     Get the directory creation date formatted using the given format.
     """
@@ -477,7 +500,7 @@ def get_dir_creation_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
     return date.strftime(format)
 
 
-def get_dir_hash(path, *, func="md5"):
+def get_dir_hash(path: PathIn, *, func: str = "md5") -> str:
     """
     Get the hash of the directory at the given path using
     the specified algorithm function (md5 by default).
@@ -494,7 +517,7 @@ def get_dir_hash(path, *, func="md5"):
     return hash_hex
 
 
-def get_dir_last_modified_date(path):
+def get_dir_last_modified_date(path: PathIn) -> datetime:
     """
     Get the directory last modification date.
     """
@@ -516,7 +539,9 @@ def get_dir_last_modified_date(path):
     return last_modified_date
 
 
-def get_dir_last_modified_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
+def get_dir_last_modified_date_formatted(
+    path: PathIn, *, format: str = "%Y-%m-%d %H:%M:%S"
+) -> str:
     """
     Get the directory last modification date formatted using the given format.
     """
@@ -525,7 +550,7 @@ def get_dir_last_modified_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
     return date.strftime(format)
 
 
-def get_dir_size(path):
+def get_dir_size(path: PathIn) -> int:
     """
     Get the directory size in bytes.
     """
@@ -540,7 +565,7 @@ def get_dir_size(path):
     return size
 
 
-def get_dir_size_formatted(path):
+def get_dir_size_formatted(path: PathIn) -> str:
     """
     Get the directory size formatted using the right unit suffix.
     """
@@ -549,7 +574,7 @@ def get_dir_size_formatted(path):
     return size_formatted
 
 
-def get_file_basename(path):
+def get_file_basename(path: PathIn) -> str:
     """
     Get the file basename from the given path/url.
     """
@@ -558,7 +583,7 @@ def get_file_basename(path):
     return basename
 
 
-def get_file_creation_date(path):
+def get_file_creation_date(path: PathIn) -> datetime:
     """
     Get the file creation date.
     """
@@ -569,7 +594,9 @@ def get_file_creation_date(path):
     return creation_date
 
 
-def get_file_creation_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
+def get_file_creation_date_formatted(
+    path: PathIn, *, format: str = "%Y-%m-%d %H:%M:%S"
+) -> str:
     """
     Get the file creation date formatted using the given format.
     """
@@ -578,7 +605,7 @@ def get_file_creation_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
     return date.strftime(format)
 
 
-def get_file_extension(path):
+def get_file_extension(path: PathIn) -> str:
     """
     Get the file extension from the given path/url.
     """
@@ -587,7 +614,7 @@ def get_file_extension(path):
     return extension
 
 
-def get_file_hash(path, *, func="md5"):
+def get_file_hash(path: PathIn, *, func: str = "md5") -> str:
     """
     Get the hash of the file at the given path using
     the specified algorithm function (md5 by default).
@@ -602,7 +629,7 @@ def get_file_hash(path, *, func="md5"):
     return hash_hex
 
 
-def get_file_last_modified_date(path):
+def get_file_last_modified_date(path: PathIn) -> datetime:
     """
     Get the file last modification date.
     """
@@ -613,7 +640,9 @@ def get_file_last_modified_date(path):
     return last_modified_date
 
 
-def get_file_last_modified_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
+def get_file_last_modified_date_formatted(
+    path: PathIn, *, format: str = "%Y-%m-%d %H:%M:%S"
+) -> str:
     """
     Get the file last modification date formatted using the given format.
     """
@@ -622,7 +651,7 @@ def get_file_last_modified_date_formatted(path, *, format="%Y-%m-%d %H:%M:%S"):
     return date.strftime(format)
 
 
-def get_file_size(path):
+def get_file_size(path: PathIn) -> int:
     """
     Get the directory size in bytes.
     """
@@ -633,7 +662,7 @@ def get_file_size(path):
     return size
 
 
-def get_file_size_formatted(path):
+def get_file_size_formatted(path: PathIn) -> str:
     """
     Get the directory size formatted using the right unit suffix.
     """
@@ -643,7 +672,7 @@ def get_file_size_formatted(path):
     return size_formatted
 
 
-def get_filename(path):
+def get_filename(path: PathIn) -> str:
     """
     Get the filename from the given path/url.
     """
@@ -653,7 +682,7 @@ def get_filename(path):
     return filename
 
 
-def get_parent_dir(path, *, levels=1):
+def get_parent_dir(path: PathIn, *, levels: int = 1) -> str:
     """
     Get the parent directory for the given path going up N levels.
     """
@@ -661,7 +690,14 @@ def get_parent_dir(path, *, levels=1):
     return join_path(path, *([os.pardir] * max(1, levels)))
 
 
-def get_unique_name(path, *, prefix="", suffix="", extension="", separator="-"):
+def get_unique_name(
+    path: PathIn,
+    *,
+    prefix: str = "",
+    suffix: str = "",
+    extension: str = "",
+    separator: str = "-",
+) -> str:
     """
     Gets a unique name for a directory/file ath the given directory path.
     """
@@ -684,7 +720,7 @@ def get_unique_name(path, *, prefix="", suffix="", extension="", separator="-"):
     return name
 
 
-def is_dir(path):
+def is_dir(path: PathIn) -> bool:
     """
     Determine whether the specified path represents an existing directory.
     """
@@ -692,7 +728,7 @@ def is_dir(path):
     return os.path.isdir(path)
 
 
-def is_empty(path):
+def is_empty(path: PathIn) -> bool:
     """
     Determine whether the specified path represents an empty directory or an empty file.
     """
@@ -703,7 +739,7 @@ def is_empty(path):
     return is_empty_file(path)
 
 
-def is_empty_dir(path):
+def is_empty_dir(path: PathIn) -> bool:
     """
     Determine whether the specified path represents an empty directory.
     """
@@ -712,7 +748,7 @@ def is_empty_dir(path):
     return len(os.listdir(path)) == 0
 
 
-def is_empty_file(path):
+def is_empty_file(path: PathIn) -> bool:
     """
     Determine whether the specified path represents an empty file.
     """
@@ -720,7 +756,7 @@ def is_empty_file(path):
     return get_file_size(path) == 0
 
 
-def is_file(path):
+def is_file(path: PathIn) -> bool:
     """
     Determine whether the specified path represents an existing file.
     """
@@ -728,7 +764,7 @@ def is_file(path):
     return os.path.isfile(path)
 
 
-def join_filename(basename, extension):
+def join_filename(basename: str, extension: str) -> str:
     """
     Create a filename joining the file basename and the extension.
     """
@@ -738,7 +774,7 @@ def join_filename(basename, extension):
     return filename
 
 
-def join_filepath(dirpath, filename):
+def join_filepath(dirpath: PathIn, filename: str) -> str:
     """
     Create a filepath joining the directory path and the filename.
     """
@@ -746,7 +782,7 @@ def join_filepath(dirpath, filename):
     return join_path(dirpath, filename)
 
 
-def join_path(path, *paths):
+def join_path(path: PathIn, *paths) -> str:
     """
     Create a path joining path and paths.
     If path is __file__ (or a .py file), the resulting path will be relative
@@ -756,11 +792,11 @@ def join_path(path, *paths):
     basepath = path
     if get_file_extension(path) in ["py", "pyc", "pyo"]:
         basepath = os.path.dirname(os.path.realpath(path))
-    paths = [_get_path(path.lstrip(os.sep)) for path in paths]
-    return os.path.normpath(os.path.join(basepath, *paths))
+    paths_str = [_get_path(path.lstrip(os.sep)) for path in paths]
+    return os.path.normpath(os.path.join(basepath, *paths_str))
 
 
-def list_dirs(path):
+def list_dirs(path: PathIn) -> List[str]:
     """
     List all directories contained at the given directory path.
     """
@@ -768,7 +804,7 @@ def list_dirs(path):
     return _filter_paths(path, os.listdir(path), predicate=is_dir)
 
 
-def list_files(path):
+def list_files(path: PathIn) -> List[str]:
     """
     List all files contained at the given directory path.
     """
@@ -776,7 +812,7 @@ def list_files(path):
     return _filter_paths(path, os.listdir(path), predicate=is_file)
 
 
-def make_dirs(path):
+def make_dirs(path: PathIn) -> None:
     """
     Create the directories needed to ensure that the given path exists.
     If a file already exists at the given path an OSError is raised.
@@ -788,7 +824,7 @@ def make_dirs(path):
     os.makedirs(path, exist_ok=True)
 
 
-def make_dirs_for_file(path):
+def make_dirs_for_file(path: PathIn) -> None:
     """
     Create the directories needed to ensure that the given path exists.
     If a directory already exists at the given path an OSError is raised.
@@ -802,7 +838,7 @@ def make_dirs_for_file(path):
         make_dirs(dirpath)
 
 
-def move_dir(path, dest, *, overwrite=False, **kwargs):
+def move_dir(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -> None:
     """
     Move an existing dir from path to dest directory.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -819,7 +855,7 @@ def move_dir(path, dest, *, overwrite=False, **kwargs):
     shutil.move(path, dest, **kwargs)
 
 
-def move_file(path, dest, *, overwrite=False, **kwargs):
+def move_file(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -> None:
     """
     Move an existing file from path to dest directory.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -838,7 +874,7 @@ def move_file(path, dest, *, overwrite=False, **kwargs):
     shutil.move(path, dest, **kwargs)
 
 
-def read_file(path, *, encoding="utf-8"):
+def read_file(path: PathIn, *, encoding: str = "utf-8") -> str:
     """
     Read the content of the file at the given path using the specified encoding.
     """
@@ -850,7 +886,7 @@ def read_file(path, *, encoding="utf-8"):
     return content
 
 
-def read_file_from_url(url, **kwargs):
+def read_file_from_url(url: str, **kwargs) -> str:
     """
     Read the content of the file at the given url.
     """
@@ -862,7 +898,7 @@ def read_file_from_url(url, **kwargs):
 
 
 def read_file_json(
-    path,
+    path: PathIn,
     *,
     cls=None,
     object_hook=None,
@@ -870,7 +906,7 @@ def read_file_json(
     parse_int=None,
     parse_constant=None,
     object_pairs_hook=None,
-):
+) -> Dict:
     """
     Read and decode a json encoded file at the given path.
     """
@@ -888,7 +924,13 @@ def read_file_json(
     return data
 
 
-def _read_file_lines_in_range(path, *, line_start=0, line_end=-1, encoding="utf-8"):
+def _read_file_lines_in_range(
+    path: PathIn,
+    *,
+    line_start: int = 0,
+    line_end: int = -1,
+    encoding: str = "utf-8",
+) -> Generator:
     path = _get_path(path)
     line_start_negative = line_start < 0
     line_end_negative = line_end < 0
@@ -910,14 +952,14 @@ def _read_file_lines_in_range(path, *, line_start=0, line_end=-1, encoding="utf-
 
 
 def read_file_lines(
-    path,
+    path: PathIn,
     *,
-    line_start=0,
-    line_end=-1,
-    strip_white=True,
-    skip_empty=True,
-    encoding="utf-8",
-):
+    line_start: int = 0,
+    line_end: int = -1,
+    strip_white: bool = True,
+    skip_empty: bool = True,
+    encoding: str = "utf-8",
+) -> List[str]:
     """
     Read file content lines.
     It is possible to specify the line indexes (negative indexes too),
@@ -929,19 +971,22 @@ def read_file_lines(
         content = read_file(path, encoding=encoding)
         lines = content.splitlines()
     else:
-        lines = _read_file_lines_in_range(
-            path, line_start=line_start, line_end=line_end, encoding=encoding
+        lines = list(
+            _read_file_lines_in_range(
+                path,
+                line_start=line_start,
+                line_end=line_end,
+                encoding=encoding,
+            )
         )
     if strip_white:
         lines = [line.strip() for line in lines]
     if skip_empty:
         lines = [line for line in lines if line]
-    if not isinstance(lines, list):
-        lines = list(lines)
     return lines
 
 
-def read_file_lines_count(path):
+def read_file_lines_count(path: PathIn) -> int:
     """
     Read file lines count.
     """
@@ -954,7 +999,7 @@ def read_file_lines_count(path):
     return lines_count
 
 
-def remove_dir(path, **kwargs):
+def remove_dir(path: PathIn, **kwargs) -> bool:
     """
     Remove a directory at the given path and all its content.
     If the directory is removed with success returns True, otherwise False.
@@ -969,7 +1014,7 @@ def remove_dir(path, **kwargs):
     return not exists(path)
 
 
-def remove_dir_content(path):
+def remove_dir_content(path: PathIn) -> None:
     """
     Removes all directory content (both sub-directories and files).
     """
@@ -979,7 +1024,7 @@ def remove_dir_content(path):
     remove_files(*list_files(path))
 
 
-def remove_dirs(*paths):
+def remove_dirs(*paths) -> None:
     """
     Remove multiple directories at the given paths and all their content.
     """
@@ -987,7 +1032,7 @@ def remove_dirs(*paths):
         remove_dir(path)
 
 
-def remove_file(path):
+def remove_file(path: PathIn) -> bool:
     """
     Remove a file at the given path.
     If the file is removed with success returns True, otherwise False.
@@ -1000,7 +1045,7 @@ def remove_file(path):
     return not exists(path)
 
 
-def remove_files(*paths):
+def remove_files(*paths) -> None:
     """
     Remove multiple files at the given paths.
     """
@@ -1008,7 +1053,7 @@ def remove_files(*paths):
         remove_file(path)
 
 
-def rename_dir(path, name):
+def rename_dir(path: PathIn, name: str) -> None:
     """
     Rename a directory with the given name.
     If a directory or a file with the given name already exists, an OSError is raised.
@@ -1022,7 +1067,7 @@ def rename_dir(path, name):
     os.rename(path, dest)
 
 
-def rename_file(path, name):
+def rename_file(path: PathIn, name: str) -> None:
     """
     Rename a file with the given name.
     If a directory or a file with the given name already exists, an OSError is raised.
@@ -1035,7 +1080,7 @@ def rename_file(path, name):
     os.rename(path, dest)
 
 
-def rename_file_basename(path, basename):
+def rename_file_basename(path: PathIn, basename: str) -> None:
     """
     Rename a file basename with the given basename.
     """
@@ -1045,7 +1090,7 @@ def rename_file_basename(path, basename):
     rename_file(path, filename)
 
 
-def rename_file_extension(path, extension):
+def rename_file_extension(path: PathIn, extension: str) -> None:
     """
     Rename a file extension with the given extension.
     """
@@ -1055,7 +1100,7 @@ def rename_file_extension(path, extension):
     rename_file(path, filename)
 
 
-def replace_dir(path, src, *, autodelete=False):
+def replace_dir(path: PathIn, src: PathIn, *, autodelete: bool = False) -> None:
     """
     Replace directory at the specified path with the directory located at src.
     If autodelete, the src directory will be removed at the end of the operation.
@@ -1090,7 +1135,7 @@ def replace_dir(path, src, *, autodelete=False):
         remove_dir(path=src)
 
 
-def replace_file(path, src, *, autodelete=False):
+def replace_file(path: PathIn, src: PathIn, *, autodelete: bool = False) -> None:
     """
     Replace file at the specified path with the file located at src.
     If autodelete, the src file will be removed at the end of the operation.
@@ -1125,7 +1170,7 @@ def replace_file(path, src, *, autodelete=False):
         remove_file(path=src)
 
 
-def _search_paths(path, pattern):
+def _search_paths(path: PathIn, pattern: str) -> List[str]:
     """
     Search all paths relative to path matching the given pattern.
     """
@@ -1136,7 +1181,7 @@ def _search_paths(path, pattern):
     return paths
 
 
-def search_dirs(path, pattern="**/*"):
+def search_dirs(path: PathIn, pattern: str = "**/*") -> List[str]:
     """
     Search for directories at path matching the given pattern.
     """
@@ -1144,7 +1189,7 @@ def search_dirs(path, pattern="**/*"):
     return _filter_paths(path, _search_paths(path, pattern), predicate=is_dir)
 
 
-def search_files(path, pattern="**/*.*"):
+def search_files(path: PathIn, pattern: str = "**/*.*") -> List[str]:
     """
     Search for files at path matching the given pattern.
     """
@@ -1152,7 +1197,7 @@ def search_files(path, pattern="**/*.*"):
     return _filter_paths(path, _search_paths(path, pattern), predicate=is_file)
 
 
-def split_filename(path):
+def split_filename(path: PathIn) -> Tuple[str, str]:
     """
     Split a filename and returns its basename and extension.
     """
@@ -1163,7 +1208,7 @@ def split_filename(path):
     return (basename, extension)
 
 
-def split_filepath(path):
+def split_filepath(path: PathIn) -> Tuple[str, str]:
     """
     Split a filepath and returns its directory-path and filename.
     """
@@ -1173,7 +1218,7 @@ def split_filepath(path):
     return (dirpath, filename)
 
 
-def split_path(path):
+def split_path(path: PathIn) -> List[str]:
     """
     Split a path and returns its path-names.
     """
@@ -1184,7 +1229,13 @@ def split_path(path):
     return names
 
 
-def write_file(path, content, *, append=False, encoding="utf-8"):
+def write_file(
+    path: PathIn,
+    content: str,
+    *,
+    append: bool = False,
+    encoding: str = "utf-8",
+) -> None:
     """
     Write file with the specified content at the given path.
     """
@@ -1197,18 +1248,18 @@ def write_file(path, content, *, append=False, encoding="utf-8"):
 
 
 def write_file_json(
-    path,
-    data,
+    path: PathIn,
+    data: Union[List, Dict],
     *,
-    skipkeys=False,
-    ensure_ascii=True,
-    check_circular=True,
-    allow_nan=True,
+    skipkeys: bool = False,
+    ensure_ascii: bool = True,
+    check_circular: bool = True,
+    allow_nan: bool = True,
     cls=None,
-    indent=None,
+    indent: Optional[int] = None,
     separators=None,
-    default=None,
-    sort_keys=False,
+    default: Optional[Callable] = None,
+    sort_keys: bool = False,
 ):
     """
     Write a json file at the given path with the specified data encoded in json format.
