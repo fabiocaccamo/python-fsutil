@@ -33,10 +33,16 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-test.txt
 
-    - name: Run tests
+    - name: Run pre-commit
       run: |
         pre-commit run -a
+
+    - name: Run mypy
+      run: |
         mypy fsutil --install-types --non-interactive
+
+    - name: Run tests
+      run: |
         coverage run --append --source=fsutil -m unittest
         coverage report -m
         coverage xml -o ./coverage.xml
