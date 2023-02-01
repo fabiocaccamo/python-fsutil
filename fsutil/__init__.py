@@ -8,7 +8,7 @@ import tempfile
 import uuid
 import zipfile
 from datetime import datetime
-from typing import Callable, Dict, Generator, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Generator, Iterable, List, Optional, Tuple, Union
 from urllib.parse import urlsplit
 
 try:
@@ -144,7 +144,7 @@ def assert_dir(path: PathIn) -> None:
         raise OSError(f"Invalid directory path: {path}")
 
 
-def assert_exists(path) -> None:
+def assert_exists(path: PathIn) -> None:
     """
     Raise an OSError if the given path doesn't exist.
     """
@@ -153,7 +153,7 @@ def assert_exists(path) -> None:
         raise OSError(f"Invalid item path: {path}")
 
 
-def assert_file(path) -> None:
+def assert_file(path: PathIn) -> None:
     """
     Raise an OSError if the given path doesn't exist or it is not a file.
     """
@@ -250,7 +250,9 @@ def convert_size_string_to_bytes(size: str) -> Union[float, int]:
     return int((1024**factor) * amount)
 
 
-def copy_dir(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -> None:
+def copy_dir(
+    path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs: Any
+) -> None:
     """
     Copy the directory at the given path and all its content to dest path.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -268,7 +270,7 @@ def copy_dir(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -
     copy_dir_content(path, dest, **kwargs)
 
 
-def copy_dir_content(path: PathIn, dest: PathIn, **kwargs) -> None:
+def copy_dir_content(path: PathIn, dest: PathIn, **kwargs: Any) -> None:
     """
     Copy the content of the directory at the given path to dest path.
     More informations about kwargs supported options here:
@@ -283,7 +285,9 @@ def copy_dir_content(path: PathIn, dest: PathIn, **kwargs) -> None:
     shutil.copytree(path, dest, **kwargs)
 
 
-def copy_file(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -> None:
+def copy_file(
+    path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs: Any
+) -> None:
     """
     Copy the file at the given path and its metadata to dest path.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -378,7 +382,7 @@ def delete_dir_content(path: PathIn) -> None:
     remove_dir_content(path)
 
 
-def delete_dirs(*paths) -> None:
+def delete_dirs(*paths: PathIn) -> None:
     """
     Alias for remove_dirs.
     """
@@ -393,7 +397,7 @@ def delete_file(path: PathIn) -> bool:
     return removed
 
 
-def delete_files(*paths) -> None:
+def delete_files(*paths: PathIn) -> None:
     """
     Alias for remove_files.
     """
@@ -406,7 +410,7 @@ def download_file(
     dirpath: Optional[PathIn] = None,
     filename: Optional[str] = None,
     chunk_size: int = 8192,
-    **kwargs,
+    **kwargs: Any,
 ) -> str:
     """
     Download a file from url to dirpath.
@@ -463,7 +467,10 @@ def extract_zip_file(
 
 
 def _filter_paths(
-    basepath: str, relpaths: List[str], *, predicate: Optional[Callable] = None
+    basepath: str,
+    relpaths: List[str],
+    *,
+    predicate: Optional[Callable[[str], bool]] = None,
 ) -> List[str]:
     """
     Filter paths relative to basepath according to the optional predicate function.
@@ -782,7 +789,7 @@ def join_filepath(dirpath: PathIn, filename: str) -> str:
     return join_path(dirpath, filename)
 
 
-def join_path(path: PathIn, *paths) -> str:
+def join_path(path: PathIn, *paths: PathIn) -> str:
     """
     Create a path joining path and paths.
     If path is __file__ (or a .py file), the resulting path will be relative
@@ -792,7 +799,7 @@ def join_path(path: PathIn, *paths) -> str:
     basepath = path
     if get_file_extension(path) in ["py", "pyc", "pyo"]:
         basepath = os.path.dirname(os.path.realpath(path))
-    paths_str = [_get_path(path.lstrip(os.sep)) for path in paths]
+    paths_str = [_get_path(path).lstrip(os.sep) for path in paths]
     return os.path.normpath(os.path.join(basepath, *paths_str))
 
 
@@ -838,7 +845,9 @@ def make_dirs_for_file(path: PathIn) -> None:
         make_dirs(dirpath)
 
 
-def move_dir(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -> None:
+def move_dir(
+    path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs: Any
+) -> None:
     """
     Move an existing dir from path to dest directory.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -855,7 +864,9 @@ def move_dir(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -
     shutil.move(path, dest, **kwargs)
 
 
-def move_file(path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs) -> None:
+def move_file(
+    path: PathIn, dest: PathIn, *, overwrite: bool = False, **kwargs: Any
+) -> None:
     """
     Move an existing file from path to dest directory.
     If overwrite is not allowed and dest path exists, an OSError is raised.
@@ -886,7 +897,7 @@ def read_file(path: PathIn, *, encoding: str = "utf-8") -> str:
     return content
 
 
-def read_file_from_url(url: str, **kwargs) -> str:
+def read_file_from_url(url: str, **kwargs: Any) -> str:
     """
     Read the content of the file at the given url.
     """
@@ -897,30 +908,13 @@ def read_file_from_url(url: str, **kwargs) -> str:
     return content
 
 
-def read_file_json(
-    path: PathIn,
-    *,
-    cls=None,
-    object_hook=None,
-    parse_float=None,
-    parse_int=None,
-    parse_constant=None,
-    object_pairs_hook=None,
-) -> Dict:
+def read_file_json(path: PathIn, **kwargs: Any) -> Any:
     """
     Read and decode a json encoded file at the given path.
     """
     path = _get_path(path)
     content = read_file(path)
-    data = json.loads(
-        content,
-        cls=cls,
-        object_hook=object_hook,
-        parse_float=parse_float,
-        parse_int=parse_int,
-        parse_constant=parse_constant,
-        object_pairs_hook=object_pairs_hook,
-    )
+    data = json.loads(content, **kwargs)
     return data
 
 
@@ -930,7 +924,7 @@ def _read_file_lines_in_range(
     line_start: int = 0,
     line_end: int = -1,
     encoding: str = "utf-8",
-) -> Generator:
+) -> Generator[str, None, None]:
     path = _get_path(path)
     line_start_negative = line_start < 0
     line_end_negative = line_end < 0
@@ -999,7 +993,7 @@ def read_file_lines_count(path: PathIn) -> int:
     return lines_count
 
 
-def remove_dir(path: PathIn, **kwargs) -> bool:
+def remove_dir(path: PathIn, **kwargs: Any) -> bool:
     """
     Remove a directory at the given path and all its content.
     If the directory is removed with success returns True, otherwise False.
@@ -1024,7 +1018,7 @@ def remove_dir_content(path: PathIn) -> None:
     remove_files(*list_files(path))
 
 
-def remove_dirs(*paths) -> None:
+def remove_dirs(*paths: PathIn) -> None:
     """
     Remove multiple directories at the given paths and all their content.
     """
@@ -1045,7 +1039,7 @@ def remove_file(path: PathIn) -> bool:
     return not exists(path)
 
 
-def remove_files(*paths) -> None:
+def remove_files(*paths: PathIn) -> None:
     """
     Remove multiple files at the given paths.
     """
@@ -1249,40 +1243,21 @@ def write_file(
 
 def write_file_json(
     path: PathIn,
-    data: Union[List, Dict],
-    *,
-    skipkeys: bool = False,
-    ensure_ascii: bool = True,
-    check_circular: bool = True,
-    allow_nan: bool = True,
-    cls=None,
-    indent: Optional[int] = None,
-    separators=None,
-    default: Optional[Callable] = None,
-    sort_keys: bool = False,
-):
+    data: Any,
+    **kwargs: Any,
+) -> None:
     """
     Write a json file at the given path with the specified data encoded in json format.
     """
     path = _get_path(path)
 
-    def default_encoder(obj):
+    def default_encoder(obj: Any) -> Any:
         if isinstance(obj, datetime):
             return obj.isoformat()
         elif isinstance(obj, set):
             return list(obj)
         return str(obj)
 
-    content = json.dumps(
-        data,
-        skipkeys=skipkeys,
-        ensure_ascii=ensure_ascii,
-        check_circular=check_circular,
-        allow_nan=allow_nan,
-        cls=cls,
-        indent=indent,
-        separators=separators,
-        default=default or default_encoder,
-        sort_keys=sort_keys,
-    )
+    kwargs.setdefault("default", default_encoder)
+    content = json.dumps(data, **kwargs)
     write_file(path, content)
