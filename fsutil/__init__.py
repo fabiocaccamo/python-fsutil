@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import glob
 import hashlib
 import json
@@ -8,7 +10,7 @@ import tempfile
 import uuid
 import zipfile
 from datetime import datetime
-from typing import Any, Callable, Generator, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Generator, Iterable, Union
 from urllib.parse import urlsplit
 
 try:
@@ -236,7 +238,7 @@ def convert_size_bytes_to_string(size: int) -> str:
     return size_str
 
 
-def convert_size_string_to_bytes(size: str) -> Union[float, int]:
+def convert_size_string_to_bytes(size: str) -> float | int:
     """
     Convert the given size string to bytes.
     """
@@ -330,7 +332,7 @@ def create_file(path: PathIn, content: str = "", *, overwrite: bool = False) -> 
 
 def create_zip_file(
     path: PathIn,
-    content_paths: List[PathIn],
+    content_paths: list[PathIn],
     *,
     overwrite: bool = True,
     compression: int = zipfile.ZIP_DEFLATED,
@@ -407,8 +409,8 @@ def delete_files(*paths: PathIn) -> None:
 def download_file(
     url: str,
     *,
-    dirpath: Optional[PathIn] = None,
-    filename: Optional[str] = None,
+    dirpath: PathIn | None = None,
+    filename: str | None = None,
     chunk_size: int = 8192,
     **kwargs: Any,
 ) -> str:
@@ -448,7 +450,7 @@ def extract_zip_file(
     dest: PathIn,
     *,
     autodelete: bool = False,
-    content_paths: Optional[Iterable[Union[str, zipfile.ZipInfo]]] = None,
+    content_paths: Iterable[str | zipfile.ZipInfo] | None = None,
 ) -> None:
     """
     Extract zip file at path to dest path.
@@ -468,10 +470,10 @@ def extract_zip_file(
 
 def _filter_paths(
     basepath: str,
-    relpaths: List[str],
+    relpaths: list[str],
     *,
-    predicate: Optional[Callable[[str], bool]] = None,
-) -> List[str]:
+    predicate: Callable[[str], bool] | None = None,
+) -> list[str]:
     """
     Filter paths relative to basepath according to the optional predicate function.
     If predicate is defined, paths are filtered using it, otherwise all paths will be listed.
@@ -803,7 +805,7 @@ def join_path(path: PathIn, *paths: PathIn) -> str:
     return os.path.normpath(os.path.join(basepath, *paths_str))
 
 
-def list_dirs(path: PathIn) -> List[str]:
+def list_dirs(path: PathIn) -> list[str]:
     """
     List all directories contained at the given directory path.
     """
@@ -811,7 +813,7 @@ def list_dirs(path: PathIn) -> List[str]:
     return _filter_paths(path, os.listdir(path), predicate=is_dir)
 
 
-def list_files(path: PathIn) -> List[str]:
+def list_files(path: PathIn) -> list[str]:
     """
     List all files contained at the given directory path.
     """
@@ -953,7 +955,7 @@ def read_file_lines(
     strip_white: bool = True,
     skip_empty: bool = True,
     encoding: str = "utf-8",
-) -> List[str]:
+) -> list[str]:
     """
     Read file content lines.
     It is possible to specify the line indexes (negative indexes too),
@@ -1164,7 +1166,7 @@ def replace_file(path: PathIn, src: PathIn, *, autodelete: bool = False) -> None
         remove_file(path=src)
 
 
-def _search_paths(path: PathIn, pattern: str) -> List[str]:
+def _search_paths(path: PathIn, pattern: str) -> list[str]:
     """
     Search all paths relative to path matching the given pattern.
     """
@@ -1175,7 +1177,7 @@ def _search_paths(path: PathIn, pattern: str) -> List[str]:
     return paths
 
 
-def search_dirs(path: PathIn, pattern: str = "**/*") -> List[str]:
+def search_dirs(path: PathIn, pattern: str = "**/*") -> list[str]:
     """
     Search for directories at path matching the given pattern.
     """
@@ -1183,7 +1185,7 @@ def search_dirs(path: PathIn, pattern: str = "**/*") -> List[str]:
     return _filter_paths(path, _search_paths(path, pattern), predicate=is_dir)
 
 
-def search_files(path: PathIn, pattern: str = "**/*.*") -> List[str]:
+def search_files(path: PathIn, pattern: str = "**/*.*") -> list[str]:
     """
     Search for files at path matching the given pattern.
     """
@@ -1191,7 +1193,7 @@ def search_files(path: PathIn, pattern: str = "**/*.*") -> List[str]:
     return _filter_paths(path, _search_paths(path, pattern), predicate=is_file)
 
 
-def split_filename(path: PathIn) -> Tuple[str, str]:
+def split_filename(path: PathIn) -> tuple[str, str]:
     """
     Split a filename and returns its basename and extension.
     """
@@ -1202,7 +1204,7 @@ def split_filename(path: PathIn) -> Tuple[str, str]:
     return (basename, extension)
 
 
-def split_filepath(path: PathIn) -> Tuple[str, str]:
+def split_filepath(path: PathIn) -> tuple[str, str]:
     """
     Split a filepath and returns its directory-path and filename.
     """
@@ -1212,7 +1214,7 @@ def split_filepath(path: PathIn) -> Tuple[str, str]:
     return (dirpath, filename)
 
 
-def split_path(path: PathIn) -> List[str]:
+def split_path(path: PathIn) -> list[str]:
     """
     Split a path and returns its path-names.
     """
