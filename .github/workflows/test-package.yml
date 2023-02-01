@@ -29,7 +29,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install --upgrade pip
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-test.txt
 
@@ -39,12 +39,12 @@ jobs:
 
     - name: Run mypy
       run: |
-        mypy fsutil --install-types --non-interactive
+        mypy --install-types --non-interactive
 
     - name: Run tests
       run: |
-        coverage run --append --source=fsutil -m unittest
-        coverage report -m
+        coverage run --append -m unittest discover
+        coverage report --show-missing
         coverage xml -o ./coverage.xml
 
     - name: Upload coverage to Codecov
