@@ -401,7 +401,9 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path4))
 
     def test_download_file(self):
-        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
+        url = (
+            "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
+        )
         path = fsutil.download_file(url, dirpath=__file__)
         self.assertTrue(fsutil.exists(path))
         lines = fsutil.read_file_lines(path, skip_empty=False)
@@ -424,7 +426,9 @@ class fsutil_test_case(unittest.TestCase):
     def test_download_file_without_requests_installed(self):
         requests_installed = fsutil.requests_installed
         fsutil.requests_installed = False
-        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
+        url = (
+            "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
+        )
         with self.assertRaises(ModuleNotFoundError):
             fsutil.download_file(url, dirpath=__file__)
         fsutil.requests_installed = requests_installed
@@ -455,9 +459,7 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.create_file(f4_path, content="hello world 4")
         fsutil.create_file(f5_path, content="hello world 5")
         fsutil.create_file(f6_path, content="hello world 6")
-        fsutil.create_zip_file(
-            zip_path, [f1_path, f2_path, f3_path, f4_path, f5_f6_dir]
-        )
+        fsutil.create_zip_file(zip_path, [f1_path, f2_path, f3_path, f4_path, f5_f6_dir])
         fsutil.extract_zip_file(zip_path, unzip_path)
         self.assertTrue(fsutil.is_dir(unzip_path))
         self.assertTrue(fsutil.is_file(self.temp_path("unarchive/f1.txt")))
@@ -556,9 +558,7 @@ class fsutil_test_case(unittest.TestCase):
         self.temp_file_of_size(self.temp_path("a/b/c/c-2.txt"), "500 KB")  # 512000
         self.temp_file_of_size(self.temp_path("a/b/c/c-3.txt"), "200 KB")  # 204800
         self.assertEqual(fsutil.get_dir_size_formatted(self.temp_path("a")), "9.73 MB")
-        self.assertEqual(
-            fsutil.get_dir_size_formatted(self.temp_path("a/b")), "8.68 MB"
-        )
+        self.assertEqual(fsutil.get_dir_size_formatted(self.temp_path("a/b")), "8.68 MB")
         self.assertEqual(
             fsutil.get_dir_size_formatted(self.temp_path("a/b/c")), "4.43 MB"
         )
@@ -845,7 +845,9 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.read_file(path), "Hello World")
 
     def test_read_file_from_url(self):
-        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
+        url = (
+            "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
+        )
         content = fsutil.read_file_from_url(url)
         self.assertTrue("python-fsutil" in content)
 
