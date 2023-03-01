@@ -411,7 +411,7 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path))
 
     def test_download_file_multiple_to_temp_dir(self):
-        for i in range(3):
+        for _ in range(3):
             url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
             path = fsutil.download_file(url)
             self.assertTrue(fsutil.exists(path))
@@ -780,7 +780,7 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_make_dirs_race_condition(self):
         path = self.temp_path("a/b/c/")
-        for i in range(0, 20):
+        for _ in range(0, 20):
             t = threading.Thread(target=fsutil.make_dirs, args=[path], kwargs={})
             t.start()
         t.join()
@@ -1171,7 +1171,7 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
         self.assertEqual(
             fsutil.read_file(path),
-            f"""{{"test": "Hello World", "test_datetime": "{now.isoformat()}", "test_decimal": "{dec}"}}""",
+            f"""{{"test": "Hello World", "test_datetime": "{now.isoformat()}", "test_decimal": "{dec}"}}""",  # noqa: B907, B950
         )
 
     def test_write_file_with_append(self):

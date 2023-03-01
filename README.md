@@ -716,7 +716,7 @@ python -m venv venv && . venv/bin/activate
 python -m pip install --upgrade pip
 
 # install requirements
-pip install -r requirements.txt -r requirements-test.txt
+python -m pip install -r requirements.txt -r requirements-test.txt
 
 # run tests using tox
 tox
