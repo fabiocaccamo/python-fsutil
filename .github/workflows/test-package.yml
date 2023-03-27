@@ -43,7 +43,7 @@ jobs:
 
     - name: Run tests
       run: |
-        coverage run --append -m unittest discover
+        coverage run --append --source=fsutil -m unittest
         coverage report --show-missing
         coverage xml -o ./coverage.xml
 
