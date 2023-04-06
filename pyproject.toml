@@ -2,6 +2,70 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "python-fsutil"
+description = "high-level file-system operations for lazy devs."
+authors = [
+    { name = "Fabio Caccamo", email = "fabio.caccamo@gmail.com" },
+]
+keywords = [
+    "python",
+    "file",
+    "system",
+    "util",
+    "utils",
+    "utility",
+    "utilities",
+    "dir",
+    "directory",
+    "path",
+    "fs",
+    "os",
+    "shutil",
+    "glob",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: MacOS X",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Desktop Environment :: File Managers",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Filesystems",
+    "Topic :: Utilities",
+]
+dynamic = ["version"]
+maintainers = [
+    { name = "Fabio Caccamo", email = "fabio.caccamo@gmail.com" },
+]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.license]
+file = "LICENSE.txt"
+content-type = "text/plain"
+
+[project.urls]
+Homepage = "https://github.com/fabiocaccamo/python-fsutil"
+Download = "https://github.com/fabiocaccamo/python-fsutil/releases"
+Documentation = "https://github.com/fabiocaccamo/python-fsutil#readme"
+Issues = "https://github.com/fabiocaccamo/python-fsutil/issues"
+Funding = "https://github.com/sponsors/fabiocaccamo/"
+Twitter = "https://twitter.com/fabiocaccamo"
+
 [tool.black]
 line-length = 88
 include = '\.pyi?$'
@@ -20,17 +84,21 @@ exclude = '''
 )/
 '''
 
+[tool.mypy]
+files = ["fsutil"]
+ignore_missing_imports = true
+strict = true
+
 [tool.ruff]
-ignore = ["E501"]
+ignore = []
 line-length = 88
-select = [
-    "B",
-    "B9",
-    "C",
-    "E",
-    "F",
-    "W",
-]
+select = ["B", "B9", "C", "E", "F", "W"]
 
 [tool.ruff.mccabe]
 max-complexity = 10
+
+[tool.setuptools.packages.find]
+include = ["fsutil*"]
+
+[tool.setuptools.dynamic.version]
+attr = "fsutil.metadata.__version__"
