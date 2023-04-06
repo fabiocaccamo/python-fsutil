@@ -418,7 +418,8 @@ def download_file(
     Download a file from url to dirpath.
     If dirpath is not provided, the file will be downloaded to a temp directory.
     If filename is provided, the file will be named using filename.
-    It is possible to pass extra request options (eg. for authentication) using **kwargs.
+    It is possible to pass extra request options
+    (eg. for authentication) using **kwargs.
     """
     _require_requests_installed()
     # https://stackoverflow.com/a/16696317/2096218
@@ -455,7 +456,8 @@ def extract_zip_file(
     """
     Extract zip file at path to dest path.
     If autodelete, the archive will be deleted after extraction.
-    If content_paths list is defined, only listed items will be extracted, otherwise all.
+    If content_paths list is defined,
+    only listed items will be extracted, otherwise all.
     """
     path = _get_path(path)
     dest = _get_path(dest)
@@ -476,7 +478,8 @@ def _filter_paths(
 ) -> list[str]:
     """
     Filter paths relative to basepath according to the optional predicate function.
-    If predicate is defined, paths are filtered using it, otherwise all paths will be listed.
+    If predicate is defined, paths are filtered using it,
+    otherwise all paths will be listed.
     """
     paths = []
     for relpath in relpaths:

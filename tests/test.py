@@ -1171,7 +1171,13 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
         self.assertEqual(
             fsutil.read_file(path),
-            f"""{{"test": "Hello World", "test_datetime": "{now.isoformat()}", "test_decimal": "{dec}"}}""",  # noqa: B907, B950
+            (
+                "{"
+                f'"test": "Hello World", '
+                f'"test_datetime": "{now.isoformat()}", '
+                f'"test_decimal": "{dec}"'
+                "}"
+            ),
         )
 
     def test_write_file_with_append(self):
