@@ -121,5 +121,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# custom
 TODO.txt
 test-coverage.sh
