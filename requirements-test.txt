@@ -1,4 +1,4 @@
-coverage == 7.2.*
+coverage == 7.3.*
 mypy == 1.4.*
 pre-commit == 3.3.*
 requests == 2.31.*
