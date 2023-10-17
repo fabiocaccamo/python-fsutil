@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import pathlib
+import re
 import shutil
 import tempfile
 import uuid
@@ -423,14 +424,34 @@ def download_file(
     """
     _require_requests_installed()
     # https://stackoverflow.com/a/16696317/2096218
-    dirpath = dirpath or tempfile.gettempdir()
-    dirpath = _get_path(dirpath)
-    filename = filename or get_filename(url) or "download"
-    filepath = join_path(dirpath, filename)
-    make_dirs_for_file(filepath)
+
     kwargs["stream"] = True
     with requests.get(url, **kwargs) as response:
         response.raise_for_status()
+
+        # build filename
+        if not filename:
+            # detect filename from headers
+            content_disposition = response.headers.get("content-disposition", "") or ""
+            filename_pattern = r'filename="(.*)"'
+            filename_match = re.search(filename_pattern, content_disposition)
+            if filename_match:
+                filename = filename_match.group(1)
+            # or detect filename from url
+            if not filename:
+                filename = get_filename(url)
+            # or fallback to a unique name
+            if not filename:
+                filename_uuid = str(uuid.uuid4())
+                filename = f"download-{filename_uuid}"
+
+        # build filepath
+        dirpath = dirpath or tempfile.gettempdir()
+        dirpath = _get_path(dirpath)
+        filepath = join_path(dirpath, filename)
+        make_dirs_for_file(filepath)
+
+        # write file to disk
         with open(filepath, "wb") as file:
             for chunk in response.iter_content(chunk_size=chunk_size):
                 if chunk:
