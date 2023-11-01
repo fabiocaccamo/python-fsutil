@@ -44,6 +44,7 @@ import fsutil
 -   [`copy_file`](#copy_file)
 -   [`create_dir`](#create_dir)
 -   [`create_file`](#create_file)
+-   [`create_tar_file`](#create_tar_file)
 -   [`create_zip_file`](#create_zip_file)
 -   [`delete_dir`](#delete_dir)
 -   [`delete_dir_content`](#delete_dir_content)
@@ -52,6 +53,7 @@ import fsutil
 -   [`delete_files`](#delete_files)
 -   [`download_file`](#download_file) *(require `requests` to be installed)*
 -   [`exists`](#exists)
+-   [`extract_tar_file`](#extract_tar_file)
 -   [`extract_zip_file`](#extract_zip_file)
 -   [`get_dir_creation_date`](#get_dir_creation_date)
 -   [`get_dir_creation_date_formatted`](#get_dir_creation_date_formatted)
@@ -219,6 +221,14 @@ fsutil.create_dir(path, overwrite=False)
 fsutil.create_file(path, content="", overwrite=False)
 ```
 
+#### `create_tar_file`
+
+```python
+# Create tar file at path compressing directories/files listed in content_paths.
+# If overwrite is allowed and dest tar already exists, it will be overwritten.
+fsutil.create_tar_file(path, content_paths, overwrite=True, compression="gzip")
+```
+
 #### `create_zip_file`
 
 ```python
@@ -277,6 +287,15 @@ filepath = fsutil.download_file(url, dirpath=None, filename="archive.zip", chunk
 ```python
 # Check if a directory of a file exists at the given path.
 value = fsutil.exists(path)
+```
+
+#### `extract_tar_file`
+
+```python
+# Extract tar file at path to dest path.
+# If autodelete, the archive will be deleted after extraction.
+# If content_paths list is defined, only listed items will be extracted, otherwise all.
+fsutil.extract_tar_file(path, dest, content_paths=None, autodelete=False)
 ```
 
 #### `extract_zip_file`

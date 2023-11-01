@@ -7,6 +7,7 @@ import os
 import pathlib
 import re
 import shutil
+import tarfile
 import tempfile
 import uuid
 import zipfile
@@ -331,6 +332,46 @@ def create_file(path: PathIn, content: str = "", *, overwrite: bool = False) -> 
     write_file(path, content)
 
 
+def create_tar_file(
+    path: PathIn,
+    content_paths: list[PathIn],
+    *,
+    overwrite: bool = True,
+    compression: str = "",
+) -> None:
+    """
+    Create tar file at path compressing directories/files listed in content_paths.
+    If overwrite is allowed and dest tar already exists, it will be overwritten.
+    """
+    path = _get_path(path)
+    assert_not_dir(path)
+    if not overwrite:
+        assert_not_exists(path)
+    make_dirs_for_file(path)
+
+    def _write_content_to_tar_file(
+        file: tarfile.TarFile, content_path: PathIn, basedir: str = ""
+    ) -> None:
+        path = _get_path(content_path)
+        assert_exists(path)
+        if is_file(path):
+            filename = get_filename(path)
+            filepath = join_path(basedir, filename)
+            file.add(path, filepath)
+        elif is_dir(path):
+            for item_name in os.listdir(path):
+                item_path = join_path(path, item_name)
+                item_basedir = (
+                    join_path(basedir, item_name) if is_dir(item_path) else basedir
+                )
+                _write_content_to_tar_file(file, item_path, item_basedir)
+
+    compression = f"w:{compression}" if compression else "w"
+    with tarfile.open(path, compression) as file:
+        for content_path in content_paths:
+            _write_content_to_tar_file(file, content_path)
+
+
 def create_zip_file(
     path: PathIn,
     content_paths: list[PathIn],
@@ -465,6 +506,30 @@ def exists(path: PathIn) -> bool:
     """
     path = _get_path(path)
     return os.path.exists(path)
+
+
+def extract_tar_file(
+    path: PathIn,
+    dest: PathIn,
+    *,
+    autodelete: bool = False,
+    content_paths: Iterable[tarfile.TarInfo] | None = None,
+) -> None:
+    """
+    Extract tar file at path to dest path.
+    If autodelete, the archive will be deleted after extraction.
+    If content_paths list is defined,
+    only listed items will be extracted, otherwise all.
+    """
+    path = _get_path(path)
+    dest = _get_path(dest)
+    assert_file(path)
+    assert_not_file(dest)
+    make_dirs(dest)
+    with tarfile.TarFile(path, "r") as file:
+        file.extractall(dest, members=content_paths)
+    if autodelete:
+        remove_file(path)
 
 
 def extract_zip_file(
