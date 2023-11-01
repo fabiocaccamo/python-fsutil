@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.11.0) - 2023-11-01
+-   Add `Python 3.12` support. (#84)
+-   Add `tar` files operations support. #48 (#87)
+-   Switch from `setup.cfg` to `pyproject.toml`.
+-   Replace `flake8` with `Ruff`.
+-   Fix `tox` test command.
+-   Upgrade syntax for `Python >= 3.8`.
+-   Reformat tests code.
+-   Set `Black` pre-commit hook `line-length` option value.
+-   Add `fix-future-annotations` `pre-commit` hook.
+-   Bump requirements and `pre-commit` hooks.
+
 ## [0.10.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.10.0) - 2023-02-01
 -   Rename default branch from `master` to `main`.
 -   Move `flake8` config to `setup.cfg`.
