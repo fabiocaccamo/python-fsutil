@@ -339,6 +339,10 @@ def create_tar_file(
     overwrite: bool = True,
     compression: str = None,
 ) -> None:
+    """
+    Create tar file at path compressing directories/files listed in content_paths.
+    If overwrite is allowed and dest tar already exists, it will be overwritten.
+    """
     path = _get_path(path)
     assert_not_dir(path)
     if not overwrite:
@@ -512,7 +516,7 @@ def extract_tar_file(
     content_paths: Iterable[str | tarfile.TarInfo] | None = None,
 ) -> None:
     """
-    Extract zip file at path to dest path.
+    Extract tar file at path to dest path.
     If autodelete, the archive will be deleted after extraction.
     If content_paths list is defined,
     only listed items will be extracted, otherwise all.
