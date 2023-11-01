@@ -337,7 +337,7 @@ def create_tar_file(
     content_paths: list[PathIn],
     *,
     overwrite: bool = True,
-    compression: str = None,
+    compression: str = "",
 ) -> None:
     """
     Create tar file at path compressing directories/files listed in content_paths.
@@ -513,7 +513,7 @@ def extract_tar_file(
     dest: PathIn,
     *,
     autodelete: bool = False,
-    content_paths: Iterable[str | tarfile.TarInfo] | None = None,
+    content_paths: Iterable[tarfile.TarInfo] | None = None,
 ) -> None:
     """
     Extract tar file at path to dest path.
