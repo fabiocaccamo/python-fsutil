@@ -333,6 +333,28 @@ class fsutil_test_case(unittest.TestCase):
         self.assertTrue(fsutil.is_file(zip_path))
         self.assertTrue(fsutil.get_file_size(zip_path) > 0)
 
+    def test_create_tar_file(self):
+        tar_path = self.temp_path("archive.zip")
+        f1_path = self.temp_path("a/b/f1.txt")
+        f2_path = self.temp_path("a/b/f2.txt")
+        f3_path = self.temp_path("x/y/f3.txt")
+        f4_path = self.temp_path("x/y/f4.txt")
+        fsutil.create_file(f1_path, content="hello world 1")
+        fsutil.create_file(f2_path, content="hello world 2")
+        fsutil.create_file(f3_path, content="hello world 3")
+        fsutil.create_file(f4_path, content="hello world 4")
+        fsutil.create_tar_file(tar_path, [f1_path, f2_path, f3_path, f4_path])
+        with self.assertRaises(OSError):
+            fsutil.create_tar_file(
+                tar_path, [f1_path, f2_path, f3_path, f4_path], overwrite=False
+            )
+        self.assertTrue(fsutil.is_file(f1_path))
+        self.assertTrue(fsutil.is_file(f2_path))
+        self.assertTrue(fsutil.is_file(f3_path))
+        self.assertTrue(fsutil.is_file(f4_path))
+        self.assertTrue(fsutil.is_file(tar_path))
+        self.assertTrue(fsutil.get_file_size(tar_path) > 0)
+
     def test_delete_dir(self):
         fsutil.create_file(self.temp_path("a/b/c/d.txt"))
         fsutil.create_file(self.temp_path("a/b/c/e.txt"))
@@ -478,6 +500,46 @@ class fsutil_test_case(unittest.TestCase):
         self.assertTrue(fsutil.is_dir(unzip_path))
         self.assertTrue(fsutil.is_file(self.temp_path("unarchive/f1.txt")))
         self.assertFalse(fsutil.is_file(zip_path))
+
+    def test_extract_tar_file(self):
+        tar_path = self.temp_path("archive.tar")
+        untar_path = self.temp_path("unarchive/")
+        f1_path = self.temp_path("a/b/f1.txt")
+        f2_path = self.temp_path("a/b/f2.txt")
+        f3_path = self.temp_path("j/k/f3.txt")
+        f4_path = self.temp_path("j/k/f4.txt")
+        f5_path = self.temp_path("x/y/z/f5.txt")
+        f6_path = self.temp_path("x/y/z/f6.txt")
+        f5_f6_dir = self.temp_path("x")
+        fsutil.create_file(f1_path, content="hello world 1")
+        fsutil.create_file(f2_path, content="hello world 2")
+        fsutil.create_file(f3_path, content="hello world 3")
+        fsutil.create_file(f4_path, content="hello world 4")
+        fsutil.create_file(f5_path, content="hello world 5")
+        fsutil.create_file(f6_path, content="hello world 6")
+        fsutil.create_tar_file(
+            tar_path, [f1_path, f2_path, f3_path, f4_path, f5_f6_dir]
+        )
+        fsutil.extract_tar_file(tar_path, untar_path)
+        self.assertTrue(fsutil.is_dir(untar_path))
+        self.assertTrue(fsutil.is_file(self.temp_path("unarchive/f1.txt")))
+        self.assertTrue(fsutil.is_file(self.temp_path("unarchive/f2.txt")))
+        self.assertTrue(fsutil.is_file(self.temp_path("unarchive/f3.txt")))
+        self.assertTrue(fsutil.is_file(self.temp_path("unarchive/f4.txt")))
+        self.assertTrue(fsutil.is_file(self.temp_path("unarchive/y/z/f5.txt")))
+        self.assertTrue(fsutil.is_file(self.temp_path("unarchive/y/z/f6.txt")))
+        self.assertTrue(fsutil.is_file(tar_path))
+
+    def test_extract_tar_file_with_autodelete(self):
+        tar_path = self.temp_path("archive.tar")
+        untar_path = self.temp_path("unarchive/")
+        path = self.temp_path("f1.txt")
+        fsutil.create_file(path, content="hello world 1")
+        fsutil.create_tar_file(tar_path, [path])
+        fsutil.extract_tar_file(tar_path, untar_path, autodelete=True)
+        self.assertTrue(fsutil.is_dir(untar_path))
+        self.assertTrue(fsutil.is_file(self.temp_path("unarchive/f1.txt")))
+        self.assertFalse(fsutil.is_file(tar_path))
 
     def test_get_dir_creation_date(self):
         path = self.temp_path("a/b/c.txt")
