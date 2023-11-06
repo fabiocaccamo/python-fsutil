@@ -40,20 +40,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-test.txt
+        echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
 
     - name: Run pre-commit
       run: |
-        source ./venv/bin/activate
         pre-commit run -a
 
     - name: Run mypy
       run: |
-        source ./venv/bin/activate
         mypy --install-types --non-interactive
 
     - name: Run tests
       run: |
-        source ./venv/bin/activate
         coverage run --append --source=fsutil -m unittest
         coverage report --show-missing
         coverage xml -o ./coverage.xml
