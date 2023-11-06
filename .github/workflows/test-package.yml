@@ -27,17 +27,13 @@ jobs:
         python-version: ${{ matrix.python-version }}
         # cache: 'pip'
 
-    # - name: Cache virtualenv
-    #   uses: actions/cache@v3
-    #   with:
-    #     key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-test.txt') }}
-    #     path: ./venv
-
-    - name: Create virtualenv
+    - name: Cache virtualenv
       uses: actions/cache@v3
       with:
         key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-test.txt') }}
         path: ./venv
+
+    - name: Create virtualenv
       run: |
         python -m venv ./venv
         source ./venv/bin/activate
