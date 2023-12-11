@@ -85,9 +85,6 @@ exclude = '''
 )/
 '''
 
-[tool.isort]
-profile = "black"
-
 [tool.mypy]
 files = ["fsutil"]
 ignore_missing_imports = true
