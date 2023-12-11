@@ -1345,7 +1345,7 @@ def _write_file_non_atomic(
     *,
     append: bool = False,
     encoding: str = "utf-8",
-):
+) -> None:
     mode = "a" if append else "w"
     with open(path, mode, encoding=encoding) as file:
         file.write(content)
