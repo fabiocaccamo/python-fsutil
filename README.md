@@ -714,14 +714,14 @@ path_names = fsutil.split_path(path)
 
 ```python
 # Write file with the specified content at the given path.
-fsutil.write_file(path, content, append=False, encoding="utf-8")
+fsutil.write_file(path, content, append=False, encoding="utf-8", atomic=False)
 ```
 
 #### `write_file_json`
 
 ```python
 # Write a json file at the given path with the specified data encoded in json format.
-fsutil.write_file_json(path, data, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False)
+fsutil.write_file_json(path, data, encoding="utf-8", atomic=False, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False)
 ```
 
 ## Testing

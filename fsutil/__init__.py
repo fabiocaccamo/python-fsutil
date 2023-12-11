@@ -1314,12 +1314,50 @@ def split_path(path: PathIn) -> list[str]:
     return names
 
 
+def _write_file_atomic(
+    path: PathIn,
+    content: str,
+    *,
+    append: bool = False,
+    encoding: str = "utf-8",
+) -> None:
+    mode = "a" if append else "w"
+    if append:
+        content = read_file(path, encoding=encoding) + content
+    dirpath, _ = split_filepath(path)
+    with tempfile.NamedTemporaryFile(
+        mode=mode,
+        dir=dirpath,
+        delete=False,
+        encoding=encoding,
+    ) as file:
+        file.write(content)
+        file.flush()
+        os.fsync(file.fileno())
+    temp_path = file.name
+    os.replace(temp_path, path)
+    remove_file(temp_path)
+
+
+def _write_file_non_atomic(
+    path: PathIn,
+    content: str,
+    *,
+    append: bool = False,
+    encoding: str = "utf-8",
+):
+    mode = "a" if append else "w"
+    with open(path, mode, encoding=encoding) as file:
+        file.write(content)
+
+
 def write_file(
     path: PathIn,
     content: str,
     *,
     append: bool = False,
     encoding: str = "utf-8",
+    atomic: bool = False,
 ) -> None:
     """
     Write file with the specified content at the given path.
@@ -1327,14 +1365,20 @@ def write_file(
     path = _get_path(path)
     assert_not_dir(path)
     make_dirs_for_file(path)
-    mode = "a" if append else "w"
-    with open(path, mode, encoding=encoding) as file:
-        file.write(content)
+    write_file_func = _write_file_atomic if atomic else _write_file_non_atomic
+    write_file_func(
+        path,
+        content,
+        append=append,
+        encoding=encoding,
+    )
 
 
 def write_file_json(
     path: PathIn,
     data: Any,
+    encoding: str = "utf-8",
+    atomic: bool = False,
     **kwargs: Any,
 ) -> None:
     """
@@ -1351,4 +1395,10 @@ def write_file_json(
 
     kwargs.setdefault("default", default_encoder)
     content = json.dumps(data, **kwargs)
-    write_file(path, content)
+    write_file(
+        path,
+        content,
+        append=False,
+        encoding=encoding,
+        atomic=atomic,
+    )

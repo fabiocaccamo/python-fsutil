@@ -1214,6 +1214,17 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.write_file(self.temp_path("a/b/c.txt"), content="Hello Jupiter")
         self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
 
+    def test_write_file_atomic(self):
+        path = self.temp_path("a/b/c.txt")
+        fsutil.write_file(
+            self.temp_path("a/b/c.txt"), content="Hello World", atomic=True
+        )
+        self.assertEqual(fsutil.read_file(path), "Hello World")
+        fsutil.write_file(
+            self.temp_path("a/b/c.txt"), content="Hello Jupiter", atomic=True
+        )
+        self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
+
     def test_write_file_with_filename_only(self):
         path = "document.txt"
         fsutil.write_file(path, content="Hello World")
@@ -1242,12 +1253,47 @@ class fsutil_test_case(unittest.TestCase):
             ),
         )
 
+    def test_write_file_json_atomic(self):
+        path = self.temp_path("a/b/c.json")
+        now = datetime.now()
+        dec = Decimal("3.33")
+        data = {
+            "test": "Hello World",
+            "test_datetime": now,
+            "test_decimal": dec,
+        }
+        fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data, atomic=True)
+        self.assertEqual(
+            fsutil.read_file(path),
+            (
+                "{"
+                f'"test": "Hello World", '
+                f'"test_datetime": "{now.isoformat()}", '
+                f'"test_decimal": "{dec}"'
+                "}"
+            ),
+        )
+
     def test_write_file_with_append(self):
         path = self.temp_path("a/b/c.txt")
         fsutil.write_file(self.temp_path("a/b/c.txt"), content="Hello World")
         self.assertEqual(fsutil.read_file(path), "Hello World")
         fsutil.write_file(
             self.temp_path("a/b/c.txt"), content=" - Hello Sun", append=True
+        )
+        self.assertEqual(fsutil.read_file(path), "Hello World - Hello Sun")
+
+    def test_write_file_with_append_atomic(self):
+        path = self.temp_path("a/b/c.txt")
+        fsutil.write_file(
+            self.temp_path("a/b/c.txt"), content="Hello World", atomic=True
+        )
+        self.assertEqual(fsutil.read_file(path), "Hello World")
+        fsutil.write_file(
+            self.temp_path("a/b/c.txt"),
+            content=" - Hello Sun",
+            append=True,
+            atomic=True,
         )
         self.assertEqual(fsutil.read_file(path), "Hello World - Hello Sun")
 
