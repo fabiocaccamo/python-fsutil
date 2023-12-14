@@ -1325,18 +1325,22 @@ def _write_file_atomic(
     if append:
         content = read_file(path, encoding=encoding) + content
     dirpath, _ = split_filepath(path)
-    with tempfile.NamedTemporaryFile(
-        mode=mode,
-        dir=dirpath,
-        delete=False,
-        encoding=encoding,
-    ) as file:
-        file.write(content)
-        file.flush()
-        os.fsync(file.fileno())
-    temp_path = file.name
-    os.replace(temp_path, path)
-    remove_file(temp_path)
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode=mode,
+            dir=dirpath,
+            delete=True,
+            encoding=encoding,
+        ) as file:
+            file.write(content)
+            file.flush()
+            os.fsync(file.fileno())
+            os.replace(file.name, path)
+    except FileNotFoundError:
+        # success - the NamedTemporaryFile has not been able
+        # to remove the temp file on __exit__ because the temp file
+        # has replaced atomically the file at path.
+        pass
 
 
 def _write_file_non_atomic(
