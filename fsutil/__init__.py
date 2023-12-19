@@ -1335,7 +1335,7 @@ def _write_file_atomic(
             file.write(content)
             file.flush()
             os.fsync(file.fileno())
-            os.replace(file.name, path)
+            shutil.move(file.name, path)
     except FileNotFoundError:
         # success - the NamedTemporaryFile has not been able
         # to remove the temp file on __exit__ because the temp file
