@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.13.0) - 2023-12-19
+-   Add `get_permissions` and `set_permissions` methods.
+-   Fix permissions lost when using `write_file` with `atomic=True`. #94
+-   Improve `write_file` with `atomic=True` atomicity. #91
+-   Remove tests duplicated code.
+
 ## [0.12.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.12.0) - 2023-12-11
 -   Add possibility to write files atomically (`fsutil.write_file(path, content, atomic=True)`). #91
 
