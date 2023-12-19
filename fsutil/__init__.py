@@ -1346,6 +1346,7 @@ def _write_file_atomic(
     append: bool = False,
     encoding: str = "utf-8",
 ) -> None:
+    path = _get_path(path)
     mode = "a" if append else "w"
     if append:
         content = read_file(path, encoding=encoding) + content
@@ -1360,7 +1361,10 @@ def _write_file_atomic(
             file.write(content)
             file.flush()
             os.fsync(file.fileno())
-            os.replace(file.name, path)
+            temp_path = file.name
+            if exists(path):
+                set_permissions(temp_path, get_permissions(path))
+            os.replace(temp_path, path)
     except FileNotFoundError:
         # success - the NamedTemporaryFile has not been able
         # to remove the temp file on __exit__ because the temp file

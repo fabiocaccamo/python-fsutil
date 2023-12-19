@@ -1234,6 +1234,14 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.write_file(path, content="Hello Jupiter", atomic=True)
         self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
 
+    def test_write_file_atomic_permissions_inheritance(self):
+        path = self.temp_path("a/b/c.txt")
+        fsutil.write_file(path, content="Hello World", atomic=False)
+        self.assertEqual(fsutil.get_permissions(path), 644)
+        fsutil.set_permissions(path, 777)
+        fsutil.write_file(path, content="Hello Jupiter", atomic=True)
+        self.assertEqual(fsutil.get_permissions(path), 777)
+
     def test_write_file_with_filename_only(self):
         path = "document.txt"
         fsutil.write_file(path, content="Hello World")
