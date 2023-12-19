@@ -737,6 +737,12 @@ class fsutil_test_case(unittest.TestCase):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(fsutil.get_parent_dir(s, levels=6), "/")
 
+    def test_get_permissions(self):
+        path = self.temp_path("a/b/c.txt")
+        fsutil.write_file(path, content="Hello World")
+        permissions = fsutil.get_permissions(path)
+        self.assertEqual(permissions, 644)
+
     def test_get_unique_name(self):
         path = self.temp_path("a/b/c")
         fsutil.create_dir(path)
@@ -1180,6 +1186,13 @@ class fsutil_test_case(unittest.TestCase):
             self.temp_path("x/y/z/c"),
         ]
         self.assertEqual(results, expected_results)
+
+    def test_set_permissions(self):
+        path = self.temp_path("a/b/c.txt")
+        fsutil.write_file(path, content="Hello World")
+        fsutil.set_permissions(path, 777)
+        permissions = fsutil.get_permissions(path)
+        self.assertEqual(permissions, 777)
 
     def test_split_filename(self):
         s = "Document"

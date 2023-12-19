@@ -80,6 +80,7 @@ __all__ = [
     "get_file_size_formatted",
     "get_filename",
     "get_parent_dir",
+    "get_permissions",
     "get_unique_name",
     "is_dir",
     "is_empty",
@@ -113,6 +114,7 @@ __all__ = [
     "replace_file",
     "search_dirs",
     "search_files",
+    "set_permissions",
     "split_filename",
     "split_filepath",
     "split_path",
@@ -788,6 +790,17 @@ def get_parent_dir(path: PathIn, *, levels: int = 1) -> str:
     return join_path(path, *([os.pardir] * max(1, levels)))
 
 
+def get_permissions(path: PathIn) -> int:
+    """
+    Gets the file/directory permissions.
+    """
+    path = _get_path(path)
+    assert_exists(path)
+    st_mode = os.stat(path).st_mode
+    permissions = int(str(oct(st_mode & 0o777))[2:])
+    return permissions
+
+
 def get_unique_name(
     path: PathIn,
     *,
@@ -1280,6 +1293,18 @@ def search_files(path: PathIn, pattern: str = "**/*.*") -> list[str]:
     """
     path = _get_path(path)
     return _filter_paths(path, _search_paths(path, pattern), predicate=is_file)
+
+
+def set_permissions(path: PathIn, permissions: int) -> None:
+    """
+    Sets the file/directory permissions.
+    """
+    path = _get_path(path)
+    assert_exists(path)
+    # if permissions > 0o777:
+    # decimal value, convert it to octal
+    permissions = int(str(permissions), 8) & 0o777
+    os.chmod(path, permissions)
 
 
 def split_filename(path: PathIn) -> tuple[str, str]:
