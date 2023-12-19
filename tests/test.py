@@ -1,3 +1,4 @@
+import os
 import re
 import threading
 import time
@@ -1219,10 +1220,13 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.write_file(
             self.temp_path("a/b/c.txt"), content="Hello World", atomic=True
         )
+        os.chmod(path, 0o644)
         self.assertEqual(fsutil.read_file(path), "Hello World")
+        expected_permissions = os.stat(path).st_mode
         fsutil.write_file(
             self.temp_path("a/b/c.txt"), content="Hello Jupiter", atomic=True
         )
+        self.assertEqual(os.stat(path).st_mode, expected_permissions)
         self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
 
     def test_write_file_with_filename_only(self):
