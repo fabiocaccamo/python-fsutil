@@ -1295,15 +1295,13 @@ def search_files(path: PathIn, pattern: str = "**/*.*") -> list[str]:
     return _filter_paths(path, _search_paths(path, pattern), predicate=is_file)
 
 
-def set_permissions(path: PathIn, permissions: int) -> None:
+def set_permissions(path: PathIn, value: int) -> None:
     """
     Sets the file/directory permissions.
     """
     path = _get_path(path)
     assert_exists(path)
-    # if permissions > 0o777:
-    # decimal value, convert it to octal
-    permissions = int(str(permissions), 8) & 0o777
+    permissions = int(str(value), 8) & 0o777
     os.chmod(path, permissions)
 
 
