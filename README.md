@@ -74,6 +74,7 @@ import fsutil
 -   [`get_file_size_formatted`](#get_file_size_formatted)
 -   [`get_filename`](#get_filename)
 -   [`get_parent_dir`](#get_parent_dir)
+-   [`get_permissions`](#get_permissions)
 -   [`get_unique_name`](#get_unique_name)
 -   [`is_dir`](#is_dir)
 -   [`is_empty`](#is_empty)
@@ -107,6 +108,7 @@ import fsutil
 -   [`replace_file`](#replace_file)
 -   [`search_dirs`](#search_dirs)
 -   [`search_files`](#search_files)
+-   [`set_permissions`](#set_permissions)
 -   [`split_filename`](#split_filename)
 -   [`split_filepath`](#split_filepath)
 -   [`split_path`](#split_path)
@@ -436,10 +438,17 @@ filename = fsutil.get_filename(path)
 parent_dir = fsutil.get_parent_dir(path, levels=1)
 ```
 
+#### `get_permissions`
+
+```python
+# Get the file/directory permissions.
+permissions = fsutil.get_permissions(path)
+```
+
 #### `get_unique_name`
 
 ```python
-# Gets a unique name for a directory/file ath the given directory path.
+# Get a unique name for a directory/file ath the given directory path.
 unique_name = fsutil.get_unique_name(path, prefix="", suffix="", extension="", separator="-")
 ```
 
@@ -687,6 +696,13 @@ dirs = fsutil.search_dirs(path, pattern="**/*")
 ```python
 # Search for files at path matching the given pattern.
 files = fsutil.search_files(path, pattern="**/*.*")
+```
+
+#### `set_permissions`
+
+```python
+# Set the file/directory permissions.
+fsutil.set_permissions(path, 700)
 ```
 
 #### `split_filename`

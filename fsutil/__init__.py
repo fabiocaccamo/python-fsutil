@@ -792,7 +792,7 @@ def get_parent_dir(path: PathIn, *, levels: int = 1) -> str:
 
 def get_permissions(path: PathIn) -> int:
     """
-    Gets the file/directory permissions.
+    Get the file/directory permissions.
     """
     path = _get_path(path)
     assert_exists(path)
@@ -810,7 +810,7 @@ def get_unique_name(
     separator: str = "-",
 ) -> str:
     """
-    Gets a unique name for a directory/file ath the given directory path.
+    Get a unique name for a directory/file ath the given directory path.
     """
     path = _get_path(path)
     assert_dir(path)
@@ -1297,7 +1297,7 @@ def search_files(path: PathIn, pattern: str = "**/*.*") -> list[str]:
 
 def set_permissions(path: PathIn, value: int) -> None:
     """
-    Sets the file/directory permissions.
+    Set the file/directory permissions.
     """
     path = _get_path(path)
     assert_exists(path)
