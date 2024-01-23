@@ -1360,9 +1360,10 @@ def _write_file_atomic(
             file.flush()
             os.fsync(file.fileno())
             temp_path = file.name
-            if exists(path):
-                set_permissions(temp_path, get_permissions(path))
+            permissions = get_permissions(path) if exists(path) else None
             os.replace(temp_path, path)
+            if permissions:
+                set_permissions(path, permissions)
     except FileNotFoundError:
         # success - the NamedTemporaryFile has not been able
         # to remove the temp file on __exit__ because the temp file
