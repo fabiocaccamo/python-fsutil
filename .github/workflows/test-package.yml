@@ -35,7 +35,7 @@ jobs:
 
     - name: Run pre-commit
       run: |
-        pre-commit run -a
+        pre-commit run --all-files --show-diff-on-failure --verbose
 
     - name: Run mypy
       run: |
