@@ -24,9 +24,9 @@ repos:
     rev: v1.9.0
     hooks:
       - id: mypy
-        types: [python]
-        args: [--install-types, --non-interactive, --strict]
+        args: [--ignore-missing-imports, --strict]
         exclude: "tests"
+        additional_dependencies: [types-requests]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0

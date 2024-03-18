@@ -87,7 +87,10 @@ exclude = '''
 
 [tool.mypy]
 files = ["fsutil"]
+disable_error_code = "import-untyped"
 ignore_missing_imports = true
+install_types = true
+non_interactive = true
 strict = true
 
 [tool.ruff]
