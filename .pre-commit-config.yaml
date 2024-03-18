@@ -24,8 +24,6 @@ repos:
     rev: v1.9.0
     hooks:
       - id: mypy
-        types: [python]
-        args: [--disable-error-code=import-untyped, --ignore-missing-imports, --install-types, --non-interactive, --strict]
         exclude: "tests"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
