@@ -88,6 +88,8 @@ exclude = '''
 [tool.mypy]
 files = ["fsutil"]
 ignore_missing_imports = true
+install_types = true
+non_interactive = true
 strict = true
 
 [tool.ruff]

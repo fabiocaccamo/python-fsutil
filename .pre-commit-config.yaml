@@ -25,7 +25,7 @@ repos:
     hooks:
       - id: mypy
         types: [python]
-        args: [--install-types, --non-interactive, --strict]
+        args: [--ignore-missing-imports, --install-types, --non-interactive, --strict]
         exclude: "tests"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
