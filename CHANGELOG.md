@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.14.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.14.0) - 2024-03-19
+## [0.14.1](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.14.1) - 2024-03-19
 -   Add `mypy` to `pre-commit`.
 -   Add `transform_filepath` method. #12 #13
 -   Fix `join_filename` return value when `basename` or `extension` are empty.
