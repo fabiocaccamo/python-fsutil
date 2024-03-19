@@ -805,6 +805,8 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.join_filename("Document", ".txt"), "Document.txt")
         self.assertEqual(fsutil.join_filename(" Document ", " txt "), "Document.txt")
         self.assertEqual(fsutil.join_filename("Document", " .txt "), "Document.txt")
+        self.assertEqual(fsutil.join_filename("Document", ""), "Document")
+        self.assertEqual(fsutil.join_filename("", "txt"), "txt")
 
     def test_join_filepath(self):
         self.assertEqual(

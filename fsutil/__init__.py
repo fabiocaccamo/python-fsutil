@@ -881,8 +881,10 @@ def join_filename(basename: str, extension: str) -> str:
     """
     basename = basename.rstrip(".").strip()
     extension = extension.replace(".", "").strip()
-    filename = f"{basename}.{extension}"
-    return filename
+    if basename and extension:
+        filename = f"{basename}.{extension}"
+        return filename
+    return basename or extension
 
 
 def join_filepath(dirpath: PathIn, filename: str) -> str:
