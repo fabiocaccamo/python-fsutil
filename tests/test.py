@@ -1222,6 +1222,83 @@ class fsutil_test_case(unittest.TestCase):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(fsutil.split_path(s), ["root", "a", "b", "c", "Document.txt"])
 
+    def test_transform_filepath_without_args(self):
+        s = "/root/a/b/c/Document.txt"
+        with self.assertRaises(ValueError):
+            (fsutil.transform_filepath(s),)
+
+    def test_transform_filepath_with_empty_str_args(self):
+        s = "/root/a/b/c/Document.txt"
+        self.assertEqual(
+            fsutil.transform_filepath(s, dirpath=""),
+            "Document.txt",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(s, basename=""),
+            "/root/a/b/c/txt",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(s, extension=""),
+            "/root/a/b/c/Document",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(
+                s, dirpath="/root/x/y/z/", basename="NewDocument", extension="xls"
+            ),
+            "/root/x/y/z/NewDocument.xls",
+        )
+        with self.assertRaises(ValueError):
+            (fsutil.transform_filepath(s, dirpath="", basename="", extension=""),)
+
+    def test_transform_filepath_with_str_args(self):
+        s = "/root/a/b/c/Document.txt"
+        self.assertEqual(
+            fsutil.transform_filepath(s, dirpath="/root/x/y/z/"),
+            "/root/x/y/z/Document.txt",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(s, basename="NewDocument"),
+            "/root/a/b/c/NewDocument.txt",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(s, extension="xls"),
+            "/root/a/b/c/Document.xls",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(s, extension=".xls"),
+            "/root/a/b/c/Document.xls",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(
+                s, dirpath="/root/x/y/z/", basename="NewDocument", extension="xls"
+            ),
+            "/root/x/y/z/NewDocument.xls",
+        )
+
+    def test_transform_filepath_with_callable_args(self):
+        s = "/root/a/b/c/Document.txt"
+        self.assertEqual(
+            fsutil.transform_filepath(s, dirpath=lambda d: f"{d}/x/y/z/"),
+            "/root/a/b/c/x/y/z/Document.txt",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(s, basename=lambda b: b.lower()),
+            "/root/a/b/c/document.txt",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(s, extension=lambda e: "xls"),
+            "/root/a/b/c/Document.xls",
+        )
+        self.assertEqual(
+            fsutil.transform_filepath(
+                s,
+                dirpath=lambda d: f"{d}/x/y/z/",
+                basename=lambda b: b.lower(),
+                extension=lambda e: "xls",
+            ),
+            "/root/a/b/c/x/y/z/document.xls",
+        )
+
     def test_write_file(self):
         path = self.temp_path("a/b/c.txt")
         fsutil.write_file(path, content="Hello World")

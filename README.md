@@ -112,6 +112,7 @@ import fsutil
 -   [`split_filename`](#split_filename)
 -   [`split_filepath`](#split_filepath)
 -   [`split_path`](#split_path)
+-   [`transform_filepath`](#transform_filepath)
 -   [`write_file`](#write_file)
 -   [`write_file_json`](#write_file_json)
 
@@ -724,6 +725,13 @@ dirpath, filename = fsutil.split_filepath(path)
 ```python
 # Split a path and returns its path-names.
 path_names = fsutil.split_path(path)
+```
+
+#### `transform_filepath`
+
+```python
+# Trasform a filepath by applying the provided optional changes.
+filepath = fsutil.transform_filepath(path, dirpath=None, basename=lambda b: slugify(b), extension="webp")
 ```
 
 #### `write_file`

@@ -1339,6 +1339,63 @@ def split_path(path: PathIn) -> list[str]:
     return names
 
 
+def transform_filepath(
+    path: PathIn,
+    *,
+    dirpath: str | Callable[[str], str] | None = None,
+    basename: str | Callable[[str], str] | None = None,
+    extension: str | Callable[[str], str] | None = None,
+) -> str:
+    """
+    Trasform a filepath by applying the provided optional changes.
+
+    :param path: The path.
+    :type path: PathIn
+    :param dirpath: The new dirpath or a callable.
+    :type dirpath: str | Callable[[str], str] | None
+    :param basename: The new basename or a callable.
+    :type basename: str | Callable[[str], str] | None
+    :param extension: The new extension or a callable.
+    :type extension: str | Callable[[str], str] | None
+
+    :returns: The filepath with the applied changes.
+    :rtype: str
+    """
+
+    def _get_value(
+        new_value: str | Callable[[str], str] | None,
+        old_value: str,
+    ) -> str:
+        value = old_value
+        if new_value is not None:
+            if callable(new_value):
+                value = new_value(old_value)
+            elif isinstance(new_value, str):
+                value = new_value
+            else:
+                value = old_value
+        return value
+
+    if all([dirpath is None, basename is None, extension is None]):
+        raise ValueError(
+            "Invalid arguments: at least one of "
+            "'dirpath', 'basename' or 'extension' is required."
+        )
+    old_dirpath, old_filename = split_filepath(path)
+    old_basename, old_extension = split_filename(old_filename)
+    new_dirpath = _get_value(dirpath, old_dirpath)
+    new_basename = _get_value(basename, old_basename)
+    new_extension = _get_value(extension, old_extension)
+    if not any([new_dirpath, new_basename, new_extension]):
+        raise ValueError(
+            "Invalid arguments: at least one of "
+            "'dirpath', 'basename' or 'extension' is required."
+        )
+    new_filename = join_filename(new_basename, new_extension)
+    new_filepath = join_filepath(new_dirpath, new_filename)
+    return new_filepath
+
+
 def _write_file_atomic(
     path: PathIn,
     content: str,
