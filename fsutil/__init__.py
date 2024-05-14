@@ -7,12 +7,13 @@ import os
 import pathlib
 import re
 import shutil
+import sys
 import tarfile
 import tempfile
 import uuid
 import zipfile
 from datetime import datetime
-from typing import Any, Callable, Generator, Iterable, Union
+from typing import Any, Callable, Generator, Iterable, Literal, Union
 from urllib.parse import urlsplit
 
 try:
@@ -516,6 +517,11 @@ def extract_tar_file(
     *,
     autodelete: bool = False,
     content_paths: Iterable[tarfile.TarInfo] | None = None,
+    filter: (
+        Callable[[tarfile.TarInfo, str], tarfile.TarInfo | None]
+        | Literal["fully_trusted", "tar", "data"]
+    )
+    | None = None,
 ) -> None:
     """
     Extract tar file at path to dest path.
@@ -529,7 +535,16 @@ def extract_tar_file(
     assert_not_file(dest)
     make_dirs(dest)
     with tarfile.TarFile(path, "r") as file:
-        file.extractall(dest, members=content_paths)
+        if sys.version_info < (3, 12):
+            file.extractall(dest, members=content_paths)
+        else:
+            # https://docs.python.org/3/library/tarfile.html#tarfile-extraction-filter
+            file.extractall(
+                dest,
+                members=content_paths,
+                numeric_owner=False,
+                filter=(filter or "data"),
+            )
     if autodelete:
         remove_file(path)
 
