@@ -1,4 +1,6 @@
+import os
 import re
+import sys
 import threading
 import time
 import unittest
@@ -14,6 +16,10 @@ class fsutil_test_case(unittest.TestCase):
 
     def tearDown(self):
         fsutil.remove_dir(self.temp_path())
+
+    @staticmethod
+    def norm_path(filepath):
+        return os.path.normpath(filepath)
 
     @staticmethod
     def temp_path(filepath=""):
@@ -721,21 +727,45 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_get_parent_dir(self):
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s), "/root/a/b/c")
+        self.assertEqual(
+            fsutil.get_parent_dir(s),
+            self.norm_path("/root/a/b/c"),
+        )
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, levels=0), "/root/a/b/c")
+        self.assertEqual(
+            fsutil.get_parent_dir(s, levels=0),
+            self.norm_path("/root/a/b/c"),
+        )
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, levels=1), "/root/a/b/c")
+        self.assertEqual(
+            fsutil.get_parent_dir(s, levels=1),
+            self.norm_path("/root/a/b/c"),
+        )
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, levels=2), "/root/a/b")
+        self.assertEqual(
+            fsutil.get_parent_dir(s, levels=2),
+            self.norm_path("/root/a/b"),
+        )
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, levels=3), "/root/a")
+        self.assertEqual(
+            fsutil.get_parent_dir(s, levels=3),
+            self.norm_path("/root/a"),
+        )
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, levels=4), "/root")
+        self.assertEqual(
+            fsutil.get_parent_dir(s, levels=4),
+            self.norm_path("/root"),
+        )
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, levels=5), "/")
+        self.assertEqual(
+            fsutil.get_parent_dir(s, levels=5),
+            self.norm_path("/"),
+        )
         s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.get_parent_dir(s, levels=6), "/")
+        self.assertEqual(
+            fsutil.get_parent_dir(s, levels=6),
+            self.norm_path("/"),
+        )
 
     def test_get_permissions(self):
         path = self.temp_path("a/b/c.txt")
@@ -810,17 +840,20 @@ class fsutil_test_case(unittest.TestCase):
 
     def test_join_filepath(self):
         self.assertEqual(
-            fsutil.join_filepath("a/b/c", "Document.txt"), "a/b/c/Document.txt"
+            fsutil.join_filepath("a/b/c", "Document.txt"),
+            self.norm_path("a/b/c/Document.txt"),
         )
 
     def test_join_path_with_absolute_path(self):
         self.assertEqual(
-            fsutil.join_path("/a/b/c/", "/document.txt"), "/a/b/c/document.txt"
+            fsutil.join_path("/a/b/c/", "/document.txt"),
+            self.norm_path("/a/b/c/document.txt"),
         )
 
     def test_join_path_with_parent_dirs(self):
         self.assertEqual(
-            fsutil.join_path("/a/b/c/", "../../document.txt"), "/a/document.txt"
+            fsutil.join_path("/a/b/c/", "../../document.txt"),
+            self.norm_path("/a/document.txt"),
         )
 
     def test_list_dirs(self):
@@ -970,7 +1003,8 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(lines, expected_lines)
 
         # multiple lines not stripped
-        expected_lines = ["1\n", "2\n", "3\n"]
+        newline = "\r\n" if sys.platform == "win32" else "\n"
+        expected_lines = [f"1{newline}", f"2{newline}", f"3{newline}"]
         lines = fsutil.read_file_lines(
             path, line_start=1, line_end=3, strip_white=False, skip_empty=False
         )
@@ -1211,16 +1245,25 @@ class fsutil_test_case(unittest.TestCase):
         self.assertEqual(fsutil.split_filename(s), ("Document", "txt"))
 
     def test_split_filepath(self):
-        s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.split_filepath(s), ("/root/a/b/c", "Document.txt"))
+        s = self.norm_path("/root/a/b/c/Document.txt")
+        self.assertEqual(
+            fsutil.split_filepath(s),
+            (self.norm_path("/root/a/b/c"), "Document.txt"),
+        )
 
     def test_split_filepath_with_filename_only(self):
-        s = "Document.txt"
-        self.assertEqual(fsutil.split_filepath(s), ("", "Document.txt"))
+        s = self.norm_path("Document.txt")
+        self.assertEqual(
+            fsutil.split_filepath(s),
+            ("", "Document.txt"),
+        )
 
     def test_split_path(self):
-        s = "/root/a/b/c/Document.txt"
-        self.assertEqual(fsutil.split_path(s), ["root", "a", "b", "c", "Document.txt"])
+        s = self.norm_path("/root/a/b/c/Document.txt")
+        self.assertEqual(
+            fsutil.split_path(s),
+            ["root", "a", "b", "c", "Document.txt"],
+        )
 
     def test_transform_filepath_without_args(self):
         s = "/root/a/b/c/Document.txt"
@@ -1231,21 +1274,21 @@ class fsutil_test_case(unittest.TestCase):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(
             fsutil.transform_filepath(s, dirpath=""),
-            "Document.txt",
+            self.norm_path("Document.txt"),
         )
         self.assertEqual(
             fsutil.transform_filepath(s, basename=""),
-            "/root/a/b/c/txt",
+            self.norm_path("/root/a/b/c/txt"),
         )
         self.assertEqual(
             fsutil.transform_filepath(s, extension=""),
-            "/root/a/b/c/Document",
+            self.norm_path("/root/a/b/c/Document"),
         )
         self.assertEqual(
             fsutil.transform_filepath(
                 s, dirpath="/root/x/y/z/", basename="NewDocument", extension="xls"
             ),
-            "/root/x/y/z/NewDocument.xls",
+            self.norm_path("/root/x/y/z/NewDocument.xls"),
         )
         with self.assertRaises(ValueError):
             (fsutil.transform_filepath(s, dirpath="", basename="", extension=""),)
@@ -1254,40 +1297,40 @@ class fsutil_test_case(unittest.TestCase):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(
             fsutil.transform_filepath(s, dirpath="/root/x/y/z/"),
-            "/root/x/y/z/Document.txt",
+            self.norm_path("/root/x/y/z/Document.txt"),
         )
         self.assertEqual(
             fsutil.transform_filepath(s, basename="NewDocument"),
-            "/root/a/b/c/NewDocument.txt",
+            self.norm_path("/root/a/b/c/NewDocument.txt"),
         )
         self.assertEqual(
             fsutil.transform_filepath(s, extension="xls"),
-            "/root/a/b/c/Document.xls",
+            self.norm_path("/root/a/b/c/Document.xls"),
         )
         self.assertEqual(
             fsutil.transform_filepath(s, extension=".xls"),
-            "/root/a/b/c/Document.xls",
+            self.norm_path("/root/a/b/c/Document.xls"),
         )
         self.assertEqual(
             fsutil.transform_filepath(
                 s, dirpath="/root/x/y/z/", basename="NewDocument", extension="xls"
             ),
-            "/root/x/y/z/NewDocument.xls",
+            self.norm_path("/root/x/y/z/NewDocument.xls"),
         )
 
     def test_transform_filepath_with_callable_args(self):
         s = "/root/a/b/c/Document.txt"
         self.assertEqual(
             fsutil.transform_filepath(s, dirpath=lambda d: f"{d}/x/y/z/"),
-            "/root/a/b/c/x/y/z/Document.txt",
+            self.norm_path("/root/a/b/c/x/y/z/Document.txt"),
         )
         self.assertEqual(
             fsutil.transform_filepath(s, basename=lambda b: b.lower()),
-            "/root/a/b/c/document.txt",
+            self.norm_path("/root/a/b/c/document.txt"),
         )
         self.assertEqual(
             fsutil.transform_filepath(s, extension=lambda e: "xls"),
-            "/root/a/b/c/Document.xls",
+            self.norm_path("/root/a/b/c/Document.xls"),
         )
         self.assertEqual(
             fsutil.transform_filepath(
@@ -1296,7 +1339,7 @@ class fsutil_test_case(unittest.TestCase):
                 basename=lambda b: b.lower(),
                 extension=lambda e: "xls",
             ),
-            "/root/a/b/c/x/y/z/document.xls",
+            self.norm_path("/root/a/b/c/x/y/z/document.xls"),
         )
 
     def test_write_file(self):

@@ -138,7 +138,7 @@ def _require_requests_installed() -> None:
 
 def _get_path(path: PathIn) -> str:
     if isinstance(path, str):
-        return path
+        return os.path.normpath(path)
     return str(path)
 
 
