@@ -6,6 +6,7 @@ import time
 import unittest
 from datetime import datetime, timedelta
 from decimal import Decimal
+from unittest.mock import patch
 
 import fsutil
 
@@ -845,6 +846,13 @@ class fsutil_test_case(unittest.TestCase):
         )
 
     def test_join_path_with_absolute_path(self):
+        self.assertEqual(
+            fsutil.join_path("/a/b/c/", "/document.txt"),
+            self.norm_path("/a/b/c/document.txt"),
+        )
+
+    @patch("os.sep", "\\")
+    def test_join_path_with_absolute_path_on_windows(self):
         self.assertEqual(
             fsutil.join_path("/a/b/c/", "/document.txt"),
             self.norm_path("/a/b/c/document.txt"),
