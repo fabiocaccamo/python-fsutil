@@ -1428,6 +1428,7 @@ def _write_file_atomic(
             mode=mode,
             dir=dirpath,
             delete=True,
+            delete_on_close=False,
             encoding=encoding,
         ) as file:
             file.write(content)

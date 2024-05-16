@@ -1366,6 +1366,12 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.write_file(path, content="Hello Jupiter", atomic=True)
         self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
 
+    def test_write_file_atomic_no_temp_files_left(self):
+        path = self.temp_path("a/b/c.txt")
+        fsutil.write_file(path, content="Hello World", atomic=True)
+        fsutil.write_file(path, content="Hello Jupiter", atomic=True)
+        self.assertEqual(fsutil.list_files(self.temp_path("a/b/")), [path])
+
     @unittest.skipIf(sys.platform.startswith("win"), "Test skipped on Windows")
     def test_write_file_atomic_permissions_inheritance(self):
         path = self.temp_path("a/b/c.txt")
