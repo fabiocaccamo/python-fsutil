@@ -768,6 +768,7 @@ class fsutil_test_case(unittest.TestCase):
             self.norm_path("/"),
         )
 
+    @unittest.skipIf(sys.platform.startswith("win"), "Test skipped on Windows")
     def test_get_permissions(self):
         path = self.temp_path("a/b/c.txt")
         fsutil.write_file(path, content="Hello World")
@@ -1231,6 +1232,7 @@ class fsutil_test_case(unittest.TestCase):
         ]
         self.assertEqual(results, expected_results)
 
+    @unittest.skipIf(sys.platform.startswith("win"), "Test skipped on Windows")
     def test_set_permissions(self):
         path = self.temp_path("a/b/c.txt")
         fsutil.write_file(path, content="Hello World")
@@ -1364,6 +1366,7 @@ class fsutil_test_case(unittest.TestCase):
         fsutil.write_file(path, content="Hello Jupiter", atomic=True)
         self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
 
+    @unittest.skipIf(sys.platform.startswith("win"), "Test skipped on Windows")
     def test_write_file_atomic_permissions_inheritance(self):
         path = self.temp_path("a/b/c.txt")
         fsutil.write_file(path, content="Hello World", atomic=False)
