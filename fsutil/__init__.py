@@ -825,7 +825,7 @@ def get_unique_name(
     separator: str = "-",
 ) -> str:
     """
-    Get a unique name for a directory/file ath the given directory path.
+    Get a unique name for a directory/file at the given directory path.
     """
     path = _get_path(path)
     assert_dir(path)

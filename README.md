@@ -449,7 +449,7 @@ permissions = fsutil.get_permissions(path)
 #### `get_unique_name`
 
 ```python
-# Get a unique name for a directory/file ath the given directory path.
+# Get a unique name for a directory/file at the given directory path.
 unique_name = fsutil.get_unique_name(path, prefix="", suffix="", extension="", separator="-")
 ```
 
