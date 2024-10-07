@@ -1045,7 +1045,7 @@ def _read_file_lines_in_range(
     line_start: int = 0,
     line_end: int = -1,
     encoding: str = "utf-8",
-) -> Generator[str, None, None]:
+) -> Generator[str]:
     path = _get_path(path)
     line_start_negative = line_start < 0
     line_end_negative = line_end < 0
