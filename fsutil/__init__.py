@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import pathlib
+import platform
 import re
 import shutil
 import sys
@@ -1424,11 +1425,12 @@ def _write_file_atomic(
     if append:
         content = read_file(path, encoding=encoding) + content
     dirpath, _ = split_filepath(path)
+    auto_delete_temp_file = False if platform.system() == "Windows" else True
     try:
         with tempfile.NamedTemporaryFile(
             mode=mode,
             dir=dirpath,
-            delete=True,
+            delete=auto_delete_temp_file,
             # delete_on_close=False, # supported since Python >= 3.12
             encoding=encoding,
         ) as file:
@@ -1445,6 +1447,11 @@ def _write_file_atomic(
         # to remove the temp file on __exit__ because the temp file
         # has replaced atomically the file at path.
         pass
+    finally:
+        # attempt for fixing #121 (on Windows destroys created file on exit)
+        # manually delete the temporary file if still exists
+        if temp_path and exists(temp_path):
+            remove_file(temp_path)
 
 
 def _write_file_non_atomic(
