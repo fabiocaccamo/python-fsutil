@@ -2,4 +2,4 @@ coverage == 7.6.*
 mypy == 1.11.*
 pre-commit == 4.0.*
 requests == 2.32.*
-tox == 4.22.*
+tox == 4.23.*
