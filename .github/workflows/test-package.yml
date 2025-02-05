@@ -43,9 +43,7 @@ jobs:
 
     - name: Run tests
       run: |
-        coverage run --append --source=fsutil -m unittest
-        coverage report --show-missing
-        coverage xml -o ./coverage.xml
+        pytest tests --cov=fsutil --cov-report=term-missing --cov-fail-under=90
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
