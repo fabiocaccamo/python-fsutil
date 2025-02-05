@@ -451,12 +451,10 @@ class fsutil_test_case(unittest.TestCase):
             self.assertFalse(fsutil.exists(path))
 
     def test_download_file_without_requests_installed(self):
-        requests_installed = fsutil.requests_installed
-        fsutil.requests_installed = False
         url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
-        with self.assertRaises(ModuleNotFoundError):
-            fsutil.download_file(url, dirpath=__file__)
-        fsutil.requests_installed = requests_installed
+        with patch("fsutil.core.require_requests", side_effect=ModuleNotFoundError()):
+            with self.assertRaises(ModuleNotFoundError):
+                fsutil.download_file(url, dirpath=__file__)
 
     def test_exists(self):
         path = self.temp_path("a/b/")
