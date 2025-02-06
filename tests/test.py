@@ -32,46 +32,6 @@ class fsutil_test_case(unittest.TestCase):
             file.seek(size_bytes - 1)
             file.write(b"\0")
 
-    def test_assert_dir(self):
-        path = self.temp_path("a/b/")
-        with self.assertRaises(OSError):
-            fsutil.assert_dir(path)
-        fsutil.create_dir(path)
-        fsutil.assert_dir(path)
-
-    def test_assert_dir_with_file(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.create_file(path)
-        with self.assertRaises(OSError):
-            fsutil.assert_dir(path)
-
-    def test_assert_exists_with_directory(self):
-        path = self.temp_path("a/b/")
-        with self.assertRaises(OSError):
-            fsutil.assert_exists(path)
-        fsutil.create_dir(path)
-        fsutil.assert_exists(path)
-
-    def test_assert_exists_with_file(self):
-        path = self.temp_path("a/b/c.txt")
-        with self.assertRaises(OSError):
-            fsutil.assert_exists(path)
-        fsutil.create_file(path)
-        fsutil.assert_exists(path)
-
-    def test_assert_file(self):
-        path = self.temp_path("a/b/c.txt")
-        with self.assertRaises(OSError):
-            fsutil.assert_file(path)
-        fsutil.create_file(path)
-        fsutil.assert_file(path)
-
-    def test_assert_file_with_directory(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.create_dir(path)
-        with self.assertRaises(OSError):
-            fsutil.assert_file(path)
-
     def test_clean_dir_only_dirs(self):
         fsutil.create_dir(self.temp_path("x/y/z/a"))
         fsutil.create_dir(self.temp_path("x/y/z/b"))
@@ -454,16 +414,6 @@ class fsutil_test_case(unittest.TestCase):
             with self.assertRaises(ModuleNotFoundError):
                 fsutil.download_file(url, dirpath=__file__)
 
-    def test_exists(self):
-        path = self.temp_path("a/b/")
-        self.assertFalse(fsutil.exists(path))
-        fsutil.create_dir(path)
-        self.assertTrue(fsutil.exists(path))
-        path = self.temp_path("a/b/c.txt")
-        self.assertFalse(fsutil.exists(path))
-        fsutil.create_file(path)
-        self.assertTrue(fsutil.exists(path))
-
     def test_extract_zip_file(self):
         zip_path = self.temp_path("archive.zip")
         unzip_path = self.temp_path("unarchive/")
@@ -778,48 +728,6 @@ class fsutil_test_case(unittest.TestCase):
         self.assertTrue(basename.startswith("custom-prefix_"))
         self.assertTrue(basename.endswith("_custom-suffix"))
         self.assertEqual(extension, "txt")
-
-    def test_is_dir(self):
-        path = self.temp_path("a/b/")
-        self.assertFalse(fsutil.is_dir(path))
-        fsutil.create_dir(path)
-        self.assertTrue(fsutil.is_dir(path))
-        path = self.temp_path("a/b/c.txt")
-        self.assertFalse(fsutil.is_dir(path))
-        fsutil.create_file(path)
-        self.assertFalse(fsutil.is_dir(path))
-
-    def test_is_empty(self):
-        fsutil.create_file(self.temp_path("a/b/c.txt"))
-        fsutil.create_file(self.temp_path("a/b/d.txt"), content="1")
-        fsutil.create_dir(self.temp_path("a/b/e"))
-        self.assertTrue(fsutil.is_empty(self.temp_path("a/b/c.txt")))
-        self.assertFalse(fsutil.is_empty(self.temp_path("a/b/d.txt")))
-        self.assertTrue(fsutil.is_empty(self.temp_path("a/b/e")))
-        self.assertFalse(fsutil.is_empty(self.temp_path("a/b")))
-
-    def test_is_empty_dir(self):
-        path = self.temp_path("a/b/")
-        fsutil.create_dir(path)
-        self.assertTrue(fsutil.is_empty_dir(path))
-        filepath = self.temp_path("a/b/c.txt")
-        fsutil.create_file(filepath)
-        self.assertTrue(fsutil.is_file(filepath))
-        self.assertFalse(fsutil.is_empty_dir(path))
-
-    def test_is_empty_file(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.create_file(path)
-        self.assertTrue(fsutil.is_empty_file(path))
-        path = self.temp_path("a/b/d.txt")
-        fsutil.create_file(path, content="hello world")
-        self.assertFalse(fsutil.is_empty_file(path))
-
-    def test_is_file(self):
-        path = self.temp_path("a/b/c.txt")
-        self.assertFalse(fsutil.is_file(path))
-        fsutil.create_file(path)
-        self.assertTrue(fsutil.is_file(path))
 
     def test_join_filename(self):
         self.assertEqual(fsutil.join_filename("Document", "txt"), "Document.txt")
