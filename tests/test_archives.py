@@ -127,3 +127,7 @@ def test_extract_tar_file_with_autodelete(temp_path):
     assert fsutil.is_dir(untar_path)
     assert fsutil.is_file(temp_path("unarchive/f1.txt"))
     assert not fsutil.is_file(tar_path)
+
+
+if __name__ == "__main__":
+    pytest.main()
