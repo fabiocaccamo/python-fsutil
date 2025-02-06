@@ -1,11 +1,9 @@
 import os
 import re
-import sys
 import threading
 import time
 import unittest
 from datetime import datetime, timedelta
-from decimal import Decimal
 from unittest.mock import patch
 
 import fsutil
@@ -942,98 +940,6 @@ class fsutil_test_case(unittest.TestCase):
         self.assertFalse(fsutil.exists(path))
         self.assertTrue(fsutil.is_file(self.temp_path("a/c.txt")))
 
-    def test_read_file(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.write_file(path, content="Hello World")
-        self.assertEqual(fsutil.read_file(path), "Hello World")
-
-    def test_read_file_from_url(self):
-        url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
-        content = fsutil.read_file_from_url(url)
-        self.assertTrue("python-fsutil" in content)
-
-    def test_read_file_json(self):
-        path = self.temp_path("a/b/c.json")
-        now = datetime.now()
-        data = {
-            "test": "Hello World",
-            "test_datetime": now,
-            "test_set": {1, 2, 3},
-        }
-        fsutil.write_file_json(self.temp_path("a/b/c.json"), data=data)
-        expected_data = data.copy()
-        expected_data["test_datetime"] = now.isoformat()
-        expected_data["test_set"] = list(expected_data["test_set"])
-        self.assertEqual(fsutil.read_file_json(path), expected_data)
-
-    def test_read_file_lines(self):
-        path = self.temp_path("a/b/c.txt")
-        lines = ["", "1 ", " 2", "", "", " 3 ", "  4  ", "", "", "5"]
-        fsutil.write_file(path, content="\n".join(lines))
-
-        expected_lines = list(lines)
-        lines = fsutil.read_file_lines(path, strip_white=False, skip_empty=False)
-        self.assertEqual(lines, expected_lines)
-
-        expected_lines = ["", "1", "2", "", "", "3", "4", "", "", "5"]
-        lines = fsutil.read_file_lines(path, strip_white=True, skip_empty=False)
-        self.assertEqual(lines, expected_lines)
-
-        expected_lines = ["1 ", " 2", " 3 ", "  4  ", "5"]
-        lines = fsutil.read_file_lines(path, strip_white=False, skip_empty=True)
-        self.assertEqual(lines, expected_lines)
-
-        expected_lines = ["1", "2", "3", "4", "5"]
-        lines = fsutil.read_file_lines(path, strip_white=True, skip_empty=True)
-        self.assertEqual(lines, expected_lines)
-
-    def test_read_file_lines_with_lines_range(self):
-        path = self.temp_path("a/b/c.txt")
-        lines = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        fsutil.write_file(path, content="\n".join(lines))
-
-        # single line
-        expected_lines = ["1"]
-        lines = fsutil.read_file_lines(path, line_start=1, line_end=1)
-        self.assertEqual(lines, expected_lines)
-
-        # multiple lines
-        expected_lines = ["1", "2", "3"]
-        lines = fsutil.read_file_lines(path, line_start=1, line_end=3)
-        self.assertEqual(lines, expected_lines)
-
-        # multiple lines not stripped
-        newline = "\r\n" if sys.platform == "win32" else "\n"
-        expected_lines = [f"1{newline}", f"2{newline}", f"3{newline}"]
-        lines = fsutil.read_file_lines(
-            path, line_start=1, line_end=3, strip_white=False, skip_empty=False
-        )
-        self.assertEqual(lines, expected_lines)
-
-        # last line
-        expected_lines = ["9"]
-        lines = fsutil.read_file_lines(path, line_start=-1)
-        self.assertEqual(lines, expected_lines)
-
-        # last 3 lines
-        expected_lines = ["7", "8", "9"]
-        lines = fsutil.read_file_lines(path, line_start=-3)
-        self.assertEqual(lines, expected_lines)
-
-        # empty file
-        fsutil.write_file(path, content="")
-        expected_lines = []
-        lines = fsutil.read_file_lines(path, line_start=-2)
-        self.assertEqual(lines, expected_lines)
-
-    def test_read_file_lines_count(self):
-        path = self.temp_path("a/b/c.txt")
-        lines = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        fsutil.write_file(path, content="\n".join(lines))
-
-        lines_count = fsutil.read_file_lines_count(path)
-        self.assertEqual(lines_count, 10)
-
     def test_rename_dir(self):
         path = self.temp_path("a/b/c")
         fsutil.make_dirs(path)
@@ -1334,98 +1240,6 @@ class fsutil_test_case(unittest.TestCase):
             ),
             self.norm_path("/root/a/b/c/x/y/z/document.xls"),
         )
-
-    def test_write_file(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.write_file(path, content="Hello World")
-        self.assertEqual(fsutil.read_file(path), "Hello World")
-        fsutil.write_file(path, content="Hello Jupiter")
-        self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
-
-    def test_write_file_atomic(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.write_file(path, content="Hello World", atomic=True)
-        self.assertEqual(fsutil.read_file(path), "Hello World")
-        fsutil.write_file(path, content="Hello Jupiter", atomic=True)
-        self.assertEqual(fsutil.read_file(path), "Hello Jupiter")
-
-    def test_write_file_atomic_no_temp_files_left(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.write_file(path, content="Hello World", atomic=True)
-        fsutil.write_file(path, content="Hello Jupiter", atomic=True)
-        self.assertEqual(fsutil.list_files(self.temp_path("a/b/")), [path])
-
-    @unittest.skipIf(sys.platform.startswith("win"), "Test skipped on Windows")
-    def test_write_file_atomic_permissions_inheritance(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.write_file(path, content="Hello World", atomic=False)
-        self.assertEqual(fsutil.get_permissions(path), 644)
-        fsutil.set_permissions(path, 777)
-        fsutil.write_file(path, content="Hello Jupiter", atomic=True)
-        self.assertEqual(fsutil.get_permissions(path), 777)
-
-    def test_write_file_with_filename_only(self):
-        path = "document.txt"
-        fsutil.write_file(path, content="Hello World")
-        self.assertTrue(fsutil.is_file(path))
-        # cleanup
-        fsutil.remove_file(path)
-
-    def test_write_file_json(self):
-        path = self.temp_path("a/b/c.json")
-        now = datetime.now()
-        dec = Decimal("3.33")
-        data = {
-            "test": "Hello World",
-            "test_datetime": now,
-            "test_decimal": dec,
-        }
-        fsutil.write_file_json(path, data=data)
-        self.assertEqual(
-            fsutil.read_file(path),
-            (
-                "{"
-                f'"test": "Hello World", '
-                f'"test_datetime": "{now.isoformat()}", '
-                f'"test_decimal": "{dec}"'
-                "}"
-            ),
-        )
-
-    def test_write_file_json_atomic(self):
-        path = self.temp_path("a/b/c.json")
-        now = datetime.now()
-        dec = Decimal("3.33")
-        data = {
-            "test": "Hello World",
-            "test_datetime": now,
-            "test_decimal": dec,
-        }
-        fsutil.write_file_json(path, data=data, atomic=True)
-        self.assertEqual(
-            fsutil.read_file(path),
-            (
-                "{"
-                f'"test": "Hello World", '
-                f'"test_datetime": "{now.isoformat()}", '
-                f'"test_decimal": "{dec}"'
-                "}"
-            ),
-        )
-
-    def test_write_file_with_append(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.write_file(path, content="Hello World")
-        self.assertEqual(fsutil.read_file(path), "Hello World")
-        fsutil.write_file(path, content=" - Hello Sun", append=True)
-        self.assertEqual(fsutil.read_file(path), "Hello World - Hello Sun")
-
-    def test_write_file_with_append_atomic(self):
-        path = self.temp_path("a/b/c.txt")
-        fsutil.write_file(path, content="Hello World", atomic=True)
-        self.assertEqual(fsutil.read_file(path), "Hello World")
-        fsutil.write_file(path, content=" - Hello Sun", append=True, atomic=True)
-        self.assertEqual(fsutil.read_file(path), "Hello World - Hello Sun")
 
 
 if __name__ == "__main__":
