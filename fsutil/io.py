@@ -10,8 +10,8 @@ from typing import Any
 
 from fsutil.args import get_path as _get_path
 from fsutil.checks import assert_file, assert_not_dir, exists
-from fsutil.core import make_dirs_for_file, remove_file
 from fsutil.deps import require_requests
+from fsutil.operations import make_dirs_for_file, remove_file
 from fsutil.paths import split_filepath
 from fsutil.perms import get_permissions, set_permissions
 from fsutil.types import PathIn

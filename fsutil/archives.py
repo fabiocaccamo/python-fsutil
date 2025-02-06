@@ -17,7 +17,7 @@ from fsutil.checks import (
     is_dir,
     is_file,
 )
-from fsutil.core import make_dirs, make_dirs_for_file, remove_file
+from fsutil.operations import make_dirs, make_dirs_for_file, remove_file
 from fsutil.paths import get_filename, join_path
 from fsutil.types import PathIn
 

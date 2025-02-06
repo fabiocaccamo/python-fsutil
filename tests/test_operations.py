@@ -227,7 +227,7 @@ def test_download_file_multiple_to_temp_dir(temp_path):
 
 def test_download_file_without_requests_installed(temp_path):
     url = "https://raw.githubusercontent.com/fabiocaccamo/python-fsutil/main/README.md"
-    with patch("fsutil.core.require_requests", side_effect=ModuleNotFoundError()):
+    with patch("fsutil.operations.require_requests", side_effect=ModuleNotFoundError()):
         with pytest.raises(ModuleNotFoundError):
             fsutil.download_file(url, dirpath=temp_path())
 

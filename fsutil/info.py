@@ -7,7 +7,7 @@ from datetime import datetime
 from fsutil.args import get_path as _get_path
 from fsutil.checks import assert_dir, assert_file
 from fsutil.converters import convert_size_bytes_to_string
-from fsutil.core import search_files
+from fsutil.operations import search_files
 from fsutil.types import PathIn
 
 
