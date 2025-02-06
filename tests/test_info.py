@@ -50,8 +50,8 @@ def test_get_dir_hash(temp_path):
     fsutil.create_file(f4_path, content="hello world 4")
     fsutil.create_file(f5_path, content="hello world 5")
     fsutil.create_file(f6_path, content="hello world 6")
-    hash = fsutil.get_dir_hash(temp_path("x/"))
-    assert hash == "eabe619c41f0c4611b7b9746bededfcb"
+    dir_hash = fsutil.get_dir_hash(temp_path("x/"))
+    assert dir_hash == "eabe619c41f0c4611b7b9746bededfcb"
 
 
 def test_get_dir_last_modified_date(temp_path):
@@ -123,8 +123,8 @@ def test_get_file_creation_date_formatted(temp_path):
 def test_get_file_hash(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path, content="Hello World")
-    hash = fsutil.get_file_hash(path)
-    assert hash == "b10a8db164e0754105b7a99be72e3fe5"
+    file_hash = fsutil.get_file_hash(path)
+    assert file_hash == "b10a8db164e0754105b7a99be72e3fe5"
 
 
 def test_get_file_last_modified_date(temp_path):

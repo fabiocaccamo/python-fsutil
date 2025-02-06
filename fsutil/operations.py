@@ -413,7 +413,7 @@ def rename_file(path: PathIn, name: str) -> None:
     """
     path = _get_path(path)
     assert_file(path)
-    dirpath, filename = split_filepath(path)
+    dirpath, _ = split_filepath(path)
     dest = join_filepath(dirpath, name)
     assert_not_exists(dest)
     os.rename(path, dest)
