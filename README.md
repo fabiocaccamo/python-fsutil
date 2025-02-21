@@ -768,8 +768,8 @@ pre-commit install --install-hooks
 # run tests using tox
 tox
 
-# or run tests using unittest
-python -m unittest
+# or run tests using pytest
+pytest
 ```
 
 ## License
