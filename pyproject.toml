@@ -85,12 +85,17 @@ exclude = '''
 '''
 
 [tool.mypy]
-files = ["fsutil"]
+files = ["src"]
 disable_error_code = "import-untyped"
 ignore_missing_imports = true
 install_types = true
 non_interactive = true
 strict = true
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+addopts = "-v"
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 88
@@ -102,8 +107,9 @@ select = ["B", "B9", "C", "E", "F", "I", "W"]
 [tool.ruff.lint.mccabe]
 max-complexity = 10
 
-[tool.setuptools.packages.find]
-include = ["fsutil*"]
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["fsutil"]
 
 [tool.setuptools.dynamic.version]
 attr = "fsutil.metadata.__version__"

@@ -1,4 +1,5 @@
 include LICENSE.txt
 include README.md
-recursive-include fsutil *
+recursive-include src *
+recursive-include tests *
 recursive-exclude * *.pyc __pycache__ .DS_Store
