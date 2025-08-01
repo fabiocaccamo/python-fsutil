@@ -4,4 +4,4 @@ pre-commit == 4.1.*
 pytest == 8.3.*
 pytest-cov == 6.0.*
 requests == 2.32.*
-tox == 4.24.*
+tox == 4.28.*
