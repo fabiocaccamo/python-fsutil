@@ -1,6 +1,6 @@
 coverage == 7.6.*
 mypy == 1.15.*
-pre-commit == 4.1.*
+pre-commit == 4.3.*
 pytest == 8.3.*
 pytest-cov == 6.0.*
 requests == 2.32.*
