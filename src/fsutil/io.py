@@ -120,7 +120,6 @@ def read_file_lines_count(path: PathIn) -> int:
     assert_file(path)
     lines_count = 0
     with open(path, "rb") as file:
-        file.seek(0)
         lines_count = sum(1 for line in file)
     return lines_count
 

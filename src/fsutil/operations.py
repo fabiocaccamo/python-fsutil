@@ -210,10 +210,23 @@ def download_file(
         if not filename:
             # detect filename from headers
             content_disposition = response.headers.get("content-disposition", "") or ""
-            filename_pattern = r'filename="(.*)"'
-            filename_match = re.search(filename_pattern, content_disposition)
-            if filename_match:
-                filename = filename_match.group(1)
+            # Improved regex to handle various filename formats in Content-Disposition
+            filename_patterns = [
+                r'filename\*=UTF-8\'\'([^;]+)',  # RFC 5987 encoded filename
+                r'filename="([^"]*)"',           # quoted filename
+                r"filename='([^']*)'",           # single quoted filename
+                r'filename=([^;]+)',             # unquoted filename
+            ]
+            for pattern in filename_patterns:
+                filename_match = re.search(pattern, content_disposition, re.IGNORECASE)
+                if filename_match:
+                    filename = filename_match.group(1).strip()
+                    # URL decode if it's an encoded filename
+                    if pattern.startswith(r'filename\*'):
+                        import urllib.parse
+                        filename = urllib.parse.unquote(filename)
+                    break
+
             # or detect filename from url
             if not filename:
                 filename = get_filename(url)
