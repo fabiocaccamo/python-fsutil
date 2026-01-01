@@ -1,7 +1,7 @@
-coverage == 7.10.*
-mypy == 1.18.*
-pre-commit == 4.3.*
-pytest == 8.4.*
+coverage == 7.13.*
+mypy == 1.19.*
+pre-commit == 4.5.*
+pytest == 9.0.*
 pytest-cov == 7.0.*
 requests == 2.32.*
-tox == 4.30.*
+tox == 4.32.*
