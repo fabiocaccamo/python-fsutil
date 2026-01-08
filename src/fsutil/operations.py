@@ -517,6 +517,8 @@ def _search_paths(path: PathIn, pattern: str) -> list[str]:
     assert_dir(path)
     pathname = os.path.join(path, pattern)
     paths = glob.glob(pathname, recursive=True)
+    # normalize paths to use OS-specific separators
+    paths = [os.path.normpath(path_result) for path_result in paths]
     return paths
 
 
