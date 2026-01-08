@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-import platform
 import tempfile
 from collections.abc import Generator
 from datetime import datetime
@@ -137,12 +136,12 @@ def _write_file_atomic(
     if append:
         content = read_file(path, encoding=encoding) + content
     dirpath, _ = split_filepath(path)
-    auto_delete_temp_file = False if platform.system() == "Windows" else True
+    temp_path = None
     try:
         with tempfile.NamedTemporaryFile(
             mode=mode,
             dir=dirpath,
-            delete=auto_delete_temp_file,
+            delete=False,
             # delete_on_close=False, # supported since Python >= 3.12
             encoding=encoding,
         ) as file:
@@ -150,10 +149,11 @@ def _write_file_atomic(
             file.flush()
             os.fsync(file.fileno())
             temp_path = file.name
-            permissions = get_permissions(path) if exists(path) else None
-            os.replace(temp_path, path)
-            if permissions:
-                set_permissions(path, permissions)
+        # file is now closed, safe to replace on Windows
+        permissions = get_permissions(path) if exists(path) else None
+        os.replace(temp_path, path)
+        if permissions:
+            set_permissions(path, permissions)
     except FileNotFoundError:
         # success - the NamedTemporaryFile has not been able
         # to remove the temp file on __exit__ because the temp file
