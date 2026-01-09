@@ -46,6 +46,7 @@ jobs:
         mypy --install-types --non-interactive
 
     - name: Run tests
+      shell: bash
       run: |
         pytest tests --cov=fsutil --cov-report=term-missing --cov-fail-under=90
 
