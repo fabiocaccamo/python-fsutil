@@ -518,7 +518,9 @@ def _search_paths(path: PathIn, pattern: str) -> list[str]:
     pathname = os.path.join(path, pattern)
     paths = glob.glob(pathname, recursive=True)
     # normalize paths to use OS-specific separators
-    paths = [os.path.normpath(path_result) for path_result in paths]
+    paths = [
+        os.path.relpath(os.path.normpath(path_result), path) for path_result in paths
+    ]
     return paths
 
 

@@ -518,6 +518,24 @@ def test_search_files(temp_path):
     assert results == expected_results
 
 
+def test_search_files_with_relative_path(temp_path, monkeypatch):
+    """
+    Regression test: search_files with a relative path must not return an empty
+    list due to the double-prefix bug in _filter_paths.
+    """
+    fsutil.create_file(temp_path("a/b/c/IMG_1002.png"))
+    fsutil.create_file(temp_path("a/x/c/IMG_1005.png"))
+    fsutil.create_file(temp_path("a/b/c/IMG_1000.jpg"))
+
+    # change cwd to the parent of "a/" so that the relative path is valid
+    monkeypatch.chdir(temp_path(""))
+
+    results = fsutil.search_files("./a/", "**/c/IMG_*.png")
+
+    assert len(results) == 2
+    assert all(fsutil.is_file(result) for result in results)
+
+
 def test_search_dirs(temp_path):
     fsutil.create_file(temp_path("a/b/c/IMG_1000.jpg"))
     fsutil.create_file(temp_path("x/y/z/c/IMG_1001.jpg"))
