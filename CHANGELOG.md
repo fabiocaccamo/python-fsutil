@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.1](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.16.1) - 2026-04-07
+-   Fix search methods not working correctly with relative paths.
+-   Bump requirements and `pre-commit` hooks.
+
 ## [0.16.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.16.0) - 2026-01-08
 -   Add `Python 3.14` support.
 -   Fix atomic file operations support on Windows. #121
