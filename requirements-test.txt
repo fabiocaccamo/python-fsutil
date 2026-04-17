@@ -4,6 +4,6 @@ pre-commit == 4.5.*
 pytest == 9.0.*
 pytest-cov == 7.1.*
 requests == 2.33.*
-setuptools >= 78.1.1
+setuptools == 82.0.*
 tox == 4.52.*
-urllib3 >= 2.6.3
+urllib3 == 2.6.*
