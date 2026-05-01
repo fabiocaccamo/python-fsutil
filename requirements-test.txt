@@ -1,9 +1,9 @@
 coverage == 7.13.*
 mypy == 1.20.*
-pre-commit == 4.5.*
+pre-commit == 4.6.*
 pytest == 9.0.*
 pytest-cov == 7.1.*
 requests == 2.33.*
 setuptools == 82.0.*
-tox == 4.52.*
+tox == 4.53.*
 urllib3 == 2.6.*
