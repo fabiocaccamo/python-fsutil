@@ -222,6 +222,13 @@ def download_file(
                 filename_uuid = str(uuid.uuid4())
                 filename = f"download-{filename_uuid}"
 
+        # sanitize filename to prevent path traversal attacks
+        # (e.g. a malicious server could return filename="../../.bashrc")
+        filename = os.path.basename(filename)
+        if not filename:
+            filename_uuid = str(uuid.uuid4())
+            filename = f"download-{filename_uuid}"
+
         # build filepath
         dirpath = dirpath or tempfile.gettempdir()
         dirpath = _get_path(dirpath)
