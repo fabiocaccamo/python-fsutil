@@ -213,7 +213,7 @@ def download_file(
             filename_pattern = r'filename="(.*)"'
             filename_match = re.search(filename_pattern, content_disposition)
             if filename_match:
-                filename = filename_match.group(1)
+                filename = os.path.basename(filename_match.group(1))
             # or detect filename from url
             if not filename:
                 filename = get_filename(url)
