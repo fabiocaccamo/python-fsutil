@@ -232,6 +232,33 @@ def test_download_file_without_requests_installed(temp_path):
             fsutil.download_file(url, dirpath=temp_path())
 
 
+def test_download_file_content_disposition_filename_is_sanitized(temp_path):
+    class MockResponse:
+        headers = {"content-disposition": 'attachment; filename="..\\..\\evil.txt"'}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            return None
+
+        def raise_for_status(self):
+            return None
+
+        def iter_content(self, chunk_size=1):
+            yield b"hello world"
+
+    class MockRequests:
+        def get(self, *args, **kwargs):
+            return MockResponse()
+
+    with patch("fsutil.operations.require_requests", return_value=MockRequests()):
+        path = fsutil.download_file("https://example.com/file.txt", dirpath=temp_path())
+        assert fsutil.exists(path)
+        assert fsutil.get_filename(path) == "evil.txt"
+        assert path == temp_path("evil.txt")
+
+
 def test_list_dirs(temp_path):
     for i in range(0, 5):
         fsutil.create_dir(temp_path(f"a/b/c/d-{i}"))

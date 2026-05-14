@@ -214,7 +214,8 @@ def download_file(
             filename_match = re.search(filename_pattern, content_disposition)
             if filename_match:
                 # sanitize Content-Disposition filename to prevent path traversal
-                filename = os.path.basename(filename_match.group(1))
+                filename = filename_match.group(1).replace("\\", "/")
+                filename = os.path.basename(filename)
             # or detect filename from url
             if not filename:
                 filename = get_filename(url)
