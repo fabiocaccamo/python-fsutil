@@ -20,6 +20,21 @@ def test_convert_size_bytes_to_string(size_bytes, expected_output):
 
 
 @pytest.mark.parametrize(
+    "size_bytes, expected_output",
+    [
+        (2**80, "1.00 YB"),
+        (2**90, "1024.00 YB"),
+        (2**100, "1048576.00 YB"),
+    ],
+)
+def test_convert_size_bytes_to_string_saturates_at_largest_unit(
+    size_bytes, expected_output
+):
+    # Sizes at or above 1024 YB must clamp to the YB unit, not raise IndexError.
+    assert fsutil.convert_size_bytes_to_string(size_bytes) == expected_output
+
+
+@pytest.mark.parametrize(
     "size_string, expected_output",
     [
         ("1023 bytes", "1023 bytes"),

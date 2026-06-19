@@ -11,7 +11,7 @@ def convert_size_bytes_to_string(size: int) -> str:
     units = SIZE_UNITS
     factor = 0
     factor_limit = len(units) - 1
-    while (size_num >= 1024) and (factor <= factor_limit):
+    while (size_num >= 1024) and (factor < factor_limit):
         size_num /= 1024
         factor += 1
     size_units = units[factor]
