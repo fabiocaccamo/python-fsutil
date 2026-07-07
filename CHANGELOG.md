@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.17.0) - 2026-07-07
+-   Add support for file-like objects in `get_file_hash`.
+-   Fix `IndexError` in `convert_size_bytes_to_string` for sizes >= 1024 YB. #186 (thanks to [@SAY-5](https://github.com/SAY-5))
+-   Harden Content-Disposition filename sanitization in `download_file` to prevent path traversal. #181
+-   Bump requirements and `pre-commit` hooks.
+
 ## [0.16.1](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.16.1) - 2026-04-07
 -   Fix search methods not working correctly with relative paths.
 -   Bump requirements and `pre-commit` hooks.
