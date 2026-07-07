@@ -1,3 +1,4 @@
+import io
 import re
 import time
 from datetime import datetime, timedelta
@@ -125,6 +126,20 @@ def test_get_file_hash(temp_path):
     fsutil.create_file(path, content="Hello World")
     file_hash = fsutil.get_file_hash(path)
     assert file_hash == "b10a8db164e0754105b7a99be72e3fe5"
+
+
+def test_get_file_hash_with_file_like_object():
+    file = io.BytesIO(b"Hello World")
+    file_hash = fsutil.get_file_hash(file)
+    assert file_hash == "b10a8db164e0754105b7a99be72e3fe5"
+
+
+def test_get_file_hash_with_file_like_object_restores_position():
+    file = io.BytesIO(b"Hello World")
+    file.seek(6)
+    file_hash = fsutil.get_file_hash(file)
+    assert file_hash == "b10a8db164e0754105b7a99be72e3fe5"
+    assert file.tell() == 6
 
 
 def test_get_file_last_modified_date(temp_path):

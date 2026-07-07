@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import os
+import pathlib
 from datetime import datetime
+from typing import IO
 
 from fsutil.args import get_path as _get_path
 from fsutil.checks import assert_dir, assert_file
@@ -129,17 +131,29 @@ def get_file_creation_date_formatted(
     return date.strftime(format)
 
 
-def get_file_hash(path: PathIn, *, func: str = "md5") -> str:
+def get_file_hash(path: PathIn | IO[bytes], *, func: str = "md5") -> str:
     """
-    Get the hash of the file at the given path using
-    the specified algorithm function (md5 by default).
+    Get the hash of the file at the given path (or of the given
+    binary file-like object) using the specified algorithm
+    function (md5 by default).
     """
-    path = _get_path(path)
-    assert_file(path)
     hash = hashlib.new(func)
-    with open(path, "rb") as file:
-        for chunk in iter(lambda: file.read(4096), b""):
+    if isinstance(path, (str, pathlib.Path)):
+        path = _get_path(path)
+        assert_file(path)
+        with open(path, "rb") as file:
+            for chunk in iter(lambda: file.read(4096), b""):
+                hash.update(chunk)
+    else:
+        fileobj = path
+        position = None
+        if fileobj.seekable():
+            position = fileobj.tell()
+            fileobj.seek(0)
+        for chunk in iter(lambda: fileobj.read(4096), b""):
             hash.update(chunk)
+        if position is not None:
+            fileobj.seek(position)
     hash_hex = hash.hexdigest()
     return hash_hex
 
