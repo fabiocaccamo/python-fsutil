@@ -13,6 +13,9 @@ import fsutil
         (1073741824, "1.00 GB"),
         (1879048192, "1.75 GB"),
         (1099511627776, "1.00 TB"),
+        (2**80, "1.00 YB"),
+        (2**90, "1024.00 YB"),
+        (2**100, "1048576.00 YB"),
     ],
 )
 def test_convert_size_bytes_to_string(size_bytes, expected_output):
@@ -51,6 +54,9 @@ def test_convert_size_bytes_to_string_and_convert_size_string_to_bytes(
         ("1.00 MB", 1048576),
         ("1.00 GB", 1073741824),
         ("1.00 TB", 1099511627776),
+        ("1.00 YB", 2**80),
+        ("1024.00 YB", 2**90),
+        ("1048576.00 YB", 2**100),
     ],
 )
 def test_convert_size_string_to_bytes(size_string, expected_output):
@@ -69,6 +75,9 @@ def test_convert_size_string_to_bytes(size_string, expected_output):
         (1170378588, 1170378588),
         (2136746229, 2136746229),
         (1099511627776, 1099511627776),
+        (2**80, 2**80),
+        (2**90, 2**90),
+        (2**100, 2**100),
     ],
 )
 def test_convert_size_string_to_bytes_and_convert_size_bytes_to_string(
