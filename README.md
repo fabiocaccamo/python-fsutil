@@ -238,7 +238,9 @@ fsutil.create_tar_file(path, content_paths, overwrite=True, compression="gzip")
 ```python
 # Create zip file at path compressing directories/files listed in content_paths.
 # If overwrite is allowed and dest zip already exists, it will be overwritten.
-fsutil.create_zip_file(path, content_paths, overwrite=True, compression=zipfile.ZIP_DEFLATED)
+fsutil.create_zip_file(
+    path, content_paths, overwrite=True, compression=zipfile.ZIP_DEFLATED
+)
 ```
 
 #### `delete_dir`
@@ -283,7 +285,9 @@ fsutil.delete_files(*paths)
 # If dirpath is not provided, the file will be downloaded to a temp directory.
 # If filename is provided, the file will be named using filename.
 # It is possible to pass extra request options (eg. for authentication) using **kwargs.
-filepath = fsutil.download_file(url, dirpath=None, filename="archive.zip", chunk_size=8192, **kwargs)
+filepath = fsutil.download_file(
+    url, dirpath=None, filename="archive.zip", chunk_size=8192, **kwargs
+)
 ```
 
 #### `exists`
@@ -322,7 +326,7 @@ date = fsutil.get_dir_creation_date(path)
 
 ```python
 # Get the directory creation date formatted using the given format.
-date_str = fsutil.get_dir_creation_date_formatted(path, format='%Y-%m-%d %H:%M:%S')
+date_str = fsutil.get_dir_creation_date_formatted(path, format="%Y-%m-%d %H:%M:%S")
 ```
 
 #### `get_dir_hash`
@@ -408,7 +412,9 @@ date = fsutil.get_file_last_modified_date(path)
 
 ```python
 # Get the file last modification date formatted using the given format.
-date_str = fsutil.get_file_last_modified_date_formatted(path, format="%Y-%m-%d %H:%M:%S")
+date_str = fsutil.get_file_last_modified_date_formatted(
+    path, format="%Y-%m-%d %H:%M:%S"
+)
 ```
 
 #### `get_file_size`
@@ -450,7 +456,9 @@ permissions = fsutil.get_permissions(path)
 
 ```python
 # Get a unique name for a directory/file at the given directory path.
-unique_name = fsutil.get_unique_name(path, prefix="", suffix="", extension="", separator="-")
+unique_name = fsutil.get_unique_name(
+    path, prefix="", suffix="", extension="", separator="-"
+)
 ```
 
 #### `is_dir`
@@ -579,7 +587,15 @@ content = fsutil.read_file_from_url(url, **kwargs)
 
 ```python
 # Read and decode a json encoded file at the given path.
-data = fsutil.read_file_json(path, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None)
+data = fsutil.read_file_json(
+    path,
+    cls=None,
+    object_hook=None,
+    parse_float=None,
+    parse_int=None,
+    parse_constant=None,
+    object_pairs_hook=None,
+)
 ```
 
 #### `read_file_lines`
@@ -588,7 +604,9 @@ data = fsutil.read_file_json(path, cls=None, object_hook=None, parse_float=None,
 # Read file content lines.
 # It is possible to specify the line indexes (negative indexes too),
 # very useful especially when reading large files.
-content = fsutil.read_file_lines(path, line_start=0, line_end=-1, strip_white=True, skip_empty=True, encoding="utf-8")
+content = fsutil.read_file_lines(
+    path, line_start=0, line_end=-1, strip_white=True, skip_empty=True, encoding="utf-8"
+)
 ```
 
 #### `read_file_lines_count`
@@ -731,7 +749,9 @@ path_names = fsutil.split_path(path)
 
 ```python
 # Trasform a filepath by applying the provided optional changes.
-filepath = fsutil.transform_filepath(path, dirpath=None, basename=lambda b: slugify(b), extension="webp")
+filepath = fsutil.transform_filepath(
+    path, dirpath=None, basename=lambda b: slugify(b), extension="webp"
+)
 ```
 
 #### `write_file`
@@ -745,7 +765,21 @@ fsutil.write_file(path, content, append=False, encoding="utf-8", atomic=False)
 
 ```python
 # Write a json file at the given path with the specified data encoded in json format.
-fsutil.write_file_json(path, data, encoding="utf-8", atomic=False, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False)
+fsutil.write_file_json(
+    path,
+    data,
+    encoding="utf-8",
+    atomic=False,
+    skipkeys=False,
+    ensure_ascii=True,
+    check_circular=True,
+    allow_nan=True,
+    cls=None,
+    indent=None,
+    separators=None,
+    default=None,
+    sort_keys=False,
+)
 ```
 
 ## Testing
