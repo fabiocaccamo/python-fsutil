@@ -1,3 +1,5 @@
+import tarfile
+
 import pytest
 
 import fsutil
@@ -89,7 +91,8 @@ def test_extract_zip_file_with_autodelete(temp_path):
     assert not fsutil.is_file(zip_path)
 
 
-def test_extract_tar_file(temp_path):
+@pytest.mark.parametrize("compression", ["", "gz", "bz2", "xz"])
+def test_extract_tar_file(temp_path, compression):
     tar_path = temp_path("archive.tar")
     untar_path = temp_path("unarchive/")
     f1_path = temp_path("a/b/f1.txt")
@@ -105,7 +108,11 @@ def test_extract_tar_file(temp_path):
     fsutil.create_file(f4_path, content="hello world 4")
     fsutil.create_file(f5_path, content="hello world 5")
     fsutil.create_file(f6_path, content="hello world 6")
-    fsutil.create_tar_file(tar_path, [f1_path, f2_path, f3_path, f4_path, f5_f6_dir])
+    fsutil.create_tar_file(
+        tar_path,
+        [f1_path, f2_path, f3_path, f4_path, f5_f6_dir],
+        compression=compression,
+    )
     fsutil.extract_tar_file(tar_path, untar_path)
     assert fsutil.is_dir(untar_path)
     assert fsutil.is_file(temp_path("unarchive/f1.txt"))
@@ -117,16 +124,31 @@ def test_extract_tar_file(temp_path):
     assert fsutil.is_file(tar_path)
 
 
-def test_extract_tar_file_with_autodelete(temp_path):
+@pytest.mark.parametrize("compression", ["", "gz", "bz2", "xz"])
+def test_extract_tar_file_with_autodelete(temp_path, compression):
     tar_path = temp_path("archive.tar")
     untar_path = temp_path("unarchive/")
     path = temp_path("f1.txt")
     fsutil.create_file(path, content="hello world 1")
-    fsutil.create_tar_file(tar_path, [path])
+    fsutil.create_tar_file(tar_path, [path], compression=compression)
     fsutil.extract_tar_file(tar_path, untar_path, autodelete=True)
     assert fsutil.is_dir(untar_path)
     assert fsutil.is_file(temp_path("unarchive/f1.txt"))
     assert not fsutil.is_file(tar_path)
+
+
+@pytest.mark.parametrize("compression", ["", "gz", "bz2", "xz"])
+def test_extract_tar_file_selected_members(temp_path, compression):
+    tar_path = temp_path("archive.tar")
+    paths = [temp_path("first.txt"), temp_path("second.txt")]
+    for path in paths:
+        fsutil.create_file(path, content="hello world")
+    fsutil.create_tar_file(tar_path, paths, compression=compression)
+    with tarfile.open(tar_path) as archive:
+        members = [archive.getmember("second.txt")]
+    fsutil.extract_tar_file(tar_path, temp_path("output"), content_paths=members)
+    assert not fsutil.exists(temp_path("output/first.txt"))
+    assert fsutil.read_file(temp_path("output/second.txt")) == "hello world"
 
 
 if __name__ == "__main__":
