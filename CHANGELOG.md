@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+-   Propagate atomic write failures and remove temporary files when writing or syncing fails.
+
 ## [0.17.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.17.0) - 2026-07-07
 -   Add support for file-like objects in `get_file_hash`.
 -   Fix `IndexError` in `convert_size_bytes_to_string` for sizes >= 1024 YB. #186 (thanks to [@SAY-5](https://github.com/SAY-5))
