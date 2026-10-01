@@ -61,18 +61,19 @@ def _read_file_lines_in_range(
     line_end_negative = line_end < 0
     if line_start_negative or line_end_negative:
         # pre-calculate lines count only if using negative line indexes
-        lines_count = read_file_lines_count(path)
+        with open(path, encoding=encoding, newline="\n") as file:
+            lines_count = sum(1 for line in file)
         # normalize negative indexes
         if line_start_negative:
             line_start = max(0, line_start + lines_count)
         if line_end_negative:
             line_end = min(line_end + lines_count, lines_count - 1)
-    with open(path, "rb") as file:
+    with open(path, encoding=encoding, newline="\n") as file:
         file.seek(0)
         line_index = 0
         for line in file:
             if line_index >= line_start and line_index <= line_end:
-                yield line.decode(encoding)
+                yield line
             line_index += 1
 
 

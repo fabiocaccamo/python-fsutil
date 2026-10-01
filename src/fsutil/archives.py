@@ -114,7 +114,7 @@ def extract_tar_file(
     | None = None,
 ) -> None:
     """
-    Extract tar file at path to dest path.
+    Extract a plain or compressed tar file at path to dest path.
     If autodelete, the archive will be deleted after extraction.
     If content_paths list is defined,
     only listed items will be extracted, otherwise all.
@@ -124,7 +124,7 @@ def extract_tar_file(
     assert_file(path)
     assert_not_file(dest)
     make_dirs(dest)
-    with tarfile.TarFile(path, "r") as file:
+    with tarfile.open(path, "r:*") as file:
         if sys.version_info < (3, 12):
             file.extractall(dest, members=content_paths)
         else:
