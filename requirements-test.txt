@@ -7,4 +7,6 @@ PyYAML == 6.0.*
 requests == 2.34.*
 setuptools == 84.0.*
 tox == 4.61.*
+types-requests == 2.33.*
+types-PyYAML == 6.0.*
 urllib3 == 2.7.*
