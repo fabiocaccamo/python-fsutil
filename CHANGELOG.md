@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+-   Propagate atomic write failures and remove temporary files when writing or syncing fails.
 -   Fix `read_file_lines` ranges and negative indexes for UTF-16 and UTF-32 encoded files.
 
 ## [0.17.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.17.0) - 2026-07-07

@@ -146,20 +146,15 @@ def _write_file_atomic(
             # delete_on_close=False, # supported since Python >= 3.12
             encoding=encoding,
         ) as file:
+            temp_path = file.name
             file.write(content)
             file.flush()
             os.fsync(file.fileno())
-            temp_path = file.name
         # file is now closed, safe to replace on Windows
         permissions = get_permissions(path) if exists(path) else None
         os.replace(temp_path, path)
         if permissions:
             set_permissions(path, permissions)
-    except FileNotFoundError:
-        # success - the NamedTemporaryFile has not been able
-        # to remove the temp file on __exit__ because the temp file
-        # has replaced atomically the file at path.
-        pass
     finally:
         # attempt for fixing #121 (on Windows destroys created file on exit)
         # manually delete the temporary file if still exists

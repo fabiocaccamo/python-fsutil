@@ -1,6 +1,7 @@
 import sys
 from datetime import datetime
 from decimal import Decimal
+from unittest.mock import patch
 
 import pytest
 
@@ -180,6 +181,37 @@ def test_write_file_atomic_no_temp_files_left(temp_path):
     fsutil.write_file(path, content="Hello World", atomic=True)
     fsutil.write_file(path, content="Hello Jupiter", atomic=True)
     assert fsutil.list_files(temp_path("a/b/")) == [path]
+
+
+@pytest.mark.parametrize("operation", ["replace", "fsync"])
+@pytest.mark.parametrize("error_type", [FileNotFoundError, PermissionError])
+def test_write_file_atomic_failure(tmp_path, operation, error_type):
+    path = tmp_path / "original.txt"
+    path.write_bytes(b"original")
+    permissions = fsutil.get_permissions(path)
+    error = error_type("atomic write failed")
+
+    with patch(f"fsutil.io.os.{operation}", side_effect=error):
+        with pytest.raises(error_type) as exc_info:
+            fsutil.write_file(path, content="replacement", atomic=True)
+
+    assert exc_info.value is error
+    assert path.read_bytes() == b"original"
+    assert fsutil.get_permissions(path) == permissions
+    assert list(tmp_path.iterdir()) == [path]
+
+
+def test_write_file_atomic_encoding_failure(tmp_path):
+    path = tmp_path / "original.txt"
+    path.write_bytes(b"original")
+    permissions = fsutil.get_permissions(path)
+
+    with pytest.raises(UnicodeEncodeError):
+        fsutil.write_file(path, content="caf\u00e9", encoding="ascii", atomic=True)
+
+    assert path.read_bytes() == b"original"
+    assert fsutil.get_permissions(path) == permissions
+    assert list(tmp_path.iterdir()) == [path]
 
 
 @pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
