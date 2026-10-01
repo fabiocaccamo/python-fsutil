@@ -11,3 +11,15 @@ def require_requests() -> ModuleType:
             "'requests' module is not installed, "
             "it can be installed by running: 'pip install requests'"
         ) from error
+
+
+def require_yaml() -> ModuleType:
+    try:
+        import yaml
+
+        return yaml
+    except ImportError as error:
+        raise ModuleNotFoundError(
+            "'PyYAML' module is not installed, "
+            "it can be installed by running: 'pip install python-fsutil[yaml]'"
+        ) from error
