@@ -5,5 +5,5 @@ pytest == 9.1.*
 pytest-cov == 7.1.*
 requests == 2.34.*
 setuptools == 84.0.*
-tox == 4.61.*
-urllib3 == 2.7.*
+tox == 4.64.*
+urllib3 == 2.8.*
