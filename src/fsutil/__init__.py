@@ -43,8 +43,10 @@ from fsutil.io import (
     read_file_json,
     read_file_lines,
     read_file_lines_count,
+    read_file_yaml,
     write_file,
     write_file_json,
+    write_file_yaml,
 )
 from fsutil.metadata import (
     __author__,
@@ -176,6 +178,7 @@ __all__ = [
     "read_file_json",
     "read_file_lines",
     "read_file_lines_count",
+    "read_file_yaml",
     "remove_dir",
     "remove_dir_content",
     "remove_dirs",
@@ -196,4 +199,5 @@ __all__ = [
     "transform_filepath",
     "write_file",
     "write_file_json",
+    "write_file_yaml",
 ]

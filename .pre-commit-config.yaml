@@ -27,7 +27,8 @@ repos:
         args: [--config-file=pyproject.toml]
         exclude: "tests"
         additional_dependencies: [
-          types-requests
+          types-requests,
+          types-PyYAML
         ]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks

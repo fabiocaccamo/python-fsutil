@@ -9,7 +9,7 @@ from typing import Any
 
 from fsutil.args import get_path as _get_path
 from fsutil.checks import assert_file, assert_not_dir, exists
-from fsutil.deps import require_requests
+from fsutil.deps import require_requests, require_yaml
 from fsutil.operations import make_dirs_for_file, remove_file
 from fsutil.paths import split_filepath
 from fsutil.perms import get_permissions, set_permissions
@@ -47,6 +47,16 @@ def read_file_json(path: PathIn, **kwargs: Any) -> Any:
     content = read_file(path)
     data = json.loads(content, **kwargs)
     return data
+
+
+def read_file_yaml(path: PathIn, *, encoding: str = "utf-8") -> Any:
+    """
+    Read a single YAML document using PyYAML's safe loader.
+    Requires the optional PyYAML dependency.
+    """
+    yaml = require_yaml()
+    content = read_file(path, encoding=encoding)
+    return yaml.safe_load(content)
 
 
 def _read_file_lines_in_range(
@@ -230,3 +240,20 @@ def write_file_json(
         encoding=encoding,
         atomic=atomic,
     )
+
+
+def write_file_yaml(
+    path: PathIn,
+    data: Any,
+    *,
+    encoding: str = "utf-8",
+    atomic: bool = False,
+    **kwargs: Any,
+) -> None:
+    """
+    Write a YAML document using PyYAML's safe dumper.
+    Requires the optional PyYAML dependency. kwargs are passed to safe_dump.
+    """
+    yaml = require_yaml()
+    content = yaml.safe_dump(data, stream=None, **kwargs)
+    write_file(path, content, encoding=encoding, atomic=atomic)

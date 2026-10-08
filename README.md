@@ -21,6 +21,13 @@ high-level file-system operations for lazy devs.
 pip install python-fsutil
 ```
 
+YAML file operations require the optional [PyYAML](https://pyyaml.org/) dependency:
+
+```bash
+pip install "python-fsutil[yaml]"
+```
+
+
 ## Usage
 
 Just import the main module and call its methods.
@@ -95,6 +102,7 @@ import fsutil
 -   [`read_file_json`](#read_file_json)
 -   [`read_file_lines`](#read_file_lines)
 -   [`read_file_lines_count`](#read_file_lines_count)
+-   [`read_file_yaml`](#read_file_yaml) *(requires `PyYAML` to be installed)*
 -   [`remove_dir`](#remove_dir)
 -   [`remove_dir_content`](#remove_dir_content)
 -   [`remove_dirs`](#remove_dirs)
@@ -115,6 +123,7 @@ import fsutil
 -   [`transform_filepath`](#transform_filepath)
 -   [`write_file`](#write_file)
 -   [`write_file_json`](#write_file_json)
+-   [`write_file_yaml`](#write_file_yaml) *(requires `PyYAML` to be installed)*
 
 
 #### `assert_dir`
@@ -598,6 +607,16 @@ data = fsutil.read_file_json(
 )
 ```
 
+#### `read_file_yaml`
+
+```python
+# Read one YAML document using PyYAML's safe loader.
+data = fsutil.read_file_yaml(path, encoding="utf-8")
+```
+
+Empty documents return `None`. Invalid YAML, multiple documents, and Python-specific
+object tags raise `yaml.YAMLError`. Install the optional YAML dependency first.
+
 #### `read_file_lines`
 
 ```python
@@ -781,6 +800,25 @@ fsutil.write_file_json(
     sort_keys=False,
 )
 ```
+
+#### `write_file_yaml`
+
+```python
+# Write safe YAML, creating parent directories as needed.
+fsutil.write_file_yaml(
+    path,
+    {"name": "example", "enabled": True},
+    encoding="utf-8",
+    atomic=False,
+    sort_keys=False,
+)
+```
+
+Data is serialized with `yaml.safe_dump` before the destination is opened, so an
+unsupported value does not overwrite an existing file. Formatting options such as
+`indent`, `sort_keys`, and `allow_unicode` are forwarded to `safe_dump`. Arbitrary
+Python objects and a custom output `stream` are not supported. Use `atomic=True`
+to reuse atomic file replacement.
 
 ## Testing
 ```bash
