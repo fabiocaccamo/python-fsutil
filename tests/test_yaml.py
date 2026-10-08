@@ -2,6 +2,7 @@ import subprocess
 import sys
 from datetime import date
 from io import StringIO
+from pathlib import Path
 
 import pytest
 import yaml
@@ -81,9 +82,11 @@ def test_import_without_yaml():
         [
             sys.executable,
             "-c",
-            "import sys; sys.modules['yaml'] = None; import fsutil; "
+            "import sys; sys.path.insert(0, sys.argv[1]); "
+            "sys.modules['yaml'] = None; import fsutil; "
             "assert callable(fsutil.read_file_yaml); "
             "assert callable(fsutil.write_file_yaml)",
+            str(Path(__file__).resolve().parents[1] / "src"),
         ],
         check=False,
         capture_output=True,
