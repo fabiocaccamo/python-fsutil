@@ -771,7 +771,13 @@ fsutil.write_file_json(path, data, encoding="utf-8", atomic=False, skipkeys=Fals
 
 ```python
 # Write safe YAML, creating parent directories as needed.
-fsutil.write_file_yaml(path, {"name": "example", "enabled": True}, encoding="utf-8", atomic=False, sort_keys=False)
+fsutil.write_file_yaml(
+    path,
+    {"name": "example", "enabled": True},
+    encoding="utf-8",
+    atomic=False,
+    sort_keys=False,
+)
 ```
 
 Data is serialized with `yaml.safe_dump` before the destination is opened, so an
