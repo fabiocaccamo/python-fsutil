@@ -801,7 +801,16 @@ fsutil.write_file_json(
 
 ```python
 # Write a yaml file at the given path with the specified data encoded in yaml format using the safe dumper (requires PyYAML).
-fsutil.write_file_yaml(path, data, encoding="utf-8", atomic=False, allow_unicode=True, sort_keys=False, indent=None, default_flow_style=False)
+fsutil.write_file_yaml(
+    path,
+    data,
+    encoding="utf-8",
+    atomic=False,
+    allow_unicode=True,
+    sort_keys=False,
+    indent=None,
+    default_flow_style=False,
+)
 ```
 
 ## Testing
