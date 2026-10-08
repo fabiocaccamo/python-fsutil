@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
--   Add `read_file_yaml` and `write_file_yaml` (requires the optional `PyYAML` dependency). #196
--   Fix `read_file_lines` ranges and negative indexes for UTF-16 and UTF-32 encoded files.
+## [0.18.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.18.0) - 2026-10-08
+-   Add `read_file_yaml` and `write_file_yaml` (requires the optional `PyYAML` dependency). #196 (thanks to [@Gonghan-Princess](https://github.com/Gonghan-Princess))
+-   Add support for compressed tar archives in `extract_tar_file`. #193 (thanks to [@Gonghan-Princess](https://github.com/Gonghan-Princess))
+-   Fix `read_file_lines` ranges and negative indexes for UTF-16 and UTF-32 encoded files. #195 (thanks to [@Gonghan-Princess](https://github.com/Gonghan-Princess))
+-   Bump requirements and `pre-commit` hooks.
 
 ## [0.17.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.17.0) - 2026-07-07
 -   Add support for file-like objects in `get_file_hash`.
