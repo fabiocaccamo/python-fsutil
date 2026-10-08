@@ -254,6 +254,10 @@ def write_file_yaml(
     Write a YAML document using PyYAML's safe dumper.
     Requires the optional PyYAML dependency. kwargs are passed to safe_dump.
     """
+    if "stream" in kwargs:
+        raise TypeError("write_file_yaml() does not support the 'stream' argument")
     yaml = require_yaml()
-    content = yaml.safe_dump(data, stream=None, **kwargs)
+    kwargs.setdefault("allow_unicode", True)
+    kwargs.setdefault("sort_keys", False)
+    content = yaml.safe_dump(data, **kwargs)
     write_file(path, content, encoding=encoding, atomic=atomic)

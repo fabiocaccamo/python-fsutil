@@ -27,7 +27,6 @@ YAML file operations require the optional [PyYAML](https://pyyaml.org/) dependen
 pip install "python-fsutil[yaml]"
 ```
 
-
 ## Usage
 
 Just import the main module and call its methods.
@@ -607,16 +606,6 @@ data = fsutil.read_file_json(
 )
 ```
 
-#### `read_file_yaml`
-
-```python
-# Read one YAML document using PyYAML's safe loader.
-data = fsutil.read_file_yaml(path, encoding="utf-8")
-```
-
-Empty documents return `None`. Invalid YAML, multiple documents, and Python-specific
-object tags raise `yaml.YAMLError`. Install the optional YAML dependency first.
-
 #### `read_file_lines`
 
 ```python
@@ -633,6 +622,13 @@ content = fsutil.read_file_lines(
 ```python
 # Read file lines count.
 lines_count = fsutil.read_file_lines_count(path)
+```
+
+#### `read_file_yaml`
+
+```python
+# Read and decode a single yaml document at the given path using the safe loader (requires PyYAML).
+data = fsutil.read_file_yaml(path, encoding="utf-8")
 ```
 
 #### `remove_dir`
@@ -804,21 +800,9 @@ fsutil.write_file_json(
 #### `write_file_yaml`
 
 ```python
-# Write safe YAML, creating parent directories as needed.
-fsutil.write_file_yaml(
-    path,
-    {"name": "example", "enabled": True},
-    encoding="utf-8",
-    atomic=False,
-    sort_keys=False,
-)
+# Write a yaml file at the given path with the specified data encoded in yaml format using the safe dumper (requires PyYAML).
+fsutil.write_file_yaml(path, data, encoding="utf-8", atomic=False, allow_unicode=True, sort_keys=False, indent=None, default_flow_style=False)
 ```
-
-Data is serialized with `yaml.safe_dump` before the destination is opened, so an
-unsupported value does not overwrite an existing file. Formatting options such as
-`indent`, `sort_keys`, and `allow_unicode` are forwarded to `safe_dump`. Arbitrary
-Python objects and a custom output `stream` are not supported. Use `atomic=True`
-to reuse atomic file replacement.
 
 ## Testing
 ```bash

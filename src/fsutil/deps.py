@@ -21,5 +21,5 @@ def require_yaml() -> ModuleType:
     except ImportError as error:
         raise ModuleNotFoundError(
             "'PyYAML' module is not installed, "
-            "it can be installed by running: 'pip install python-fsutil[yaml]'"
+            "it can be installed by running: 'pip install \"python-fsutil[yaml]\"'"
         ) from error
