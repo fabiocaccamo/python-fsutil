@@ -1,12 +1,12 @@
 coverage == 7.16.*
-mypy == 2.3.*
+mypy == 2.4.*
 pre-commit == 4.6.*
 pytest == 9.1.*
 pytest-cov == 7.1.*
 PyYAML == 6.0.*
 requests == 2.34.*
 setuptools == 84.0.*
-tox == 4.61.*
+tox == 4.64.*
 types-requests == 2.33.*
 types-PyYAML == 6.0.*
-urllib3 == 2.7.*
+urllib3 == 2.8.*
