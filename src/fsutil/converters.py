@@ -14,6 +14,11 @@ def convert_size_bytes_to_string(size: int) -> str:
     while (size_num >= 1024) and (factor < factor_limit):
         size_num /= 1024
         factor += 1
+    # Rounding can carry the value up to 1024 (e.g. 1048575 bytes -> "1024 KB"),
+    # in which case it belongs to the next unit.
+    if factor < factor_limit and round(size_num, 2 if factor > 1 else 0) >= 1024:
+        size_num /= 1024
+        factor += 1
     size_units = units[factor]
     size_str = f"{size_num:.2f}" if (factor > 1) else f"{size_num:.0f}"
     size_str = f"{size_str} {size_units}"
