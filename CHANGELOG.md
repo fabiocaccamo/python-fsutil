@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+-   Create missing files when appending atomically, matching non-atomic append behavior.
+
 ## [0.18.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.18.0) - 2026-10-08
 -   Add `read_file_yaml` and `write_file_yaml` (requires the optional `PyYAML` dependency). #196 (thanks to [@Gonghan-Princess](https://github.com/Gonghan-Princess))
 -   Add support for compressed tar archives in `extract_tar_file`. #193 (thanks to [@Gonghan-Princess](https://github.com/Gonghan-Princess))
