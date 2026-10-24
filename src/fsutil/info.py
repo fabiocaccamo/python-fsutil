@@ -43,7 +43,7 @@ def get_dir_hash(path: PathIn, *, func: str = "md5") -> str:
     path = _get_path(path)
     assert_dir(path)
     hash_ = hashlib.new(func)
-    files = search_files(path)
+    files = search_files(path, pattern="**/*")
     for file in sorted(files):
         file_hash = get_file_hash(file, func=func)
         file_hash_b = bytes(file_hash, "utf-8")

@@ -55,6 +55,22 @@ def test_get_dir_hash(temp_path):
     assert dir_hash == "eabe619c41f0c4611b7b9746bededfcb"
 
 
+@pytest.mark.parametrize("filename", ["README", "nested/LICENSE"])
+@pytest.mark.parametrize("content", ["", "original content"])
+@pytest.mark.parametrize("func", ["md5", "sha256"])
+def test_get_dir_hash_includes_extensionless_files(temp_path, filename, content, func):
+    directory = temp_path()
+    empty_hash = fsutil.get_dir_hash(directory, func=func)
+    path = temp_path(filename)
+    fsutil.create_file(path, content=content)
+
+    original_hash = fsutil.get_dir_hash(directory, func=func)
+    assert original_hash != empty_hash
+
+    fsutil.write_file(path, content="updated content")
+    assert fsutil.get_dir_hash(directory, func=func) != original_hash
+
+
 def test_get_dir_last_modified_date(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path, content="Hello")
