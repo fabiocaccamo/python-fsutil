@@ -65,10 +65,11 @@ def test_get_dir_hash_includes_extensionless_files(temp_path, filename, content,
     fsutil.create_file(path, content=content)
 
     original_hash = fsutil.get_dir_hash(directory, func=func)
-    assert original_hash != empty_hash
+    # These are pytest assertions, not runtime security checks.
+    assert original_hash != empty_hash  # nosec B101
 
     fsutil.write_file(path, content="updated content")
-    assert fsutil.get_dir_hash(directory, func=func) != original_hash
+    assert fsutil.get_dir_hash(directory, func=func) != original_hash  # nosec B101
 
 
 def test_get_dir_last_modified_date(temp_path):
