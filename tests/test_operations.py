@@ -399,6 +399,18 @@ def test_rename_file_basename(temp_path):
     assert fsutil.exists(path)
 
 
+def test_rename_file_extension_preserves_hash(temp_path):
+    path = temp_path("Report#draft.txt")
+    fsutil.create_file(path, content="draft content")
+
+    fsutil.rename_file_extension(path, "pdf")
+
+    destination = temp_path("Report#draft.pdf")
+    assert fsutil.is_file(destination)
+    assert fsutil.read_file(destination) == "draft content"
+    assert not fsutil.exists(path)
+
+
 def test_rename_file_extension(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path)

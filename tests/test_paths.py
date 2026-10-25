@@ -38,6 +38,26 @@ def test_get_filename():
     )
 
 
+@pytest.mark.parametrize("filename", ["Report#draft.txt", "Report?draft.txt"])
+def test_local_filename_preserves_url_characters(filename):
+    path = os.path.join("reports", filename)
+    assert fsutil.get_filename(path) == filename
+    assert fsutil.get_file_basename(path) == filename[:-4]
+    assert fsutil.get_file_extension(path) == "txt"
+    assert fsutil.split_filename(path) == (filename[:-4], "txt")
+    assert fsutil.split_filepath(path) == ("reports", filename)
+
+
+@pytest.mark.parametrize("scheme", ["http", "https", "ftp", "file"])
+def test_url_filename_ignores_query_and_fragment(scheme):
+    path = f"{scheme}://example.com/reports/Report.txt?download=1#section"
+    assert fsutil.get_filename(path) == "Report.txt"
+    assert fsutil.get_file_basename(path) == "Report"
+    assert fsutil.get_file_extension(path) == "txt"
+    assert fsutil.split_filename(path) == ("Report", "txt")
+    assert fsutil.split_filepath(path)[1] == "Report.txt"
+
+
 def test_get_parent_dir():
     s = "/root/a/b/c/Document.txt"
     assert fsutil.get_parent_dir(s) == os.path.normpath("/root/a/b/c")
