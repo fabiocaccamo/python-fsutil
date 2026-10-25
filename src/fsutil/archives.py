@@ -49,7 +49,10 @@ def create_tar_file(
             filepath = join_path(basedir, filename)
             file.add(path, filepath)
         elif is_dir(path):
-            for item_name in os.listdir(path):
+            item_names = os.listdir(path)
+            if not item_names and basedir:
+                file.add(path, basedir, recursive=False)
+            for item_name in item_names:
                 item_path = join_path(path, item_name)
                 item_basedir = (
                     join_path(basedir, item_name) if is_dir(item_path) else basedir
@@ -89,7 +92,10 @@ def create_zip_file(
             filepath = join_path(basedir, filename)
             file.write(path, filepath)
         elif is_dir(path):
-            for item_name in os.listdir(path):
+            item_names = os.listdir(path)
+            if not item_names and basedir:
+                file.write(path, basedir)
+            for item_name in item_names:
                 item_path = join_path(path, item_name)
                 item_basedir = (
                     join_path(basedir, item_name) if is_dir(item_path) else basedir
