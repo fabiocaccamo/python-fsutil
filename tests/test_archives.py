@@ -28,6 +28,32 @@ def test_create_zip_file(temp_path):
     assert fsutil.get_file_size(zip_path) > 0
 
 
+@pytest.mark.parametrize(
+    ("extension", "create_archive", "extract_archive"),
+    [
+        ("zip", fsutil.create_zip_file, fsutil.extract_zip_file),
+        ("tar", fsutil.create_tar_file, fsutil.extract_tar_file),
+    ],
+)
+def test_archive_preserves_empty_subdirectories(
+    temp_path, extension, create_archive, extract_archive
+):
+    source = temp_path("source")
+    fsutil.create_dir(temp_path("source/empty"))
+    fsutil.create_dir(temp_path("source/nested/empty"))
+    fsutil.create_file(temp_path("source/nested/file.txt"), content="file content")
+
+    archive_path = temp_path(f"archive.{extension}")
+    create_archive(archive_path, [source])
+    extract_archive(archive_path, temp_path("output"))
+
+    for name in ("empty", "nested/empty"):
+        path = temp_path(f"output/{name}")
+        assert fsutil.is_dir(path)
+        assert fsutil.is_empty_dir(path)
+    assert fsutil.read_file(temp_path("output/nested/file.txt")) == "file content"
+
+
 def test_create_tar_file(temp_path):
     tar_path = temp_path("archive.tar")
     f1_path = temp_path("a/b/f1.txt")
