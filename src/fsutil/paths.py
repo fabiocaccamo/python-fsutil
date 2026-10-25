@@ -14,8 +14,9 @@ def get_filename(path: PathIn) -> str:
     """
     Get the filename from the given path/url.
     """
-    path = _get_path(path)
-    filepath = urlsplit(path).path
+    # Query and fragment markers are ordinary characters in local filenames.
+    raw_path = str(path)
+    filepath = urlsplit(raw_path).path if "://" in raw_path else _get_path(path)
     filename = os.path.basename(filepath)
     return filename
 
@@ -24,7 +25,6 @@ def get_file_basename(path: PathIn) -> str:
     """
     Get the file basename from the given path/url.
     """
-    path = _get_path(path)
     basename, _ = split_filename(path)
     return basename
 
@@ -33,7 +33,6 @@ def get_file_extension(path: PathIn) -> str:
     """
     Get the file extension from the given path/url.
     """
-    path = _get_path(path)
     _, extension = split_filename(path)
     return extension
 
@@ -114,7 +113,6 @@ def split_filename(path: PathIn) -> tuple[str, str]:
     """
     Split a filename and returns its basename and extension.
     """
-    path = _get_path(path)
     filename = get_filename(path)
     basename, extension = os.path.splitext(filename)
     extension = extension.replace(".", "").strip()
@@ -125,9 +123,8 @@ def split_filepath(path: PathIn) -> tuple[str, str]:
     """
     Split a filepath and returns its directory-path and filename.
     """
-    path = _get_path(path)
-    dirpath = os.path.dirname(path)
     filename = get_filename(path)
+    dirpath = os.path.dirname(_get_path(path))
     return (dirpath, filename)
 
 
