@@ -199,5 +199,20 @@ def test_write_file_with_append_atomic(temp_path):
     assert fsutil.read_file(path) == "Hello World - Hello Sun"
 
 
+@pytest.mark.parametrize("atomic", [False, True])
+@pytest.mark.parametrize("encoding", ["utf-8", "utf-16"])
+@pytest.mark.parametrize("content", ["", "first"])
+def test_write_file_append_creates_missing_file(temp_path, atomic, encoding, content):
+    path = temp_path("new/nested/file.txt")
+    fsutil.write_file(
+        path, content=content, append=True, atomic=atomic, encoding=encoding
+    )
+    assert fsutil.read_file(path, encoding=encoding) == content
+    fsutil.write_file(
+        path, content=" second", append=True, atomic=atomic, encoding=encoding
+    )
+    assert fsutil.read_file(path, encoding=encoding) == content + " second"
+
+
 if __name__ == "__main__":
     pytest.main()
