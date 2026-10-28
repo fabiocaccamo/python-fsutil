@@ -59,8 +59,10 @@ def get_unique_name(
     """
     path = _get_path(path)
     assert_dir(path)
-    name = ""
     while True:
+        # Rebuild the candidate from scratch on every retry: appending onto the
+        # previous (already colliding) candidate would keep the collision.
+        name = ""
         if prefix:
             name += f"{prefix}{separator}"
         uid = uuid.uuid4()

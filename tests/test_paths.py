@@ -1,4 +1,5 @@
 import os
+import uuid
 from unittest.mock import patch
 
 import pytest
@@ -48,6 +49,22 @@ def test_get_parent_dir():
     assert fsutil.get_parent_dir(s, levels=4) == os.path.normpath("/root")
     assert fsutil.get_parent_dir(s, levels=5) == os.path.normpath("/")
     assert fsutil.get_parent_dir(s, levels=6) == os.path.normpath("/")
+
+
+def test_get_unique_name_retries_with_a_clean_candidate(temp_path):
+    # When the first candidate collides, the retry must rebuild the name from
+    # scratch instead of appending the next prefix/uuid/suffix/extension onto
+    # the already-colliding candidate.
+    path = temp_path("a/b/c")
+    fsutil.create_dir(path)
+    first_uuid = uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+    second_uuid = uuid.UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+    fsutil.create_file(f"{path}/prefix-{first_uuid}.txt")
+
+    with patch("fsutil.paths.uuid.uuid4", side_effect=[first_uuid, second_uuid]):
+        name = fsutil.get_unique_name(path, prefix="prefix", extension="txt")
+
+    assert name == f"prefix-{second_uuid}.txt"
 
 
 def test_get_unique_name(temp_path):
