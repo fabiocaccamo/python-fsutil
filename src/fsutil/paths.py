@@ -59,8 +59,8 @@ def get_unique_name(
     """
     path = _get_path(path)
     assert_dir(path)
-    name = ""
     while True:
+        name = ""
         if prefix:
             name += f"{prefix}{separator}"
         uid = uuid.uuid4()
