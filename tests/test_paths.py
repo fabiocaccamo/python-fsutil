@@ -66,6 +66,44 @@ def test_get_unique_name(temp_path):
     assert extension == "txt"
 
 
+def test_get_unique_name_collision(temp_path, monkeypatch):
+    path = temp_path("a/b/c")
+    fsutil.create_dir(path)
+    # simulate a uuid4 collision: the first candidate name already exists
+    uids = iter(
+        [
+            "00000000-0000-0000-0000-000000000001",
+            "00000000-0000-0000-0000-000000000002",
+        ]
+    )
+    monkeypatch.setattr(fsutil.paths.uuid, "uuid4", lambda: next(uids))
+    first_candidate = fsutil.get_unique_name(
+        path,
+        prefix="prefix",
+        suffix="suffix",
+        extension="txt",
+    )
+    assert first_candidate == "prefix-00000000-0000-0000-0000-000000000001-suffix.txt"
+    fsutil.create_file(fsutil.join_path(path, first_candidate))
+
+    uids = iter(
+        [
+            "00000000-0000-0000-0000-000000000001",
+            "00000000-0000-0000-0000-000000000002",
+        ]
+    )
+    monkeypatch.setattr(fsutil.paths.uuid, "uuid4", lambda: next(uids))
+    second_candidate = fsutil.get_unique_name(
+        path,
+        prefix="prefix",
+        suffix="suffix",
+        extension="txt",
+    )
+    # the retried candidate must be rebuilt from scratch, not accumulated
+    # on top of the previous (colliding) candidate name
+    assert second_candidate == "prefix-00000000-0000-0000-0000-000000000002-suffix.txt"
+
+
 def test_join_filename():
     assert fsutil.join_filename("Document", "txt") == "Document.txt"
     assert fsutil.join_filename("Document", ".txt") == "Document.txt"
