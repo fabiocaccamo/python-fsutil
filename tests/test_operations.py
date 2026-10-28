@@ -232,6 +232,79 @@ def test_download_file_without_requests_installed(temp_path):
             fsutil.download_file(url, dirpath=temp_path())
 
 
+def _download_file_with_mocked_response(content_disposition, temp_path, url="https://example.com/file.txt"):
+    class MockResponse:
+        headers = {"content-disposition": content_disposition}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            return None
+
+        def raise_for_status(self):
+            return None
+
+        def iter_content(self, chunk_size=1):
+            yield b"hello world"
+
+    class MockRequests:
+        def get(self, *args, **kwargs):
+            return MockResponse()
+
+    with patch("fsutil.operations.require_requests", return_value=MockRequests()):
+        return fsutil.download_file(url, dirpath=temp_path())
+
+
+def test_download_file_content_disposition_filename_star(temp_path):
+    # RFC 6266: the extended filename* parameter takes precedence
+    # over the basic filename parameter when both are present
+    path = _download_file_with_mocked_response(
+        'attachment; filename="fallback.txt"; '
+        "filename*=UTF-8''%E2%82%AC%20rates.txt",
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "€ rates.txt"
+    assert path == temp_path("€ rates.txt")
+
+
+def test_download_file_content_disposition_filename_star_only(temp_path):
+    path = _download_file_with_mocked_response(
+        "attachment; filename*=UTF-8''hello%20world.txt",
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "hello world.txt"
+
+
+def test_download_file_content_disposition_filename_star_is_sanitized(temp_path):
+    # path traversal in the extended parameter must be sanitized too
+    path = _download_file_with_mocked_response(
+        "attachment; filename*=UTF-8''..%2F..%2Fevil.txt",
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "evil.txt"
+    assert path == temp_path("evil.txt")
+
+
+def test_download_file_content_disposition_filename_star_invalid_charset(temp_path):
+    # an unknown charset makes filename* unusable: fall back to filename
+    path = _download_file_with_mocked_response(
+        'attachment; filename="fallback.txt"; '
+        "filename*=unknown-charset''%E2%82%AC.txt",
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "fallback.txt"
+
+
+def test_download_file_content_disposition_filename_star_malformed(temp_path):
+    # a filename* without the charset'language'value structure is ignored
+    path = _download_file_with_mocked_response(
+        'attachment; filename="fallback.txt"; filename*=garbage',
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "fallback.txt"
+
+
 def test_download_file_content_disposition_filename_is_sanitized(temp_path):
     class MockResponse:
         headers = {"content-disposition": 'attachment; filename="..\\..\\evil.txt"'}

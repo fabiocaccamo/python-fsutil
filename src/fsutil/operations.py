@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import tempfile
+import urllib.parse
 import uuid
 from collections.abc import Callable
 from typing import Any
@@ -184,6 +185,56 @@ def delete_files(*paths: PathIn) -> None:
     remove_files(*paths)
 
 
+def _get_download_filename_from_content_disposition(
+    content_disposition: str,
+) -> str | None:
+    """Extract a sanitized filename from a ``Content-Disposition`` header value.
+
+    According to RFC 6266, the extended ``filename*`` parameter takes
+    precedence over the basic ``filename`` parameter when both are present:
+    ``attachment; filename="fallback.txt"; filename*=UTF-8''%E2%82%AC.txt``.
+    The ``filename*`` value is declared as ``charset'lang'percent-encoded``.
+    """
+    filename = _parse_filename_star(content_disposition)
+    if not filename:
+        filename_match = re.search(
+            r'filename="(.*)"', content_disposition, re.IGNORECASE
+        )
+        if filename_match:
+            filename = filename_match.group(1)
+    if not filename:
+        return None
+    # sanitize Content-Disposition filename to prevent path traversal
+    filename = filename.replace("\\", "/")
+    filename = os.path.basename(filename)
+    return filename or None
+
+
+_FILENAME_STAR_RE = re.compile(
+    r"filename\*\s*=\s*(?:\"([^\"]+)\"|([^;]+))",
+    re.IGNORECASE,
+)
+
+
+def _parse_filename_star(content_disposition: str) -> str | None:
+    """Parse the RFC 6266 extended ``filename*`` parameter, if any."""
+    match = _FILENAME_STAR_RE.search(content_disposition)
+    if not match:
+        return None
+    ext_value = match.group(1) if match.group(1) is not None else match.group(2)
+    try:
+        charset, _language, encoded_value = ext_value.strip().split("'", 2)
+    except ValueError:
+        return None
+    try:
+        filename = urllib.parse.unquote(
+            encoded_value, encoding=charset.strip() or "utf-8", errors="strict"
+        )
+    except (LookupError, UnicodeError):
+        return None
+    return filename or None
+
+
 def download_file(
     url: str,
     *,
@@ -210,12 +261,9 @@ def download_file(
         if not filename:
             # detect filename from headers
             content_disposition = response.headers.get("content-disposition", "") or ""
-            filename_pattern = r'filename="(.*)"'
-            filename_match = re.search(filename_pattern, content_disposition)
-            if filename_match:
-                # sanitize Content-Disposition filename to prevent path traversal
-                filename = filename_match.group(1).replace("\\", "/")
-                filename = os.path.basename(filename)
+            filename = _get_download_filename_from_content_disposition(
+                content_disposition
+            )
             # or detect filename from url
             if not filename:
                 filename = get_filename(url)
