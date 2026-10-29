@@ -581,3 +581,62 @@ def test_search_dirs(temp_path):
 
 if __name__ == "__main__":
     pytest.main()
+
+
+def _download_with_disposition(disposition, temp_path, url="https://example.com/file.txt"):
+    class MockResponse:
+        headers = {"content-disposition": disposition}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            return None
+
+        def raise_for_status(self):
+            return None
+
+        def iter_content(self, chunk_size=1):
+            yield b"hello world"
+
+    class MockRequests:
+        def get(self, *args, **kwargs):
+            return MockResponse()
+
+    with patch("fsutil.operations.require_requests", return_value=MockRequests()):
+        return fsutil.download_file(url, dirpath=temp_path())
+
+
+def test_download_file_prefers_extended_filename_parameter(temp_path):
+    # RFC 6266: filename* takes precedence over the basic filename parameter,
+    # and its value is charset'language'percent-encoded.
+    path = _download_with_disposition(
+        "attachment; filename=\"fallback.txt\"; filename*=UTF-8''%E2%82%AC%20rates.txt",
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "€ rates.txt"
+
+
+def test_download_file_extended_filename_is_sanitized(temp_path):
+    path = _download_with_disposition(
+        "attachment; filename*=UTF-8''..%2F..%2Fevil.txt",
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "evil.txt"
+
+
+def test_download_file_malformed_extended_filename_falls_back(temp_path):
+    # No charset'language'value structure: fall back to the basic parameter.
+    path = _download_with_disposition(
+        "attachment; filename=\"fallback.txt\"; filename*=nonsense",
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "fallback.txt"
+
+
+def test_download_file_unknown_charset_falls_back(temp_path):
+    path = _download_with_disposition(
+        "attachment; filename=\"fallback.txt\"; filename*=nope-charset''value.txt",
+        temp_path,
+    )
+    assert fsutil.get_filename(path) == "fallback.txt"
