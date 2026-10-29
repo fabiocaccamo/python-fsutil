@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import codecs
 import glob
 import os
 import re
 import shutil
 import tempfile
 import uuid
+import urllib.parse
 from collections.abc import Callable
 from typing import Any
 
@@ -184,6 +186,24 @@ def delete_files(*paths: PathIn) -> None:
     remove_files(*paths)
 
 
+def _decode_extended_filename(value: str) -> str:
+    """
+    Decode an RFC 5987 extended parameter value (charset'language'percent-encoded).
+    Returns an empty string when the charset is unknown or the value is
+    malformed, so the caller can fall back to the basic filename parameter.
+    """
+    parts = value.split("'", 2)
+    if len(parts) != 3:
+        return ""
+    charset, _language, encoded = parts
+    charset = charset.strip() or "utf-8"
+    try:
+        codecs.lookup(charset)
+        return urllib.parse.unquote(encoded, encoding=charset, errors="strict")
+    except (LookupError, UnicodeDecodeError, ValueError):
+        return ""
+
+
 def download_file(
     url: str,
     *,
@@ -210,11 +230,21 @@ def download_file(
         if not filename:
             # detect filename from headers
             content_disposition = response.headers.get("content-disposition", "") or ""
-            filename_pattern = r'filename="(.*)"'
-            filename_match = re.search(filename_pattern, content_disposition)
-            if filename_match:
+            # RFC 6266: filename* takes precedence over filename when both are
+            # present. Its value is charset'language'percent-encoded-value.
+            extended_match = re.search(
+                r"filename\*\s*=\s*([^\s;]+)", content_disposition, re.IGNORECASE
+            )
+            if extended_match:
+                filename = _decode_extended_filename(extended_match.group(1))
+            if not filename:
+                filename_pattern = r'filename="(.*)"'
+                filename_match = re.search(filename_pattern, content_disposition)
+                if filename_match:
+                    filename = filename_match.group(1)
+            if filename:
                 # sanitize Content-Disposition filename to prevent path traversal
-                filename = filename_match.group(1).replace("\\", "/")
+                filename = filename.replace("\\", "/")
                 filename = os.path.basename(filename)
             # or detect filename from url
             if not filename:
