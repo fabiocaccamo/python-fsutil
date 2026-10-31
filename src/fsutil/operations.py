@@ -316,7 +316,14 @@ def move_dir(
     if not overwrite:
         assert_not_exists(dest)
     make_dirs(dest)
-    shutil.move(path, dest, **kwargs)
+    dest_path = join_path(dest, os.path.basename(path))
+    if overwrite and dest_path != path and exists(dest_path):
+        # replace the existing item instead of failing like shutil.move does
+        if is_dir(dest_path):
+            remove_dir(dest_path)
+        else:
+            remove_file(dest_path)
+    shutil.move(path, dest_path, **kwargs)
 
 
 def move_file(

@@ -346,6 +346,23 @@ def test_move_dir(temp_path):
     assert fsutil.is_file(temp_path("x/y/b/c.txt"))
 
 
+def test_move_dir_with_overwrite(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    fsutil.create_file(temp_path("x/y/b/d.txt"), content="Hello Moon")
+    fsutil.move_dir(temp_path("a/b"), temp_path("x/y"), overwrite=True)
+    assert not fsutil.exists(path)
+    assert fsutil.is_file(temp_path("x/y/b/c.txt"))
+    assert not fsutil.exists(temp_path("x/y/b/d.txt"))
+
+
+def test_move_dir_with_overwrite_into_its_own_parent(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    fsutil.move_dir(temp_path("a/b"), temp_path("a"), overwrite=True)
+    assert fsutil.is_file(path)
+
+
 def test_move_file(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path, content="Hello World")
