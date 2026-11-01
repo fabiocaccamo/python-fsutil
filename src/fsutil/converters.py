@@ -25,8 +25,8 @@ def convert_size_string_to_bytes(size: str) -> float | int:
     Convert the given size string to bytes.
     """
     units = [item.lower() for item in SIZE_UNITS]
-    parts = size.strip().replace("  ", " ").split(" ")
-    amount = float(parts[0])
+    parts = size.split()
+    amount = float(parts[0] if parts else "")
     unit = parts[1]
     factor = units.index(unit.lower())
     if not factor:

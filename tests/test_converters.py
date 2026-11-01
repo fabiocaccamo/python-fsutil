@@ -63,6 +63,39 @@ def test_convert_size_string_to_bytes(size_string, expected_output):
     assert fsutil.convert_size_string_to_bytes(size_string) == expected_output
 
 
+@pytest.mark.parametrize("separator", [" ", "  ", "   ", "    ", "\t", " \t "])
+@pytest.mark.parametrize(
+    "amount, unit, expected_output",
+    [
+        ("1", "KB", 1024),
+        ("1.5", "MB", 1572864),
+        ("1023", "bytes", 1023),
+        ("0.25", "mB", 262144),
+    ],
+)
+def test_convert_size_string_to_bytes_with_whitespace(
+    separator, amount, unit, expected_output
+):
+    size_string = f"\t {amount}{separator}{unit} \n"
+    assert fsutil.convert_size_string_to_bytes(size_string) == expected_output
+
+
+@pytest.mark.parametrize(
+    "size_string, error_type",
+    [
+        ("", ValueError),
+        (" \t ", ValueError),
+        ("1", IndexError),
+        ("1 XB", ValueError),
+        ("one KB", ValueError),
+        ("1 2 KB", ValueError),
+    ],
+)
+def test_convert_size_string_to_bytes_with_invalid_input(size_string, error_type):
+    with pytest.raises(error_type):
+        fsutil.convert_size_string_to_bytes(size_string)
+
+
 @pytest.mark.parametrize(
     "size_bytes, expected_output",
     [
