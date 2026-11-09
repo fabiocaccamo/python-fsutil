@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import tempfile
+import urllib.parse
 import uuid
 from collections.abc import Callable
 from typing import Any
@@ -184,6 +185,44 @@ def delete_files(*paths: PathIn) -> None:
     remove_files(*paths)
 
 
+def _get_content_disposition_filename(content_disposition: str) -> str | None:
+    """
+    Extract the filename from a Content-Disposition header value.
+    The RFC 6266 / RFC 5987 extended ``filename*`` parameter takes
+    precedence over the basic ``filename`` parameter.
+    """
+    # RFC 6266 extended parameter: filename*=charset'language'percent-encoded-value
+    ext_pattern = r"filename\*\s*=\s*([^;]+)"
+    ext_match = re.search(ext_pattern, content_disposition, re.IGNORECASE)
+    if ext_match:
+        value = ext_match.group(1).strip()
+        segments = value.split("'", 2)
+        if len(segments) == 3:
+            charset, _language, encoded_value = segments
+            try:
+                filename = urllib.parse.unquote(
+                    encoded_value,
+                    encoding=charset or "utf-8",
+                    errors="strict",
+                )
+            except (LookupError, UnicodeDecodeError):
+                filename = ""
+            if filename:
+                # sanitize Content-Disposition filename to prevent path traversal
+                filename = filename.replace("\\", "/")
+                filename = os.path.basename(filename)
+                return filename or None
+    # basic parameter: filename="value"
+    filename_pattern = r'filename="(.*)"'
+    filename_match = re.search(filename_pattern, content_disposition)
+    if filename_match:
+        # sanitize Content-Disposition filename to prevent path traversal
+        filename = filename_match.group(1).replace("\\", "/")
+        filename = os.path.basename(filename)
+        return filename or None
+    return None
+
+
 def download_file(
     url: str,
     *,
@@ -210,12 +249,7 @@ def download_file(
         if not filename:
             # detect filename from headers
             content_disposition = response.headers.get("content-disposition", "") or ""
-            filename_pattern = r'filename="(.*)"'
-            filename_match = re.search(filename_pattern, content_disposition)
-            if filename_match:
-                # sanitize Content-Disposition filename to prevent path traversal
-                filename = filename_match.group(1).replace("\\", "/")
-                filename = os.path.basename(filename)
+            filename = _get_content_disposition_filename(content_disposition)
             # or detect filename from url
             if not filename:
                 filename = get_filename(url)
