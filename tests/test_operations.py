@@ -581,3 +581,81 @@ def test_search_dirs(temp_path):
 
 if __name__ == "__main__":
     pytest.main()
+
+
+def _download_with_content_disposition(temp_path, content_disposition, url):
+    class MockResponse:
+        headers = {"content-disposition": content_disposition}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            return None
+
+        def raise_for_status(self):
+            return None
+
+        def iter_content(self, chunk_size=1):
+            yield b"hello world"
+
+    class MockRequests:
+        def get(self, *args, **kwargs):
+            return MockResponse()
+
+    with patch("fsutil.operations.require_requests", return_value=MockRequests()):
+        return fsutil.download_file(url, dirpath=temp_path())
+
+
+def test_download_file_content_disposition_filename_star_takes_precedence(temp_path):
+    content_disposition = (
+        'attachment; filename="fallback.txt"; '
+        "filename*=UTF-8''%E2%82%AC%20rates.txt"
+    )
+    path = _download_with_content_disposition(
+        temp_path, content_disposition, "https://example.com/file.txt",
+    )
+    assert fsutil.get_filename(path) == "€ rates.txt"
+
+
+def test_download_file_content_disposition_filename_star_charset_decoded(temp_path):
+    content_disposition = "attachment; filename*=iso-8859-1''Sch%F6ne.txt"
+    path = _download_with_content_disposition(
+        temp_path, content_disposition, "https://example.com/file.txt",
+    )
+    assert fsutil.get_filename(path) == "Schöne.txt"
+
+
+def test_download_file_content_disposition_filename_star_falls_back_on_bad_charset(
+    temp_path,
+):
+    # unknown charset: fall back to the basic filename parameter
+    content_disposition = (
+        "attachment; filename*=bogus-charset''%41.txt; filename=\"fallback.txt\""
+    )
+    path = _download_with_content_disposition(
+        temp_path, content_disposition, "https://example.com/file.txt",
+    )
+    assert fsutil.get_filename(path) == "fallback.txt"
+
+
+def test_download_file_content_disposition_filename_star_falls_back_when_malformed(
+    temp_path,
+):
+    # missing charset'language'value segments: fall back to the basic parameter
+    content_disposition = 'attachment; filename*=garbage; filename="fallback.txt"'
+    path = _download_with_content_disposition(
+        temp_path, content_disposition, "https://example.com/file.txt",
+    )
+    assert fsutil.get_filename(path) == "fallback.txt"
+
+
+def test_download_file_content_disposition_filename_star_is_sanitized(temp_path):
+    # the decoded filename goes through the same path-traversal
+    # hardening as the basic filename parameter (#181)
+    content_disposition = "attachment; filename*=UTF-8''..%2F..%2Fevil.txt"
+    path = _download_with_content_disposition(
+        temp_path, content_disposition, "https://example.com/file.txt",
+    )
+    assert fsutil.get_filename(path) == "evil.txt"
+    assert path == temp_path("evil.txt")
