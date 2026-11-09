@@ -59,8 +59,12 @@ def get_unique_name(
     """
     path = _get_path(path)
     assert_dir(path)
-    name = ""
+    if extension:
+        extension = extension.lstrip(".").lower()
     while True:
+        # build each candidate from scratch: on a collision the previous
+        # candidate must be discarded, not appended to
+        name = ""
         if prefix:
             name += f"{prefix}{separator}"
         uid = uuid.uuid4()
@@ -68,7 +72,6 @@ def get_unique_name(
         if suffix:
             name += f"{separator}{suffix}"
         if extension:
-            extension = extension.lstrip(".").lower()
             name += f".{extension}"
         if exists(join_path(path, name)):
             continue

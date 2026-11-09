@@ -189,3 +189,23 @@ def test_transform_filepath_with_callable_args():
 
 if __name__ == "__main__":
     pytest.main()
+
+
+def test_get_unique_name_rebuilds_candidate_after_collision(temp_path):
+    """A collision must discard the previous candidate, not append to it."""
+    import uuid as uuid_module
+
+    path = temp_path("a/b/c")
+    fsutil.create_dir(path)
+
+    uid1 = uuid_module.uuid4()
+    uid2 = uuid_module.uuid4()
+    # make the first candidate exist so the loop collides once
+    name1 = f"pre_{uid1}_suf.bin"
+    fsutil.write_file(fsutil.join_filepath(path, name1), "x")
+    candidates = iter([uid1, uid2])
+    with patch("fsutil.paths.uuid.uuid4", side_effect=lambda: next(candidates)):
+        name = fsutil.get_unique_name(
+            path, prefix="pre", suffix="suf", extension="BIN", separator="_"
+        )
+    assert name == f"pre_{uid2}_suf.bin"
