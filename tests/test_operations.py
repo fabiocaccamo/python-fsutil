@@ -1,3 +1,4 @@
+import os
 import threading
 from unittest.mock import patch
 
@@ -360,6 +361,56 @@ def test_move_dir_with_overwrite_into_its_own_parent(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path, content="Hello World")
     fsutil.move_dir(temp_path("a/b"), temp_path("a"), overwrite=True)
+    assert fsutil.is_file(path)
+
+
+@pytest.mark.parametrize(
+    "source, dest",
+    [
+        # relative source vs absolute dest parent
+        ("a/b", "{abspath}/a"),
+        # absolute source vs relative dest parent
+        ("{abspath}/a/b", "a"),
+    ],
+)
+def test_move_dir_with_overwrite_into_its_own_parent_aliased(
+    temp_path, monkeypatch, source, dest
+):
+    """A dest that names the source directory through a different spelling
+    (relative vs absolute) must not have its guard delete the source
+    before the move (data-loss reported in #212 review)."""
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    # relative spellings must resolve against the tmp tree
+    monkeypatch.chdir(temp_path(""))
+
+    source_path = source.replace("{abspath}", str(temp_path("")))
+    dest_path = dest.replace("{abspath}", str(temp_path("")))
+
+    # the identity guard skips the removal and shutil.move resolves to a
+    # no-op: the source and its payload must be untouched
+    fsutil.move_dir(source_path, dest_path, overwrite=True)
+    assert fsutil.is_file(path)
+    assert fsutil.is_dir(source_path)
+
+
+def test_move_dir_with_overwrite_into_its_own_parent_symlink(temp_path):
+    if not hasattr(os, "symlink"):
+        pytest.skip("platform without os.symlink")
+    try:
+        probe = temp_path("symlink-probe-target")
+        os.makedirs(probe)
+        os.symlink(probe, temp_path("symlink-probe-link"))
+    except OSError:
+        pytest.skip("requires symlink privileges")
+
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+
+    # symlink alias for the dest parent: guard must not delete the source
+    with pytest.raises(OSError):
+        fsutil.move_dir(temp_path("a/b"), temp_path("a-alias"), overwrite=True)
+
     assert fsutil.is_file(path)
 
 

@@ -318,11 +318,16 @@ def move_dir(
     make_dirs(dest)
     dest_path = join_path(dest, os.path.basename(path))
     if overwrite and dest_path != path and exists(dest_path):
-        # replace the existing item instead of failing like shutil.move does
-        if is_dir(dest_path):
-            remove_dir(dest_path)
-        else:
-            remove_file(dest_path)
+        # A differently-spelled dest (relative vs absolute, symlinks) can
+        # still name the source directory itself; removing it would delete
+        # the source before the move. Skip the removal when both paths
+        # refer to the same directory and let shutil.move fail safely.
+        if not os.path.samefile(path, dest_path):
+            # replace the existing item instead of failing like shutil.move does
+            if is_dir(dest_path):
+                remove_dir(dest_path)
+            else:
+                remove_file(dest_path)
     shutil.move(path, dest_path, **kwargs)
 
 
