@@ -397,17 +397,17 @@ def test_move_dir_with_overwrite_into_its_own_parent_aliased(
 def test_move_dir_with_overwrite_into_its_own_parent_symlink(temp_path):
     if not hasattr(os, "symlink"):
         pytest.skip("platform without os.symlink")
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
     try:
-        probe = temp_path("symlink-probe-target")
-        os.makedirs(probe)
-        os.symlink(probe, temp_path("symlink-probe-link"))
+        # alias for the source's own parent, as the review requires
+        os.symlink(temp_path("a"), temp_path("a-alias"))
     except OSError:
         pytest.skip("requires symlink privileges")
 
-    path = temp_path("a/b/c.txt")
-    fsutil.create_file(path, content="Hello World")
-
-    # symlink alias for the dest parent: guard must not delete the source
+    # moving through the alias names the source directory itself: the
+    # identity guard must skip the removal and shutil.move must fail
+    # safely instead of deleting the source
     with pytest.raises(OSError):
         fsutil.move_dir(temp_path("a/b"), temp_path("a-alias"), overwrite=True)
 
