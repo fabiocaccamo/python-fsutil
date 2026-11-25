@@ -408,6 +408,15 @@ def test_rename_file_extension(temp_path):
     assert fsutil.exists(path)
 
 
+def test_rename_file_extension_with_multi_dot_extension(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path)
+    fsutil.rename_file_extension(path, "tar.gz")
+    assert not fsutil.exists(path)
+    path = temp_path("a/b/c.tar.gz")
+    assert fsutil.exists(path)
+
+
 def test_remove_dir(temp_path):
     fsutil.create_file(temp_path("a/b/c/d.txt"))
     fsutil.create_file(temp_path("a/b/c/e.txt"))

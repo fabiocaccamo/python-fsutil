@@ -81,7 +81,7 @@ def join_filename(basename: str, extension: str) -> str:
     Create a filename joining the file basename and the extension.
     """
     basename = basename.rstrip(".").strip()
-    extension = extension.replace(".", "").strip()
+    extension = extension.strip().lstrip(".")
     if basename and extension:
         filename = f"{basename}.{extension}"
         return filename
