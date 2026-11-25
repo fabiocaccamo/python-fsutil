@@ -40,7 +40,10 @@ def create_tar_file(
     make_dirs_for_file(path)
 
     def _write_content_to_tar_file(
-        file: tarfile.TarFile, content_path: PathIn, basedir: str = ""
+        file: tarfile.TarFile,
+        content_path: PathIn,
+        basedir: str = "",
+        ancestors: frozenset[str] = frozenset(),
     ) -> None:
         path = _get_path(content_path)
         assert_exists(path)
@@ -49,12 +52,17 @@ def create_tar_file(
             filepath = join_path(basedir, filename)
             file.add(path, filepath)
         elif is_dir(path):
+            path_realpath = os.path.realpath(path)
+            if path_realpath in ancestors:
+                # symlink cycle: stop walking to prevent infinite recursion
+                return
+            ancestors = ancestors | {path_realpath}
             for item_name in os.listdir(path):
                 item_path = join_path(path, item_name)
                 item_basedir = (
                     join_path(basedir, item_name) if is_dir(item_path) else basedir
                 )
-                _write_content_to_tar_file(file, item_path, item_basedir)
+                _write_content_to_tar_file(file, item_path, item_basedir, ancestors)
 
     mode = f"w:{compression}" if compression else "w"
     with tarfile.open(path, mode=mode) as file:  # type: ignore
@@ -80,7 +88,10 @@ def create_zip_file(
     make_dirs_for_file(path)
 
     def _write_content_to_zip_file(
-        file: zipfile.ZipFile, content_path: PathIn, basedir: str = ""
+        file: zipfile.ZipFile,
+        content_path: PathIn,
+        basedir: str = "",
+        ancestors: frozenset[str] = frozenset(),
     ) -> None:
         path = _get_path(content_path)
         assert_exists(path)
@@ -89,12 +100,17 @@ def create_zip_file(
             filepath = join_path(basedir, filename)
             file.write(path, filepath)
         elif is_dir(path):
+            path_realpath = os.path.realpath(path)
+            if path_realpath in ancestors:
+                # symlink cycle: stop walking to prevent infinite recursion
+                return
+            ancestors = ancestors | {path_realpath}
             for item_name in os.listdir(path):
                 item_path = join_path(path, item_name)
                 item_basedir = (
                     join_path(basedir, item_name) if is_dir(item_path) else basedir
                 )
-                _write_content_to_zip_file(file, item_path, item_basedir)
+                _write_content_to_zip_file(file, item_path, item_basedir, ancestors)
 
     with zipfile.ZipFile(path, "w", compression) as file:
         for content_path in content_paths:

@@ -1,4 +1,6 @@
+import os
 import tarfile
+import zipfile
 
 import pytest
 
@@ -148,8 +150,44 @@ def test_extract_tar_file_selected_members(temp_path, compression):
         members = [archive.getmember("second.txt")]
     fsutil.extract_tar_file(tar_path, temp_path("output"), content_paths=members)
     # These are pytest assertions, not runtime security checks.
-    assert not fsutil.exists(temp_path("output/first.txt"))  # nosec B101
+    assert fsutil.exists(temp_path("output/first.txt")) is False  # nosec B101
     assert fsutil.read_file(temp_path("output/second.txt")) == "hello world"  # nosec B101
+
+
+@pytest.mark.skipif(
+    os.name == "nt" or not hasattr(os, "symlink"),
+    reason="requires symlink support",
+)
+@pytest.mark.parametrize(
+    "create_archive",
+    [fsutil.create_zip_file, fsutil.create_tar_file],
+)
+def test_create_archive_with_directory_symlink_cycle(temp_path, create_archive):
+    source_path = temp_path("source")
+    other_path = temp_path("other")
+    fsutil.create_dir(source_path)
+    fsutil.create_dir(temp_path("source/sub"))
+    fsutil.create_dir(other_path)
+    fsutil.create_file(temp_path("source/f1.txt"), content="hello world 1")
+    fsutil.create_file(temp_path("other/f2.txt"), content="hello world 2")
+    # symlink pointing to an ancestor directory (cycle)
+    os.symlink(source_path, temp_path("source/self"))
+    # symlink pointing to an ancestor directory from a subdirectory (cycle)
+    os.symlink(source_path, temp_path("source/sub/up"))
+    # symlink pointing to another directory (not a cycle)
+    os.symlink(other_path, temp_path("source/neighbor"))
+
+    archive_path = temp_path("archive")
+    create_archive(archive_path, [source_path])
+    assert fsutil.is_file(archive_path)
+
+    if create_archive is fsutil.create_zip_file:
+        with zipfile.ZipFile(archive_path) as archive:
+            names = set(archive.namelist())
+    else:
+        with tarfile.open(archive_path) as archive:
+            names = {member.name for member in archive.getmembers()}
+    assert names == {"f1.txt", "neighbor/f2.txt"}
 
 
 if __name__ == "__main__":
