@@ -1,3 +1,5 @@
+import os
+import sys
 import threading
 from unittest.mock import patch
 
@@ -46,6 +48,20 @@ def test_clean_dir_only_files(temp_path):
     assert fsutil.exists(temp_path("a/b/c/f3.txt"))
     assert not fsutil.exists(temp_path("a/b/c/f4.txt"))
     assert fsutil.exists(temp_path("a/b/c/f5.txt"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_clean_dir_with_dangling_symlink(temp_path):
+    link_path = temp_path("a/b/c/dangling.txt")
+    target_path = temp_path("a/b/missing.txt")
+    fsutil.create_file(temp_path("a/b/c/f1.txt"))
+    try:
+        os.symlink(target_path, link_path)
+    except OSError:
+        pytest.skip("Symlink creation is not supported on this platform")
+    fsutil.clean_dir(temp_path("a"), dirs=True, files=True)
+    assert not fsutil.exists(temp_path("a/b/c/f1.txt"))
+    assert os.path.lexists(link_path)
 
 
 def test_clean_dir_dirs_and_files(temp_path):
