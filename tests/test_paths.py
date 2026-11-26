@@ -36,6 +36,9 @@ def test_get_filename():
         fsutil.get_filename("https://domain-name.com/Document.txt?p=1")
         == "Document.txt"
     )
+    # filenames can contain "?" / "#" characters (not URL query/fragment)
+    assert fsutil.get_filename("/root/a/b/c/Document?v1.txt") == "Document?v1.txt"
+    assert fsutil.get_filename("/root/a/b/c/Document#1.txt") == "Document#1.txt"
 
 
 def test_get_parent_dir():

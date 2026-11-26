@@ -14,8 +14,14 @@ def get_filename(path: PathIn) -> str:
     """
     Get the filename from the given path/url.
     """
-    path = _get_path(path)
-    filepath = urlsplit(path).path
+    raw_path = str(path) if path is not None else ""
+    url_split = urlsplit(raw_path) if raw_path else None
+    if url_split and url_split.scheme:
+        # url (eg. "https://domain.com/file.txt?query=param")
+        filepath = url_split.path
+    else:
+        # filesystem path (its filename can contain "?" / "#" chars)
+        filepath = _get_path(path)
     filename = os.path.basename(filepath)
     return filename
 

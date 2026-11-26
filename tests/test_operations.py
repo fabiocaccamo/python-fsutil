@@ -355,6 +355,19 @@ def test_move_file(temp_path):
     assert fsutil.is_file(temp_path("a/c.txt"))
 
 
+def test_move_file_with_special_chars_in_filename(temp_path):
+    """
+    Regression test: filenames containing "?" / "#" characters
+    must not be truncated when moving the file.
+    """
+    fsutil.create_file(temp_path("file?v1.txt"), content="Hello")
+    fsutil.create_file(temp_path("file#2.txt"), content="World")
+    fsutil.move_file(temp_path("file?v1.txt"), temp_path("dest/"))
+    fsutil.move_file(temp_path("file#2.txt"), temp_path("dest/"))
+    assert fsutil.read_file(temp_path("dest/file?v1.txt")) == "Hello"
+    assert fsutil.read_file(temp_path("dest/file#2.txt")) == "World"
+
+
 def test_rename_dir(temp_path):
     path = temp_path("a/b/c")
     fsutil.make_dirs(path)
