@@ -1,5 +1,7 @@
 import io
+import os
 import re
+import sys
 import time
 from datetime import datetime, timedelta
 
@@ -87,6 +89,20 @@ def test_get_dir_size(temp_path):
     assert fsutil.get_dir_size(temp_path("a")) == 10206412
     assert fsutil.get_dir_size(temp_path("a/b")) == 9105408
     assert fsutil.get_dir_size(temp_path("a/b/c")) == 4648960
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_get_dir_size_with_hard_links(temp_path):
+    """
+    Regression test: hard-linked files must be counted only once.
+    """
+    path = temp_path("a/a-1.txt")
+    create_file_of_size(path, "1 MB")  # 1048576
+    os.link(path, temp_path("a/b-1.txt"))
+    fsutil.create_dir(temp_path("a/c"))
+    os.link(path, temp_path("a/c/d-1.txt"))
+    dir_size = fsutil.get_dir_size(temp_path("a/"))
+    assert dir_size == 1048576
 
 
 def test_get_dir_size_formatted(temp_path):
