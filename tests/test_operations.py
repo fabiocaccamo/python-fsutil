@@ -568,17 +568,16 @@ def test_search_files_with_glob_metacharacters_in_path(temp_path):
     Regression test: search paths containing glob metacharacters
     (eg. "[", "*", "?") must not be interpreted as part of the pattern.
     """
-    basepath = temp_path("a/b[1]/")
-    fsutil.create_file(fsutil.join_path(basepath, "IMG_1000.jpg"))
-    fsutil.create_file(fsutil.join_path(basepath, "IMG_1001.jpg"))
-    results = fsutil.search_files(basepath)
+    fsutil.create_file(temp_path("a/b[1]/IMG_1000.jpg"))
+    fsutil.create_file(temp_path("a/b[1]/c/IMG_1001.jpg"))
+    results = fsutil.search_files(temp_path("a/b[1]/"))
     expected_results = [
-        fsutil.join_path(basepath, "IMG_1000.jpg"),
-        fsutil.join_path(basepath, "IMG_1001.jpg"),
+        temp_path("a/b[1]/IMG_1000.jpg"),
+        temp_path("a/b[1]/c/IMG_1001.jpg"),
     ]
     assert results == expected_results
-    results = fsutil.search_dirs(temp_path("a/"))
-    assert results == [temp_path("a/b[1]")]
+    results = fsutil.search_dirs(temp_path("a/b[1]/"))
+    assert results == [temp_path("a/b[1]/c")]
 
 
 def test_search_dirs(temp_path):
