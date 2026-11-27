@@ -1,5 +1,6 @@
 import os
 import uuid
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -37,6 +38,29 @@ def test_get_filename():
         fsutil.get_filename("https://domain-name.com/Document.txt?p=1")
         == "Document.txt"
     )
+
+
+@pytest.mark.parametrize("basename", ["Document#1", "Document?1"])
+def test_get_filename_with_url_characters_in_local_path(basename):
+    filename = f"{basename}.txt"
+    path = f"/root/a/b/c/{filename}"
+    dirpath = os.path.normpath("/root/a/b/c")
+    assert fsutil.get_filename(path) == filename
+    assert fsutil.get_filename(Path(path)) == filename
+    assert fsutil.get_filename(f"C:/a/b/c/{filename}") == filename
+    assert fsutil.get_file_basename(path) == basename
+    assert fsutil.get_file_extension(path) == "txt"
+    assert fsutil.split_filename(path) == (basename, "txt")
+    assert fsutil.split_filepath(path) == (dirpath, filename)
+
+
+def test_get_filename_with_url_query_and_fragment():
+    url = "https://domain-name.com/a/Document.txt?version=1.2#section"
+    assert fsutil.get_filename(url) == "Document.txt"
+    assert fsutil.get_file_basename(url) == "Document"
+    assert fsutil.get_file_extension(url) == "txt"
+    assert fsutil.split_filename(url) == ("Document", "txt")
+    assert fsutil.split_filepath(url)[1] == "Document.txt"
 
 
 def test_get_parent_dir():

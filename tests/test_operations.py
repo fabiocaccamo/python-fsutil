@@ -566,6 +566,15 @@ def test_rename_file_basename(temp_path):
     assert fsutil.exists(path)
 
 
+def test_rename_file_extension_with_hash_in_filename(temp_path):
+    path = temp_path("a/b/c#1.txt")
+    fsutil.create_file(path)
+    fsutil.rename_file_extension(path, "json")
+    assert not fsutil.exists(path)
+    path = temp_path("a/b/c#1.json")
+    assert fsutil.exists(path)
+
+
 def test_rename_file_extension(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path)
