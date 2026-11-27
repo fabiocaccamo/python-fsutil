@@ -1,4 +1,5 @@
 import os
+import sys
 import tarfile
 import zipfile
 
@@ -51,6 +52,31 @@ def test_create_tar_file(temp_path):
     assert fsutil.is_file(f4_path)
     assert fsutil.is_file(tar_path)
     assert fsutil.get_file_size(tar_path) > 0
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+@pytest.mark.parametrize(
+    "create_archive", [fsutil.create_zip_file, fsutil.create_tar_file]
+)
+def test_create_archive_with_symlink_cycles(temp_path, create_archive):
+    fsutil.create_file(temp_path("a/f1.txt"), content="hello world 1")
+    fsutil.create_file(temp_path("x/f2.txt"), content="hello world 2")
+    fsutil.create_dir(temp_path("a/b"))
+    # links to an ancestor directory
+    os.symlink(temp_path("a"), temp_path("a/a-link"))
+    os.symlink(temp_path("a"), temp_path("a/b/a-link"))
+    # links to another directory that links back
+    os.symlink(temp_path("x"), temp_path("a/x-link"))
+    os.symlink(temp_path("a"), temp_path("x/a-link"))
+    archive_path = temp_path("archive")
+    create_archive(archive_path, [temp_path("a")])
+    if create_archive is fsutil.create_zip_file:
+        with zipfile.ZipFile(archive_path) as archive:
+            names = archive.namelist()
+    else:
+        with tarfile.open(archive_path) as archive:
+            names = archive.getnames()
+    assert sorted(names) == ["f1.txt", "x-link/f2.txt"]
 
 
 def test_extract_zip_file(temp_path):
@@ -152,42 +178,6 @@ def test_extract_tar_file_selected_members(temp_path, compression):
     # These are pytest assertions, not runtime security checks.
     assert fsutil.exists(temp_path("output/first.txt")) is False  # nosec B101
     assert fsutil.read_file(temp_path("output/second.txt")) == "hello world"  # nosec B101
-
-
-@pytest.mark.skipif(
-    os.name == "nt" or not hasattr(os, "symlink"),
-    reason="requires symlink support",
-)
-@pytest.mark.parametrize(
-    "create_archive",
-    [fsutil.create_zip_file, fsutil.create_tar_file],
-)
-def test_create_archive_with_directory_symlink_cycle(temp_path, create_archive):
-    source_path = temp_path("source")
-    other_path = temp_path("other")
-    fsutil.create_dir(source_path)
-    fsutil.create_dir(temp_path("source/sub"))
-    fsutil.create_dir(other_path)
-    fsutil.create_file(temp_path("source/f1.txt"), content="hello world 1")
-    fsutil.create_file(temp_path("other/f2.txt"), content="hello world 2")
-    # symlink pointing to an ancestor directory (cycle)
-    os.symlink(source_path, temp_path("source/self"))
-    # symlink pointing to an ancestor directory from a subdirectory (cycle)
-    os.symlink(source_path, temp_path("source/sub/up"))
-    # symlink pointing to another directory (not a cycle)
-    os.symlink(other_path, temp_path("source/neighbor"))
-
-    archive_path = temp_path("archive")
-    create_archive(archive_path, [source_path])
-    assert fsutil.is_file(archive_path)
-
-    if create_archive is fsutil.create_zip_file:
-        with zipfile.ZipFile(archive_path) as archive:
-            names = set(archive.namelist())
-    else:
-        with tarfile.open(archive_path) as archive:
-            names = {member.name for member in archive.getmembers()}
-    assert names == {"f1.txt", "neighbor/f2.txt"}
 
 
 if __name__ == "__main__":
