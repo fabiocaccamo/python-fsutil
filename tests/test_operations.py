@@ -50,20 +50,6 @@ def test_clean_dir_only_files(temp_path):
     assert fsutil.exists(temp_path("a/b/c/f5.txt"))
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
-def test_clean_dir_with_dangling_symlink(temp_path):
-    link_path = temp_path("a/b/c/dangling.txt")
-    target_path = temp_path("a/b/missing.txt")
-    fsutil.create_file(temp_path("a/b/c/f1.txt"))
-    try:
-        os.symlink(target_path, link_path)
-    except OSError:
-        pytest.skip("Symlink creation is not supported on this platform")
-    fsutil.clean_dir(temp_path("a"), dirs=True, files=True)
-    assert not fsutil.exists(temp_path("a/b/c/f1.txt"))
-    assert os.path.lexists(link_path)
-
-
 def test_clean_dir_dirs_and_files(temp_path):
     fsutil.create_file(temp_path("a/b/c/f1.txt"))
     fsutil.create_file(temp_path("a/b/c/f2.txt"))
@@ -79,6 +65,38 @@ def test_clean_dir_dirs_and_files(temp_path):
     assert not fsutil.exists(temp_path("a/b/c"))
     assert not fsutil.exists(temp_path("a/b"))
     assert fsutil.exists(temp_path("a"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_clean_dir_with_dangling_symlink(temp_path):
+    fsutil.create_file(temp_path("a/b/c/f1.txt"))
+    os.symlink(temp_path("a/b/missing.txt"), temp_path("a/b/c/dangling.txt"))
+    fsutil.clean_dir(temp_path("a"), dirs=True, files=True)
+    assert not fsutil.exists(temp_path("a/b/c/f1.txt"))
+    assert os.path.islink(temp_path("a/b/c/dangling.txt"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_clean_dir_only_dirs_with_dangling_symlink(temp_path):
+    fsutil.create_dir(temp_path("a/b/c"))
+    fsutil.create_dir(temp_path("a/b/d"))
+    os.symlink(temp_path("a/b/missing.txt"), temp_path("a/b/c/dangling.txt"))
+    fsutil.clean_dir(temp_path("a"), dirs=True, files=False)
+    assert os.path.islink(temp_path("a/b/c/dangling.txt"))
+    assert not fsutil.exists(temp_path("a/b/d"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_clean_dir_with_symlink_to_empty_dir(temp_path):
+    fsutil.create_dir(temp_path("a/b"))
+    fsutil.create_dir(temp_path("x"))
+    os.symlink(temp_path("a/b"), temp_path("a/b-link"))
+    os.symlink(temp_path("x"), temp_path("a/x-link"))
+    fsutil.clean_dir(temp_path("a"), dirs=True, files=True)
+    assert not fsutil.exists(temp_path("a/b"))
+    assert os.path.islink(temp_path("a/b-link"))
+    assert os.path.islink(temp_path("a/x-link"))
+    assert fsutil.is_dir(temp_path("x"))
 
 
 def test_copy_file(temp_path):
