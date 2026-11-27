@@ -15,6 +15,7 @@ from fsutil.checks import (
     assert_not_exists,
     assert_not_file,
     is_dir,
+    is_empty_dir,
     is_file,
 )
 from fsutil.operations import make_dirs, make_dirs_for_file, remove_file
@@ -57,6 +58,9 @@ def create_tar_file(
                 # symlink cycle: stop walking to prevent infinite recursion
                 return
             ancestors = ancestors | {path_realpath}
+            if basedir and is_empty_dir(path):
+                # realpath to store a symlinked directory as a directory, not a link
+                file.add(path_realpath, basedir)
             for item_name in os.listdir(path):
                 item_path = join_path(path, item_name)
                 item_basedir = (
@@ -105,6 +109,8 @@ def create_zip_file(
                 # symlink cycle: stop walking to prevent infinite recursion
                 return
             ancestors = ancestors | {path_realpath}
+            if basedir and is_empty_dir(path):
+                file.write(path, basedir)
             for item_name in os.listdir(path):
                 item_path = join_path(path, item_name)
                 item_basedir = (

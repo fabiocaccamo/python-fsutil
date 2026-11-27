@@ -31,6 +31,46 @@ def test_create_zip_file(temp_path):
     assert fsutil.get_file_size(zip_path) > 0
 
 
+@pytest.mark.parametrize(
+    ("create_archive", "extract_archive"),
+    [
+        (fsutil.create_zip_file, fsutil.extract_zip_file),
+        (fsutil.create_tar_file, fsutil.extract_tar_file),
+    ],
+)
+def test_create_archive_with_empty_dirs(temp_path, create_archive, extract_archive):
+    fsutil.create_dir(temp_path("a/b"))
+    fsutil.create_dir(temp_path("a/c/d"))
+    fsutil.create_file(temp_path("a/c/f1.txt"), content="hello world 1")
+    archive_path = temp_path("archive")
+    create_archive(archive_path, [temp_path("a")])
+    extract_archive(archive_path, temp_path("unarchive"))
+    assert fsutil.is_empty_dir(temp_path("unarchive/b"))
+    assert fsutil.is_empty_dir(temp_path("unarchive/c/d"))
+    assert fsutil.is_file(temp_path("unarchive/c/f1.txt"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+@pytest.mark.parametrize(
+    ("create_archive", "extract_archive"),
+    [
+        (fsutil.create_zip_file, fsutil.extract_zip_file),
+        (fsutil.create_tar_file, fsutil.extract_tar_file),
+    ],
+)
+def test_create_archive_with_symlink_to_empty_dir(
+    temp_path, create_archive, extract_archive
+):
+    fsutil.create_dir(temp_path("a"))
+    fsutil.create_dir(temp_path("x"))
+    os.symlink(temp_path("x"), temp_path("a/x-link"))
+    archive_path = temp_path("archive")
+    create_archive(archive_path, [temp_path("a")])
+    extract_archive(archive_path, temp_path("unarchive"))
+    assert fsutil.is_empty_dir(temp_path("unarchive/x-link"))
+    assert not os.path.islink(temp_path("unarchive/x-link"))
+
+
 def test_create_tar_file(temp_path):
     tar_path = temp_path("archive.tar")
     f1_path = temp_path("a/b/f1.txt")
