@@ -1,4 +1,5 @@
 import io
+import os
 import re
 import time
 from datetime import datetime, timedelta
@@ -87,6 +88,16 @@ def test_get_dir_size(temp_path):
     assert fsutil.get_dir_size(temp_path("a")) == 10206412
     assert fsutil.get_dir_size(temp_path("a/b")) == 9105408
     assert fsutil.get_dir_size(temp_path("a/b/c")) == 4648960
+
+
+def test_get_dir_size_with_hard_links(temp_path):
+    create_file_of_size(temp_path("a/a-1.txt"), "1 MB")  # 1048576
+    create_file_of_size(temp_path("a/b/b-1.txt"), "2 MB")  # 2097152
+    os.link(temp_path("a/a-1.txt"), temp_path("a/a-2.txt"))
+    os.link(temp_path("a/a-1.txt"), temp_path("a/b/b-2.txt"))
+    os.link(temp_path("a/b/b-1.txt"), temp_path("a/b/b-3.txt"))
+    assert fsutil.get_dir_size(temp_path("a")) == 3145728
+    assert fsutil.get_dir_size(temp_path("a/b")) == 3145728
 
 
 def test_get_dir_size_formatted(temp_path):

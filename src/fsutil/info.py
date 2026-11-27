@@ -92,11 +92,20 @@ def get_dir_size(path: PathIn) -> int:
     path = _get_path(path)
     assert_dir(path)
     size = 0
+    inodes = set()
     for basepath, _, filenames in os.walk(path):
         for filename in filenames:
             filepath = os.path.join(basepath, filename)
-            if not os.path.islink(filepath):
-                size += get_file_size(filepath)
+            if os.path.islink(filepath):
+                continue
+            file_stat = os.stat(filepath)
+            if file_stat.st_nlink > 1:
+                # count hard-linked files only once
+                inode = (file_stat.st_dev, file_stat.st_ino)
+                if inode in inodes:
+                    continue
+                inodes.add(inode)
+            size += file_stat.st_size
     return size
 
 
