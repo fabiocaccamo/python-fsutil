@@ -9,7 +9,6 @@ from typing import IO
 from fsutil.args import get_path as _get_path
 from fsutil.checks import assert_dir, assert_file
 from fsutil.converters import convert_size_bytes_to_string
-from fsutil.operations import search_files
 from fsutil.types import PathIn
 
 
@@ -43,8 +42,12 @@ def get_dir_hash(path: PathIn, *, func: str = "md5") -> str:
     path = _get_path(path)
     assert_dir(path)
     hash_ = hashlib.new(func)
-    files = search_files(path)
-    for file in sorted(files):
+    files = [
+        os.path.join(basepath, filename)
+        for basepath, _, filenames in os.walk(path, followlinks=True)
+        for filename in filenames
+    ]
+    for file in sorted(filter(os.path.isfile, files)):
         file_hash = get_file_hash(file, func=func)
         file_hash_b = bytes(file_hash, "utf-8")
         hash_.update(file_hash_b)
@@ -92,11 +95,20 @@ def get_dir_size(path: PathIn) -> int:
     path = _get_path(path)
     assert_dir(path)
     size = 0
+    inodes = set()
     for basepath, _, filenames in os.walk(path):
         for filename in filenames:
             filepath = os.path.join(basepath, filename)
-            if not os.path.islink(filepath):
-                size += get_file_size(filepath)
+            if os.path.islink(filepath):
+                continue
+            file_stat = os.stat(filepath)
+            if file_stat.st_nlink > 1:
+                # count hard-linked files only once
+                inode = (file_stat.st_dev, file_stat.st_ino)
+                if inode in inodes:
+                    continue
+                inodes.add(inode)
+            size += file_stat.st_size
     return size
 
 

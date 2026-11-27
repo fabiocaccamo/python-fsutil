@@ -59,8 +59,9 @@ def get_unique_name(
     """
     path = _get_path(path)
     assert_dir(path)
-    name = ""
+    extension = extension.lstrip(".").lower()
     while True:
+        name = ""
         if prefix:
             name += f"{prefix}{separator}"
         uid = uuid.uuid4()
@@ -68,7 +69,6 @@ def get_unique_name(
         if suffix:
             name += f"{separator}{suffix}"
         if extension:
-            extension = extension.lstrip(".").lower()
             name += f".{extension}"
         if exists(join_path(path, name)):
             continue
@@ -81,7 +81,7 @@ def join_filename(basename: str, extension: str) -> str:
     Create a filename joining the file basename and the extension.
     """
     basename = basename.rstrip(".").strip()
-    extension = extension.replace(".", "").strip()
+    extension = extension.strip().strip(".")
     if basename and extension:
         filename = f"{basename}.{extension}"
         return filename

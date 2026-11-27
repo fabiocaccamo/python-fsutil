@@ -562,6 +562,8 @@ fsutil.make_dirs_for_file(path)
 ```python
 # Move an existing dir from path to dest directory.
 # If overwrite is not allowed and dest path exists, an OSError is raised.
+# If overwrite is allowed and dest directory contains a directory
+# with the same name, it will be replaced.
 # More informations about kwargs supported options here:
 # https://docs.python.org/3/library/shutil.html#shutil.move
 fsutil.move_dir(path, dest, overwrite=False, **kwargs)
