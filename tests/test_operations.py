@@ -563,6 +563,23 @@ def test_search_files_with_relative_path(temp_path, monkeypatch):
     assert all(fsutil.is_file(result) for result in results)
 
 
+def test_search_files_with_glob_metacharacters_in_path(temp_path):
+    """
+    Regression test: search paths containing glob metacharacters
+    (eg. "[", "*", "?") must not be interpreted as part of the pattern.
+    """
+    fsutil.create_file(temp_path("a/b[1]/IMG_1000.jpg"))
+    fsutil.create_file(temp_path("a/b[1]/c/IMG_1001.jpg"))
+    results = fsutil.search_files(temp_path("a/b[1]/"))
+    expected_results = [
+        temp_path("a/b[1]/IMG_1000.jpg"),
+        temp_path("a/b[1]/c/IMG_1001.jpg"),
+    ]
+    assert results == expected_results
+    results = fsutil.search_dirs(temp_path("a/b[1]/"))
+    assert results == [temp_path("a/b[1]/c")]
+
+
 def test_search_dirs(temp_path):
     fsutil.create_file(temp_path("a/b/c/IMG_1000.jpg"))
     fsutil.create_file(temp_path("x/y/z/c/IMG_1001.jpg"))
