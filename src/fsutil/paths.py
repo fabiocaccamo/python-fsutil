@@ -14,9 +14,10 @@ def get_filename(path: PathIn) -> str:
     """
     Get the filename from the given path/url.
     """
-    # Query and fragment markers are ordinary characters in local filenames.
-    raw_path = str(path)
-    filepath = urlsplit(raw_path).path if "://" in raw_path else _get_path(path)
+    # "?" and "#" are query and fragment markers only in urls
+    is_url = "://" in str(path)
+    path = _get_path(path)
+    filepath = urlsplit(path).path if is_url else path
     filename = os.path.basename(filepath)
     return filename
 
@@ -123,8 +124,8 @@ def split_filepath(path: PathIn) -> tuple[str, str]:
     """
     Split a filepath and returns its directory-path and filename.
     """
-    filename = get_filename(path)
     dirpath = os.path.dirname(_get_path(path))
+    filename = get_filename(path)
     return (dirpath, filename)
 
 
