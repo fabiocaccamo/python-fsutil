@@ -42,8 +42,7 @@ def _clean_dir_empty_dirs(path: PathIn) -> None:
     for basepath, dirnames, _ in os.walk(path, topdown=False):
         for dirname in dirnames:
             dirpath = os.path.join(basepath, dirname)
-            # skip symlinks: they are not real directories
-            # and rmtree refuses to remove them
+            # skip symlinks, rmtree refuses to remove them
             if not os.path.islink(dirpath) and is_empty_dir(dirpath):
                 remove_dir(dirpath)
 
@@ -53,7 +52,7 @@ def _clean_dir_empty_files(path: PathIn) -> None:
     for basepath, _, filenames in os.walk(path, topdown=False):
         for filename in filenames:
             filepath = os.path.join(basepath, filename)
-            # skip links to missing targets: they are not existing files
+            # skip dangling symlinks
             if is_file(filepath) and is_empty_file(filepath):
                 remove_file(filepath)
 
