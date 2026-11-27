@@ -1,6 +1,7 @@
 import os
 import sys
 import tarfile
+import zipfile
 
 import pytest
 
@@ -91,6 +92,31 @@ def test_create_tar_file(temp_path):
     assert fsutil.is_file(f4_path)
     assert fsutil.is_file(tar_path)
     assert fsutil.get_file_size(tar_path) > 0
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+@pytest.mark.parametrize(
+    "create_archive", [fsutil.create_zip_file, fsutil.create_tar_file]
+)
+def test_create_archive_with_symlink_cycles(temp_path, create_archive):
+    fsutil.create_file(temp_path("a/f1.txt"), content="hello world 1")
+    fsutil.create_file(temp_path("x/f2.txt"), content="hello world 2")
+    fsutil.create_dir(temp_path("a/b"))
+    # links to an ancestor directory
+    os.symlink(temp_path("a"), temp_path("a/a-link"))
+    os.symlink(temp_path("a"), temp_path("a/b/a-link"))
+    # links to another directory that links back
+    os.symlink(temp_path("x"), temp_path("a/x-link"))
+    os.symlink(temp_path("a"), temp_path("x/a-link"))
+    archive_path = temp_path("archive")
+    create_archive(archive_path, [temp_path("a")])
+    if create_archive is fsutil.create_zip_file:
+        with zipfile.ZipFile(archive_path) as archive:
+            names = archive.namelist()
+    else:
+        with tarfile.open(archive_path) as archive:
+            names = archive.getnames()
+    assert sorted(names) == ["f1.txt", "x-link/f2.txt"]
 
 
 def test_extract_zip_file(temp_path):

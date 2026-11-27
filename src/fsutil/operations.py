@@ -8,6 +8,7 @@ import tempfile
 import uuid
 from collections.abc import Callable
 from typing import Any
+from urllib.parse import unquote
 
 from fsutil.args import get_path as _get_path
 from fsutil.checks import (
@@ -42,7 +43,8 @@ def _clean_dir_empty_dirs(path: PathIn) -> None:
     for basepath, dirnames, _ in os.walk(path, topdown=False):
         for dirname in dirnames:
             dirpath = os.path.join(basepath, dirname)
-            if is_empty_dir(dirpath):
+            # skip symlinks, rmtree refuses to remove them
+            if not os.path.islink(dirpath) and is_empty_dir(dirpath):
                 remove_dir(dirpath)
 
 
@@ -51,7 +53,8 @@ def _clean_dir_empty_files(path: PathIn) -> None:
     for basepath, _, filenames in os.walk(path, topdown=False):
         for filename in filenames:
             filepath = os.path.join(basepath, filename)
-            if is_empty_file(filepath):
+            # skip dangling symlinks
+            if is_file(filepath) and is_empty_file(filepath):
                 remove_file(filepath)
 
 
@@ -184,6 +187,36 @@ def delete_files(*paths: PathIn) -> None:
     remove_files(*paths)
 
 
+def _get_filename_from_content_disposition(content_disposition: str) -> str:
+    """
+    Get the filename from the given Content-Disposition header value.
+    The filename* parameter takes precedence over filename (RFC 6266).
+    """
+    filenames = []
+    # filename*=charset'language'percent-encoded-value
+    filename_extended_match = re.search(
+        r"filename\*=([\w-]+)'[\w-]*'([^;\s]+)", content_disposition
+    )
+    if filename_extended_match:
+        charset, filename_encoded = filename_extended_match.groups()
+        try:
+            filenames.append(
+                unquote(filename_encoded, encoding=charset, errors="strict")
+            )
+        except (LookupError, UnicodeDecodeError):
+            # unknown charset or undecodable value, fallback to filename
+            pass
+    filename_match = re.search(r'filename="(.*)"', content_disposition)
+    if filename_match:
+        filenames.append(filename_match.group(1))
+    for filename in filenames:
+        # sanitize filename to prevent path traversal
+        filename = os.path.basename(filename.replace("\\", "/"))
+        if filename not in ("", ".", "..") and "\0" not in filename:
+            return filename
+    return ""
+
+
 def download_file(
     url: str,
     *,
@@ -210,12 +243,7 @@ def download_file(
         if not filename:
             # detect filename from headers
             content_disposition = response.headers.get("content-disposition", "") or ""
-            filename_pattern = r'filename="(.*)"'
-            filename_match = re.search(filename_pattern, content_disposition)
-            if filename_match:
-                # sanitize Content-Disposition filename to prevent path traversal
-                filename = filename_match.group(1).replace("\\", "/")
-                filename = os.path.basename(filename)
+            filename = _get_filename_from_content_disposition(content_disposition)
             # or detect filename from url
             if not filename:
                 filename = get_filename(url)
@@ -306,17 +334,32 @@ def move_dir(
     """
     Move an existing dir from path to dest directory.
     If overwrite is not allowed and dest path exists, an OSError is raised.
+    If overwrite is allowed and dest directory contains a directory
+    with the same name, it will be replaced.
     More informations about kwargs supported options here:
     https://docs.python.org/3/library/shutil.html#shutil.move
     """
-    path = _get_path(path)
+    path = os.path.abspath(_get_path(path))
     dest = _get_path(dest)
     assert_dir(path)
     assert_not_file(dest)
     if not overwrite:
         assert_not_exists(dest)
     make_dirs(dest)
-    shutil.move(path, dest, **kwargs)
+    # dirname is empty when path is a root directory
+    dirname = os.path.basename(path)
+    dest_path = os.path.join(dest, dirname)
+    if overwrite and dirname and is_dir(dest_path) and not os.path.islink(dest_path):
+        if os.path.samefile(path, dest_path):
+            # the directory is already in the dest directory
+            return
+        # move before removing, to keep the existing directory if the move fails
+        temp_path = os.path.join(dest, get_unique_name(dest))
+        shutil.move(path, temp_path, **kwargs)
+        remove_dir(dest_path)
+        os.rename(temp_path, dest_path)
+    else:
+        shutil.move(path, dest, **kwargs)
 
 
 def move_file(
@@ -517,7 +560,7 @@ def _search_paths(path: PathIn, pattern: str) -> list[str]:
     """
     path = _get_path(path)
     assert_dir(path)
-    pathname = os.path.join(path, pattern)
+    pathname = os.path.join(glob.escape(path), pattern)
     paths = glob.glob(pathname, recursive=True)
     # normalize paths to use OS-specific separators
     paths = [

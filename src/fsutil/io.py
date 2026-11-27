@@ -144,7 +144,7 @@ def _write_file_atomic(
 ) -> None:
     path = _get_path(path)
     mode = "a" if append else "w"
-    if append:
+    if append and exists(path):
         content = read_file(path, encoding=encoding) + content
     dirpath, _ = split_filepath(path)
     temp_path = None

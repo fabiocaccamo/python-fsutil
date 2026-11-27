@@ -1,5 +1,7 @@
 import io
+import os
 import re
+import sys
 import time
 from datetime import datetime, timedelta
 
@@ -55,6 +57,24 @@ def test_get_dir_hash(temp_path):
     assert dir_hash == "eabe619c41f0c4611b7b9746bededfcb"
 
 
+@pytest.mark.parametrize("filename", ["LICENSE", ".env", ".config/settings.json"])
+def test_get_dir_hash_with_extensionless_and_hidden_files(temp_path, filename):
+    path = temp_path(f"x/{filename}")
+    fsutil.create_file(path, content="hello world 1")
+    dir_hash = fsutil.get_dir_hash(temp_path("x"))
+    fsutil.write_file(path, content="hello world 2")
+    assert fsutil.get_dir_hash(temp_path("x")) != dir_hash
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_get_dir_hash_with_symlinks(temp_path):
+    fsutil.create_file(temp_path("x/f1.txt"), content="hello world 1")
+    fsutil.create_dir(temp_path("y"))
+    os.symlink(temp_path("x"), temp_path("y/x-link"))
+    os.symlink(temp_path("missing"), temp_path("y/missing-link"))
+    assert fsutil.get_dir_hash(temp_path("y")) == fsutil.get_dir_hash(temp_path("x"))
+
+
 def test_get_dir_last_modified_date(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path, content="Hello")
@@ -87,6 +107,16 @@ def test_get_dir_size(temp_path):
     assert fsutil.get_dir_size(temp_path("a")) == 10206412
     assert fsutil.get_dir_size(temp_path("a/b")) == 9105408
     assert fsutil.get_dir_size(temp_path("a/b/c")) == 4648960
+
+
+def test_get_dir_size_with_hard_links(temp_path):
+    create_file_of_size(temp_path("a/a-1.txt"), "1 MB")  # 1048576
+    create_file_of_size(temp_path("a/b/b-1.txt"), "2 MB")  # 2097152
+    os.link(temp_path("a/a-1.txt"), temp_path("a/a-2.txt"))
+    os.link(temp_path("a/a-1.txt"), temp_path("a/b/b-2.txt"))
+    os.link(temp_path("a/b/b-1.txt"), temp_path("a/b/b-3.txt"))
+    assert fsutil.get_dir_size(temp_path("a")) == 3145728
+    assert fsutil.get_dir_size(temp_path("a/b")) == 3145728
 
 
 def test_get_dir_size_formatted(temp_path):

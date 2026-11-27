@@ -1,4 +1,7 @@
+import os
+import sys
 import threading
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -63,6 +66,38 @@ def test_clean_dir_dirs_and_files(temp_path):
     assert not fsutil.exists(temp_path("a/b/c"))
     assert not fsutil.exists(temp_path("a/b"))
     assert fsutil.exists(temp_path("a"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_clean_dir_with_dangling_symlink(temp_path):
+    fsutil.create_file(temp_path("a/b/c/f1.txt"))
+    os.symlink(temp_path("a/b/missing.txt"), temp_path("a/b/c/dangling.txt"))
+    fsutil.clean_dir(temp_path("a"), dirs=True, files=True)
+    assert not fsutil.exists(temp_path("a/b/c/f1.txt"))
+    assert os.path.islink(temp_path("a/b/c/dangling.txt"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_clean_dir_only_dirs_with_dangling_symlink(temp_path):
+    fsutil.create_dir(temp_path("a/b/c"))
+    fsutil.create_dir(temp_path("a/b/d"))
+    os.symlink(temp_path("a/b/missing.txt"), temp_path("a/b/c/dangling.txt"))
+    fsutil.clean_dir(temp_path("a"), dirs=True, files=False)
+    assert os.path.islink(temp_path("a/b/c/dangling.txt"))
+    assert not fsutil.exists(temp_path("a/b/d"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_clean_dir_with_symlink_to_empty_dir(temp_path):
+    fsutil.create_dir(temp_path("a/b"))
+    fsutil.create_dir(temp_path("x"))
+    os.symlink(temp_path("a/b"), temp_path("a/b-link"))
+    os.symlink(temp_path("x"), temp_path("a/x-link"))
+    fsutil.clean_dir(temp_path("a"), dirs=True, files=True)
+    assert not fsutil.exists(temp_path("a/b"))
+    assert os.path.islink(temp_path("a/b-link"))
+    assert os.path.islink(temp_path("a/x-link"))
+    assert fsutil.is_dir(temp_path("x"))
 
 
 def test_copy_file(temp_path):
@@ -232,9 +267,9 @@ def test_download_file_without_requests_installed(temp_path):
             fsutil.download_file(url, dirpath=temp_path())
 
 
-def test_download_file_content_disposition_filename_is_sanitized(temp_path):
+def download_file_with_content_disposition(content_disposition, dirpath):
     class MockResponse:
-        headers = {"content-disposition": 'attachment; filename="..\\..\\evil.txt"'}
+        headers = {"content-disposition": content_disposition}
 
         def __enter__(self):
             return self
@@ -253,10 +288,73 @@ def test_download_file_content_disposition_filename_is_sanitized(temp_path):
             return MockResponse()
 
     with patch("fsutil.operations.require_requests", return_value=MockRequests()):
-        path = fsutil.download_file("https://example.com/file.txt", dirpath=temp_path())
-        assert fsutil.exists(path)
-        assert fsutil.get_filename(path) == "evil.txt"
-        assert path == temp_path("evil.txt")
+        return fsutil.download_file("https://example.com/file.txt", dirpath=dirpath)
+
+
+def test_download_file_content_disposition_filename_is_sanitized(temp_path):
+    path = download_file_with_content_disposition(
+        'attachment; filename="..\\..\\evil.txt"', temp_path()
+    )
+    assert fsutil.exists(path)
+    assert fsutil.get_filename(path) == "evil.txt"
+    assert path == temp_path("evil.txt")
+
+
+@pytest.mark.parametrize(
+    "content_disposition_format",
+    [
+        'attachment; filename="fallback.txt"; filename*={}',
+        'attachment; filename*={}; filename="fallback.txt"',
+    ],
+)
+@pytest.mark.parametrize(
+    ("filename_extended", "expected_filename"),
+    [
+        # filename* takes precedence over filename
+        ("UTF-8''%E2%82%AC%20rates.txt", "€ rates.txt"),
+        ("iso-8859-1'en'%A3%20rates.txt", "£ rates.txt"),
+        # filename* is sanitized
+        ("UTF-8''..%2F..%2Fevil.txt", "evil.txt"),
+        ("UTF-8''..%5C..%5Cevil.txt", "evil.txt"),
+        # unknown charset, undecodable, malformed or unusable filename* is ignored
+        ("unknown-charset''%E2%82%AC.txt", "fallback.txt"),
+        ("UTF-8''%FF.txt", "fallback.txt"),
+        ("garbage", "fallback.txt"),
+        ("UTF-8''%00.txt", "fallback.txt"),
+        ("UTF-8''..", "fallback.txt"),
+    ],
+)
+def test_download_file_content_disposition_filename_extended(
+    temp_path, content_disposition_format, filename_extended, expected_filename
+):
+    content_disposition = content_disposition_format.format(filename_extended)
+    path = download_file_with_content_disposition(content_disposition, temp_path())
+    assert fsutil.exists(path)
+    assert path == temp_path(expected_filename)
+
+
+def test_download_file_content_disposition_filename_extended_only(temp_path):
+    path = download_file_with_content_disposition(
+        "attachment; filename*=UTF-8''hello%20world.txt", temp_path()
+    )
+    assert fsutil.exists(path)
+    assert path == temp_path("hello world.txt")
+
+
+@pytest.mark.parametrize(
+    "content_disposition",
+    [
+        'attachment; filename=".."',
+        "attachment; filename*=UTF-8''..",
+        "attachment; filename*=UTF-8''%00.txt",
+    ],
+)
+def test_download_file_content_disposition_filename_unusable(
+    temp_path, content_disposition
+):
+    path = download_file_with_content_disposition(content_disposition, temp_path())
+    assert fsutil.exists(path)
+    assert path == temp_path("file.txt")
 
 
 def test_list_dirs(temp_path):
@@ -346,6 +444,75 @@ def test_move_dir(temp_path):
     assert fsutil.is_file(temp_path("x/y/b/c.txt"))
 
 
+def test_move_dir_with_overwrite(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    fsutil.create_file(temp_path("x/y/b/d.txt"), content="Hello Moon")
+    fsutil.move_dir(temp_path("a/b"), temp_path("x/y"), overwrite=True)
+    assert not fsutil.exists(path)
+    assert fsutil.is_file(temp_path("x/y/b/c.txt"))
+    assert not fsutil.exists(temp_path("x/y/b/d.txt"))
+    assert fsutil.list_dirs(temp_path("x/y")) == [temp_path("x/y/b")]
+
+
+def test_move_dir_with_overwrite_and_parent_dir_in_path(temp_path):
+    fsutil.create_file(temp_path("a/b/c/d.txt"), content="Hello World")
+    fsutil.create_file(temp_path("x/y/b/e.txt"), content="Hello Moon")
+    fsutil.move_dir(Path(temp_path("a/b/c"), ".."), temp_path("x/y"), overwrite=True)
+    assert not fsutil.exists(temp_path("a/b"))
+    assert fsutil.is_file(temp_path("x/y/b/c/d.txt"))
+    assert not fsutil.exists(temp_path("x/y/b/e.txt"))
+
+
+def test_move_dir_with_overwrite_and_existing_file(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    fsutil.create_file(temp_path("x/y/b"), content="Hello Moon")
+    with pytest.raises(OSError):
+        fsutil.move_dir(temp_path("a/b"), temp_path("x/y"), overwrite=True)
+    assert fsutil.is_file(path)
+    assert fsutil.is_file(temp_path("x/y/b"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_move_dir_with_overwrite_and_existing_symlink(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    fsutil.create_dir(temp_path("x/y"))
+    os.symlink(temp_path("a"), temp_path("x/y/b"))
+    with pytest.raises(OSError):
+        fsutil.move_dir(temp_path("a/b"), temp_path("x/y"), overwrite=True)
+    assert fsutil.is_file(path)
+    assert fsutil.list_dirs(temp_path("x/y")) == [temp_path("x/y/b")]
+
+
+def test_move_dir_with_overwrite_into_itself(temp_path):
+    path = temp_path("a/b/a/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    with pytest.raises(OSError):
+        fsutil.move_dir(temp_path("a"), temp_path("a/b"), overwrite=True)
+    assert fsutil.is_file(path)
+
+
+def test_move_dir_with_overwrite_into_its_own_parent(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    fsutil.move_dir(temp_path("a/b"), temp_path("a"), overwrite=True)
+    assert fsutil.is_file(path)
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_move_dir_with_overwrite_into_its_own_parent_with_symlinks(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    os.symlink(temp_path("a"), temp_path("a-link"))
+    os.symlink(temp_path("a/b"), temp_path("b"))
+    fsutil.move_dir(temp_path("a/b"), temp_path("a-link"), overwrite=True)
+    fsutil.move_dir(temp_path("b"), temp_path("a"), overwrite=True)
+    assert fsutil.is_file(path)
+    assert fsutil.list_dirs(temp_path("a")) == [temp_path("a/b")]
+
+
 def test_move_file(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path, content="Hello World")
@@ -405,6 +572,15 @@ def test_rename_file_extension(temp_path):
     fsutil.rename_file_extension(path, "json")
     assert not fsutil.exists(path)
     path = temp_path("a/b/c.json")
+    assert fsutil.exists(path)
+
+
+def test_rename_file_extension_with_multi_dot_extension(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path)
+    fsutil.rename_file_extension(path, "tar.gz")
+    assert not fsutil.exists(path)
+    path = temp_path("a/b/c.tar.gz")
     assert fsutil.exists(path)
 
 
@@ -561,6 +737,23 @@ def test_search_files_with_relative_path(temp_path, monkeypatch):
 
     assert len(results) == 2
     assert all(fsutil.is_file(result) for result in results)
+
+
+def test_search_files_with_glob_metacharacters_in_path(temp_path):
+    """
+    Regression test: search paths containing glob metacharacters
+    (eg. "[", "*", "?") must not be interpreted as part of the pattern.
+    """
+    fsutil.create_file(temp_path("a/b[1]/IMG_1000.jpg"))
+    fsutil.create_file(temp_path("a/b[1]/c/IMG_1001.jpg"))
+    results = fsutil.search_files(temp_path("a/b[1]/"))
+    expected_results = [
+        temp_path("a/b[1]/IMG_1000.jpg"),
+        temp_path("a/b[1]/c/IMG_1001.jpg"),
+    ]
+    assert results == expected_results
+    results = fsutil.search_dirs(temp_path("a/b[1]/"))
+    assert results == [temp_path("a/b[1]/c")]
 
 
 def test_search_dirs(temp_path):
