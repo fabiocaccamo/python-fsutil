@@ -176,7 +176,7 @@ def test_extract_tar_file_selected_members(temp_path, compression):
         members = [archive.getmember("second.txt")]
     fsutil.extract_tar_file(tar_path, temp_path("output"), content_paths=members)
     # These are pytest assertions, not runtime security checks.
-    assert fsutil.exists(temp_path("output/first.txt")) is False  # nosec B101
+    assert not fsutil.exists(temp_path("output/first.txt"))  # nosec B101
     assert fsutil.read_file(temp_path("output/second.txt")) == "hello world"  # nosec B101
 
 
