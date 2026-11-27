@@ -1,6 +1,7 @@
 import io
 import os
 import re
+import sys
 import time
 from datetime import datetime, timedelta
 
@@ -54,6 +55,24 @@ def test_get_dir_hash(temp_path):
     fsutil.create_file(f6_path, content="hello world 6")
     dir_hash = fsutil.get_dir_hash(temp_path("x/"))
     assert dir_hash == "eabe619c41f0c4611b7b9746bededfcb"
+
+
+@pytest.mark.parametrize("filename", ["LICENSE", ".env", ".config/settings.json"])
+def test_get_dir_hash_with_extensionless_and_hidden_files(temp_path, filename):
+    path = temp_path(f"x/{filename}")
+    fsutil.create_file(path, content="hello world 1")
+    dir_hash = fsutil.get_dir_hash(temp_path("x"))
+    fsutil.write_file(path, content="hello world 2")
+    assert fsutil.get_dir_hash(temp_path("x")) != dir_hash
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_get_dir_hash_with_symlinks(temp_path):
+    fsutil.create_file(temp_path("x/f1.txt"), content="hello world 1")
+    fsutil.create_dir(temp_path("y"))
+    os.symlink(temp_path("x"), temp_path("y/x-link"))
+    os.symlink(temp_path("missing"), temp_path("y/missing-link"))
+    assert fsutil.get_dir_hash(temp_path("y")) == fsutil.get_dir_hash(temp_path("x"))
 
 
 def test_get_dir_last_modified_date(temp_path):
