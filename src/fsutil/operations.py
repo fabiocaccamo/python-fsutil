@@ -8,6 +8,7 @@ import tempfile
 import uuid
 from collections.abc import Callable
 from typing import Any
+from urllib.parse import unquote
 
 from fsutil.args import get_path as _get_path
 from fsutil.checks import (
@@ -186,6 +187,36 @@ def delete_files(*paths: PathIn) -> None:
     remove_files(*paths)
 
 
+def _get_filename_from_content_disposition(content_disposition: str) -> str:
+    """
+    Get the filename from the given Content-Disposition header value.
+    The filename* parameter takes precedence over filename (RFC 6266).
+    """
+    filenames = []
+    # filename*=charset'language'percent-encoded-value
+    filename_extended_match = re.search(
+        r"filename\*=([\w-]+)'[\w-]*'([^;\s]+)", content_disposition
+    )
+    if filename_extended_match:
+        charset, filename_encoded = filename_extended_match.groups()
+        try:
+            filenames.append(
+                unquote(filename_encoded, encoding=charset, errors="strict")
+            )
+        except (LookupError, UnicodeDecodeError):
+            # unknown charset or undecodable value, fallback to filename
+            pass
+    filename_match = re.search(r'filename="(.*)"', content_disposition)
+    if filename_match:
+        filenames.append(filename_match.group(1))
+    for filename in filenames:
+        # sanitize filename to prevent path traversal
+        filename = os.path.basename(filename.replace("\\", "/"))
+        if filename not in ("", ".", "..") and "\0" not in filename:
+            return filename
+    return ""
+
+
 def download_file(
     url: str,
     *,
@@ -212,12 +243,7 @@ def download_file(
         if not filename:
             # detect filename from headers
             content_disposition = response.headers.get("content-disposition", "") or ""
-            filename_pattern = r'filename="(.*)"'
-            filename_match = re.search(filename_pattern, content_disposition)
-            if filename_match:
-                # sanitize Content-Disposition filename to prevent path traversal
-                filename = filename_match.group(1).replace("\\", "/")
-                filename = os.path.basename(filename)
+            filename = _get_filename_from_content_disposition(content_disposition)
             # or detect filename from url
             if not filename:
                 filename = get_filename(url)

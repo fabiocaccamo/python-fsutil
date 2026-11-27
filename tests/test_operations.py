@@ -266,9 +266,9 @@ def test_download_file_without_requests_installed(temp_path):
             fsutil.download_file(url, dirpath=temp_path())
 
 
-def test_download_file_content_disposition_filename_is_sanitized(temp_path):
+def download_file_with_content_disposition(content_disposition, dirpath):
     class MockResponse:
-        headers = {"content-disposition": 'attachment; filename="..\\..\\evil.txt"'}
+        headers = {"content-disposition": content_disposition}
 
         def __enter__(self):
             return self
@@ -287,10 +287,73 @@ def test_download_file_content_disposition_filename_is_sanitized(temp_path):
             return MockResponse()
 
     with patch("fsutil.operations.require_requests", return_value=MockRequests()):
-        path = fsutil.download_file("https://example.com/file.txt", dirpath=temp_path())
-        assert fsutil.exists(path)
-        assert fsutil.get_filename(path) == "evil.txt"
-        assert path == temp_path("evil.txt")
+        return fsutil.download_file("https://example.com/file.txt", dirpath=dirpath)
+
+
+def test_download_file_content_disposition_filename_is_sanitized(temp_path):
+    path = download_file_with_content_disposition(
+        'attachment; filename="..\\..\\evil.txt"', temp_path()
+    )
+    assert fsutil.exists(path)
+    assert fsutil.get_filename(path) == "evil.txt"
+    assert path == temp_path("evil.txt")
+
+
+@pytest.mark.parametrize(
+    "content_disposition_format",
+    [
+        'attachment; filename="fallback.txt"; filename*={}',
+        'attachment; filename*={}; filename="fallback.txt"',
+    ],
+)
+@pytest.mark.parametrize(
+    ("filename_extended", "expected_filename"),
+    [
+        # filename* takes precedence over filename
+        ("UTF-8''%E2%82%AC%20rates.txt", "€ rates.txt"),
+        ("iso-8859-1'en'%A3%20rates.txt", "£ rates.txt"),
+        # filename* is sanitized
+        ("UTF-8''..%2F..%2Fevil.txt", "evil.txt"),
+        ("UTF-8''..%5C..%5Cevil.txt", "evil.txt"),
+        # unknown charset, undecodable, malformed or unusable filename* is ignored
+        ("unknown-charset''%E2%82%AC.txt", "fallback.txt"),
+        ("UTF-8''%FF.txt", "fallback.txt"),
+        ("garbage", "fallback.txt"),
+        ("UTF-8''%00.txt", "fallback.txt"),
+        ("UTF-8''..", "fallback.txt"),
+    ],
+)
+def test_download_file_content_disposition_filename_extended(
+    temp_path, content_disposition_format, filename_extended, expected_filename
+):
+    content_disposition = content_disposition_format.format(filename_extended)
+    path = download_file_with_content_disposition(content_disposition, temp_path())
+    assert fsutil.exists(path)
+    assert path == temp_path(expected_filename)
+
+
+def test_download_file_content_disposition_filename_extended_only(temp_path):
+    path = download_file_with_content_disposition(
+        "attachment; filename*=UTF-8''hello%20world.txt", temp_path()
+    )
+    assert fsutil.exists(path)
+    assert path == temp_path("hello world.txt")
+
+
+@pytest.mark.parametrize(
+    "content_disposition",
+    [
+        'attachment; filename=".."',
+        "attachment; filename*=UTF-8''..",
+        "attachment; filename*=UTF-8''%00.txt",
+    ],
+)
+def test_download_file_content_disposition_filename_unusable(
+    temp_path, content_disposition
+):
+    path = download_file_with_content_disposition(content_disposition, temp_path())
+    assert fsutil.exists(path)
+    assert path == temp_path("file.txt")
 
 
 def test_list_dirs(temp_path):
