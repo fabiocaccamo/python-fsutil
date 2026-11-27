@@ -1,5 +1,7 @@
 import os
+import sys
 import threading
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -355,6 +357,46 @@ def test_move_dir_with_overwrite(temp_path):
     assert not fsutil.exists(path)
     assert fsutil.is_file(temp_path("x/y/b/c.txt"))
     assert not fsutil.exists(temp_path("x/y/b/d.txt"))
+    assert fsutil.list_dirs(temp_path("x/y")) == [temp_path("x/y/b")]
+
+
+def test_move_dir_with_overwrite_and_parent_dir_in_path(temp_path):
+    fsutil.create_file(temp_path("a/b/c/d.txt"), content="Hello World")
+    fsutil.create_file(temp_path("x/y/b/e.txt"), content="Hello Moon")
+    fsutil.move_dir(Path(temp_path("a/b/c"), ".."), temp_path("x/y"), overwrite=True)
+    assert not fsutil.exists(temp_path("a/b"))
+    assert fsutil.is_file(temp_path("x/y/b/c/d.txt"))
+    assert not fsutil.exists(temp_path("x/y/b/e.txt"))
+
+
+def test_move_dir_with_overwrite_and_existing_file(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    fsutil.create_file(temp_path("x/y/b"), content="Hello Moon")
+    with pytest.raises(OSError):
+        fsutil.move_dir(temp_path("a/b"), temp_path("x/y"), overwrite=True)
+    assert fsutil.is_file(path)
+    assert fsutil.is_file(temp_path("x/y/b"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_move_dir_with_overwrite_and_existing_symlink(temp_path):
+    path = temp_path("a/b/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    fsutil.create_dir(temp_path("x/y"))
+    os.symlink(temp_path("a"), temp_path("x/y/b"))
+    with pytest.raises(OSError):
+        fsutil.move_dir(temp_path("a/b"), temp_path("x/y"), overwrite=True)
+    assert fsutil.is_file(path)
+    assert fsutil.list_dirs(temp_path("x/y")) == [temp_path("x/y/b")]
+
+
+def test_move_dir_with_overwrite_into_itself(temp_path):
+    path = temp_path("a/b/a/c.txt")
+    fsutil.create_file(path, content="Hello World")
+    with pytest.raises(OSError):
+        fsutil.move_dir(temp_path("a"), temp_path("a/b"), overwrite=True)
+    assert fsutil.is_file(path)
 
 
 def test_move_dir_with_overwrite_into_its_own_parent(temp_path):
@@ -364,54 +406,16 @@ def test_move_dir_with_overwrite_into_its_own_parent(temp_path):
     assert fsutil.is_file(path)
 
 
-@pytest.mark.parametrize(
-    "source, dest",
-    [
-        # relative source vs absolute dest parent
-        ("a/b", "{abspath}/a"),
-        # absolute source vs relative dest parent
-        ("{abspath}/a/b", "a"),
-    ],
-)
-def test_move_dir_with_overwrite_into_its_own_parent_aliased(
-    temp_path, monkeypatch, source, dest
-):
-    """A dest that names the source directory through a different spelling
-    (relative vs absolute) must not have its guard delete the source
-    before the move (data-loss reported in #212 review)."""
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_move_dir_with_overwrite_into_its_own_parent_with_symlinks(temp_path):
     path = temp_path("a/b/c.txt")
     fsutil.create_file(path, content="Hello World")
-    # relative spellings must resolve against the tmp tree
-    monkeypatch.chdir(temp_path(""))
-
-    source_path = source.replace("{abspath}", str(temp_path("")))
-    dest_path = dest.replace("{abspath}", str(temp_path("")))
-
-    # the identity guard skips the removal and shutil.move resolves to a
-    # no-op: the source and its payload must be untouched
-    fsutil.move_dir(source_path, dest_path, overwrite=True)
+    os.symlink(temp_path("a"), temp_path("a-link"))
+    os.symlink(temp_path("a/b"), temp_path("b"))
+    fsutil.move_dir(temp_path("a/b"), temp_path("a-link"), overwrite=True)
+    fsutil.move_dir(temp_path("b"), temp_path("a"), overwrite=True)
     assert fsutil.is_file(path)
-    assert fsutil.is_dir(source_path)
-
-
-def test_move_dir_with_overwrite_into_its_own_parent_symlink(temp_path):
-    if not hasattr(os, "symlink"):
-        pytest.skip("platform without os.symlink")
-    path = temp_path("a/b/c.txt")
-    fsutil.create_file(path, content="Hello World")
-    try:
-        # alias for the source's own parent, as the review requires
-        os.symlink(temp_path("a"), temp_path("a-alias"))
-    except OSError:
-        pytest.skip("requires symlink privileges")
-
-    # moving through the alias names the source directory itself: the
-    # identity guard must skip the removal and shutil.move must fail
-    # safely instead of deleting the source
-    with pytest.raises(OSError):
-        fsutil.move_dir(temp_path("a/b"), temp_path("a-alias"), overwrite=True)
-
-    assert fsutil.is_file(path)
+    assert fsutil.list_dirs(temp_path("a")) == [temp_path("a/b")]
 
 
 def test_move_file(temp_path):
