@@ -98,14 +98,14 @@ def get_dir_size(path: PathIn) -> int:
             filepath = os.path.join(basepath, filename)
             if os.path.islink(filepath):
                 continue
-            stat = os.stat(filepath)
-            if stat.st_ino:
+            file_stat = os.stat(filepath)
+            if file_stat.st_nlink > 1:
                 # count hard-linked files only once
-                inode = (stat.st_dev, stat.st_ino)
+                inode = (file_stat.st_dev, file_stat.st_ino)
                 if inode in inodes:
                     continue
                 inodes.add(inode)
-            size += stat.st_size
+            size += file_stat.st_size
     return size
 
 
