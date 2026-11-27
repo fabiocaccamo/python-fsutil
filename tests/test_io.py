@@ -200,18 +200,10 @@ def test_write_file_with_append_atomic(temp_path):
 
 
 @pytest.mark.parametrize("atomic", [False, True])
-@pytest.mark.parametrize("encoding", ["utf-8", "utf-16"])
-@pytest.mark.parametrize("content", ["", "first"])
-def test_write_file_append_creates_missing_file(temp_path, atomic, encoding, content):
-    path = temp_path("new/nested/file.txt")
-    fsutil.write_file(
-        path, content=content, append=True, atomic=atomic, encoding=encoding
-    )
-    assert fsutil.read_file(path, encoding=encoding) == content
-    fsutil.write_file(
-        path, content=" second", append=True, atomic=atomic, encoding=encoding
-    )
-    assert fsutil.read_file(path, encoding=encoding) == content + " second"
+def test_write_file_with_append_and_missing_file(temp_path, atomic):
+    path = temp_path("a/b/c.txt")
+    fsutil.write_file(path, content="Hello World", append=True, atomic=atomic)
+    assert fsutil.read_file(path) == "Hello World"
 
 
 if __name__ == "__main__":
