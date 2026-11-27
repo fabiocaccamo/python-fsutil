@@ -71,6 +71,7 @@ def test_join_filename():
     assert fsutil.join_filename("Document", ".txt") == "Document.txt"
     assert fsutil.join_filename(" Document ", " txt ") == "Document.txt"
     assert fsutil.join_filename("Document", " .txt ") == "Document.txt"
+    assert fsutil.join_filename("Document", "txt.") == "Document.txt"
     assert fsutil.join_filename("Document", "") == "Document"
     assert fsutil.join_filename("", "txt") == "txt"
 
@@ -79,7 +80,7 @@ def test_join_filename_with_multi_dot_extension():
     assert fsutil.join_filename("archive", "tar.gz") == "archive.tar.gz"
     assert fsutil.join_filename("archive", ".tar.gz") == "archive.tar.gz"
     assert fsutil.join_filename("archive", " .tar.gz ") == "archive.tar.gz"
-    assert fsutil.join_filename("archive", "gz") == "archive.gz"
+    assert fsutil.join_filename("archive", "tar.gz.") == "archive.tar.gz"
 
 
 def test_join_filepath():
