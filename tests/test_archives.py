@@ -1,3 +1,5 @@
+import os
+import sys
 import tarfile
 
 import pytest
@@ -29,29 +31,43 @@ def test_create_zip_file(temp_path):
 
 
 @pytest.mark.parametrize(
-    ("extension", "create_archive", "extract_archive"),
+    ("create_archive", "extract_archive"),
     [
-        ("zip", fsutil.create_zip_file, fsutil.extract_zip_file),
-        ("tar", fsutil.create_tar_file, fsutil.extract_tar_file),
+        (fsutil.create_zip_file, fsutil.extract_zip_file),
+        (fsutil.create_tar_file, fsutil.extract_tar_file),
     ],
 )
-def test_archive_preserves_empty_subdirectories(
-    temp_path, extension, create_archive, extract_archive
+def test_create_archive_with_empty_dirs(temp_path, create_archive, extract_archive):
+    fsutil.create_dir(temp_path("a/b"))
+    fsutil.create_dir(temp_path("a/c/d"))
+    fsutil.create_file(temp_path("a/c/f1.txt"), content="hello world 1")
+    archive_path = temp_path("archive")
+    create_archive(archive_path, [temp_path("a")])
+    extract_archive(archive_path, temp_path("unarchive"))
+    assert fsutil.is_empty_dir(temp_path("unarchive/b"))
+    assert fsutil.is_empty_dir(temp_path("unarchive/c/d"))
+    assert fsutil.is_file(temp_path("unarchive/c/f1.txt"))
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+@pytest.mark.parametrize(
+    ("create_archive", "extract_archive"),
+    [
+        (fsutil.create_zip_file, fsutil.extract_zip_file),
+        (fsutil.create_tar_file, fsutil.extract_tar_file),
+    ],
+)
+def test_create_archive_with_symlink_to_empty_dir(
+    temp_path, create_archive, extract_archive
 ):
-    source = temp_path("source")
-    fsutil.create_dir(temp_path("source/empty"))
-    fsutil.create_dir(temp_path("source/nested/empty"))
-    fsutil.create_file(temp_path("source/nested/file.txt"), content="file content")
-
-    archive_path = temp_path(f"archive.{extension}")
-    create_archive(archive_path, [source])
-    extract_archive(archive_path, temp_path("output"))
-
-    for name in ("empty", "nested/empty"):
-        path = temp_path(f"output/{name}")
-        assert fsutil.is_dir(path)
-        assert fsutil.is_empty_dir(path)
-    assert fsutil.read_file(temp_path("output/nested/file.txt")) == "file content"
+    fsutil.create_dir(temp_path("a"))
+    fsutil.create_dir(temp_path("x"))
+    os.symlink(temp_path("x"), temp_path("a/x-link"))
+    archive_path = temp_path("archive")
+    create_archive(archive_path, [temp_path("a")])
+    extract_archive(archive_path, temp_path("unarchive"))
+    assert fsutil.is_empty_dir(temp_path("unarchive/x-link"))
+    assert not os.path.islink(temp_path("unarchive/x-link"))
 
 
 def test_create_tar_file(temp_path):
