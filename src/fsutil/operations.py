@@ -306,29 +306,32 @@ def move_dir(
     """
     Move an existing dir from path to dest directory.
     If overwrite is not allowed and dest path exists, an OSError is raised.
+    If overwrite is allowed and dest directory contains a directory
+    with the same name, it will be replaced.
     More informations about kwargs supported options here:
     https://docs.python.org/3/library/shutil.html#shutil.move
     """
-    path = _get_path(path)
+    path = os.path.abspath(_get_path(path))
     dest = _get_path(dest)
     assert_dir(path)
     assert_not_file(dest)
     if not overwrite:
         assert_not_exists(dest)
     make_dirs(dest)
-    dest_path = join_path(dest, os.path.basename(path))
-    if overwrite and dest_path != path and exists(dest_path):
-        # A differently-spelled dest (relative vs absolute, symlinks) can
-        # still name the source directory itself; removing it would delete
-        # the source before the move. Skip the removal when both paths
-        # refer to the same directory and let shutil.move fail safely.
-        if not os.path.samefile(path, dest_path):
-            # replace the existing item instead of failing like shutil.move does
-            if is_dir(dest_path):
-                remove_dir(dest_path)
-            else:
-                remove_file(dest_path)
-    shutil.move(path, dest_path, **kwargs)
+    # dirname is empty when path is a root directory
+    dirname = os.path.basename(path)
+    dest_path = os.path.join(dest, dirname)
+    if overwrite and dirname and is_dir(dest_path) and not os.path.islink(dest_path):
+        if os.path.samefile(path, dest_path):
+            # the directory is already in the dest directory
+            return
+        # move before removing, to keep the existing directory if the move fails
+        temp_path = os.path.join(dest, get_unique_name(dest))
+        shutil.move(path, temp_path, **kwargs)
+        remove_dir(dest_path)
+        os.rename(temp_path, dest_path)
+    else:
+        shutil.move(path, dest, **kwargs)
 
 
 def move_file(
