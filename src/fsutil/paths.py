@@ -59,11 +59,8 @@ def get_unique_name(
     """
     path = _get_path(path)
     assert_dir(path)
-    if extension:
-        extension = extension.lstrip(".").lower()
+    extension = extension.lstrip(".").lower()
     while True:
-        # build each candidate from scratch: on a collision the previous
-        # candidate must be discarded, not appended to
         name = ""
         if prefix:
             name += f"{prefix}{separator}"
