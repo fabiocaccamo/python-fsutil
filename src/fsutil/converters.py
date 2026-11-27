@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 SIZE_UNITS = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
 
@@ -25,11 +27,13 @@ def convert_size_string_to_bytes(size: str) -> float | int:
     Convert the given size string to bytes.
     """
     units = [item.lower() for item in SIZE_UNITS]
-    parts = size.split()
-    if len(parts) != 2:
+    # amount and unit, optionally separated by whitespace
+    pattern = rf"\s*(.+?)\s*({'|'.join(SIZE_UNITS)})\b"
+    size_match = re.match(pattern, size, re.IGNORECASE)
+    if not size_match:
         raise ValueError(f"Invalid size string: {size!r}")
-    amount = float(parts[0])
-    unit = parts[1]
+    amount = float(size_match.group(1))
+    unit = size_match.group(2)
     factor = units.index(unit.lower())
     if not factor:
         return amount

@@ -68,7 +68,21 @@ def test_convert_size_string_to_bytes_with_whitespace(size_string):
     assert fsutil.convert_size_string_to_bytes(size_string) == 1024
 
 
-@pytest.mark.parametrize("size_string", ["", "1", "1 XB", "one KB", "1 KB extra"])
+@pytest.mark.parametrize(
+    "size_string, expected_output",
+    [
+        ("1KB", 1024),
+        ("1.5MB", 1572864),
+        ("1EB", 2**60),
+        ("1e3 KB", 1024000),
+        ("1 KB extra", 1024),
+    ],
+)
+def test_convert_size_string_to_bytes_with_loose_format(size_string, expected_output):
+    assert fsutil.convert_size_string_to_bytes(size_string) == expected_output
+
+
+@pytest.mark.parametrize("size_string", ["", "1", "1 XB", "one KB", "1 2 KB", "1 KBps"])
 def test_convert_size_string_to_bytes_with_invalid_size_string(size_string):
     with pytest.raises(ValueError):
         fsutil.convert_size_string_to_bytes(size_string)
