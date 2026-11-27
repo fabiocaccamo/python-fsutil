@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.19.0) - 2026-11-27
+-   Add `Python 3.15` support.
+-   Drop `Python 3.10` support.
+-   Add support for the RFC 6266 `filename*` parameter of the `Content-Disposition` header in `download_file`. #209 (thanks to [@rahul05ranjan](https://github.com/rahul05ranjan))
+-   Add support for size strings without whitespace or with trailing text in `convert_size_string_to_bytes`, and raise `ValueError` for invalid size strings. #215 (thanks to [@boogu2005](https://github.com/boogu2005))
+-   Fix `clean_dir` raising `OSError` with dangling symlinks and symlinks to empty directories. #221 (thanks to [@rahul05ranjan](https://github.com/rahul05ranjan))
+-   Fix `convert_size_string_to_bytes` with multiple spaces or tabs between amount and unit. #215 (thanks to [@boogu2005](https://github.com/boogu2005))
+-   Fix `create_tar_file` and `create_zip_file` ignoring empty directories. #205 (thanks to [@UmutAlisoglu](https://github.com/UmutAlisoglu))
+-   Fix `create_tar_file` and `create_zip_file` infinite recursion with directory symlink cycles. #223 (thanks to [@rahul05ranjan](https://github.com/rahul05ranjan))
+-   Fix `get_dir_hash` ignoring files without extension and hidden files (the hash changes for directories containing them). #203 (thanks to [@Lushiyao5](https://github.com/Lushiyao5))
+-   Fix `get_dir_size` counting hard-linked files multiple times. #229 (thanks to [@rahul05ranjan](https://github.com/rahul05ranjan))
+-   Fix `get_filename`, `get_file_basename`, `get_file_extension`, `split_filename` and `split_filepath` truncating local filenames containing `?` or `#`. #204 (thanks to [@UmutAlisoglu](https://github.com/UmutAlisoglu))
+-   Fix `get_unique_name` returning a wrong name after a name collision. #216 (thanks to [@rahul05ranjan](https://github.com/rahul05ranjan))
+-   Fix `join_filename` (and `rename_file_extension`, `transform_filepath`) removing the dots inside multi-dot extensions, eg. `tar.gz`. #219 (thanks to [@rahul05ranjan](https://github.com/rahul05ranjan))
+-   Fix `move_dir` with `overwrite=True` raising `shutil.Error` when the destination contains a directory with the same name (it is now replaced). #212 (thanks to [@Lushiyao5](https://github.com/Lushiyao5))
+-   Fix `search_dirs` and `search_files` returning wrong results when the path contains glob special characters. #225 (thanks to [@rahul05ranjan](https://github.com/rahul05ranjan))
+-   Fix `write_file` with `append=True` and `atomic=True` failing when the file doesn't exist. #202 (thanks to [@harbinresearcher](https://github.com/harbinresearcher))
+-   Bump requirements and `pre-commit` hooks.
+
 ## [0.18.0](https://github.com/fabiocaccamo/python-fsutil/releases/tag/0.18.0) - 2026-10-08
 -   Add `read_file_yaml` and `write_file_yaml` (requires the optional `PyYAML` dependency). #196 (thanks to [@Gonghan-Princess](https://github.com/Gonghan-Princess))
 -   Add support for compressed tar archives in `extract_tar_file`. #193 (thanks to [@Gonghan-Princess](https://github.com/Gonghan-Princess))
