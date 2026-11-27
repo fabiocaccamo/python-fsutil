@@ -1,4 +1,5 @@
 import os
+import uuid
 from unittest.mock import patch
 
 import pytest
@@ -64,6 +65,17 @@ def test_get_unique_name(temp_path):
     assert basename.startswith("custom-prefix_")
     assert basename.endswith("_custom-suffix")
     assert extension == "txt"
+
+
+def test_get_unique_name_with_collision(temp_path):
+    path = temp_path("a/b/c")
+    uids = [uuid.uuid4(), uuid.uuid4()]
+    fsutil.create_file(fsutil.join_path(path, f"prefix_{uids[0]}_suffix.txt"))
+    with patch("uuid.uuid4", side_effect=uids):
+        name = fsutil.get_unique_name(
+            path, prefix="prefix", suffix="suffix", extension="TXT", separator="_"
+        )
+    assert name == f"prefix_{uids[1]}_suffix.txt"
 
 
 def test_join_filename():
