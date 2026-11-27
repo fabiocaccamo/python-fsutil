@@ -199,5 +199,12 @@ def test_write_file_with_append_atomic(temp_path):
     assert fsutil.read_file(path) == "Hello World - Hello Sun"
 
 
+@pytest.mark.parametrize("atomic", [False, True])
+def test_write_file_with_append_and_missing_file(temp_path, atomic):
+    path = temp_path("a/b/c.txt")
+    fsutil.write_file(path, content="Hello World", append=True, atomic=atomic)
+    assert fsutil.read_file(path) == "Hello World"
+
+
 if __name__ == "__main__":
     pytest.main()
