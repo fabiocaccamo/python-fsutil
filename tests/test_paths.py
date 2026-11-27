@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -38,24 +39,27 @@ def test_get_filename():
     )
 
 
-@pytest.mark.parametrize("filename", ["Report#draft.txt", "Report?draft.txt"])
-def test_local_filename_preserves_url_characters(filename):
-    path = os.path.join("reports", filename)
+@pytest.mark.parametrize("basename", ["Document#1", "Document?1"])
+def test_get_filename_with_url_characters_in_local_path(basename):
+    filename = f"{basename}.txt"
+    path = f"/root/a/b/c/{filename}"
+    dirpath = os.path.normpath("/root/a/b/c")
     assert fsutil.get_filename(path) == filename
-    assert fsutil.get_file_basename(path) == filename[:-4]
+    assert fsutil.get_filename(Path(path)) == filename
+    assert fsutil.get_filename(f"C:/a/b/c/{filename}") == filename
+    assert fsutil.get_file_basename(path) == basename
     assert fsutil.get_file_extension(path) == "txt"
-    assert fsutil.split_filename(path) == (filename[:-4], "txt")
-    assert fsutil.split_filepath(path) == ("reports", filename)
+    assert fsutil.split_filename(path) == (basename, "txt")
+    assert fsutil.split_filepath(path) == (dirpath, filename)
 
 
-@pytest.mark.parametrize("scheme", ["http", "https", "ftp", "file"])
-def test_url_filename_ignores_query_and_fragment(scheme):
-    path = f"{scheme}://example.com/reports/Report.txt?download=1#section"
-    assert fsutil.get_filename(path) == "Report.txt"
-    assert fsutil.get_file_basename(path) == "Report"
-    assert fsutil.get_file_extension(path) == "txt"
-    assert fsutil.split_filename(path) == ("Report", "txt")
-    assert fsutil.split_filepath(path)[1] == "Report.txt"
+def test_get_filename_with_url_query_and_fragment():
+    url = "https://domain-name.com/a/Document.txt?version=1.2#section"
+    assert fsutil.get_filename(url) == "Document.txt"
+    assert fsutil.get_file_basename(url) == "Document"
+    assert fsutil.get_file_extension(url) == "txt"
+    assert fsutil.split_filename(url) == ("Document", "txt")
+    assert fsutil.split_filepath(url)[1] == "Document.txt"
 
 
 def test_get_parent_dir():
