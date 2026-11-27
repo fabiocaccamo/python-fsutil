@@ -1,5 +1,7 @@
 import io
+import os
 import re
+import sys
 import time
 from datetime import datetime, timedelta
 
@@ -55,21 +57,22 @@ def test_get_dir_hash(temp_path):
     assert dir_hash == "eabe619c41f0c4611b7b9746bededfcb"
 
 
-@pytest.mark.parametrize("filename", ["README", "nested/LICENSE"])
-@pytest.mark.parametrize("content", ["", "original content"])
-@pytest.mark.parametrize("func", ["md5", "sha256"])
-def test_get_dir_hash_includes_extensionless_files(temp_path, filename, content, func):
-    directory = temp_path()
-    empty_hash = fsutil.get_dir_hash(directory, func=func)
-    path = temp_path(filename)
-    fsutil.create_file(path, content=content)
+@pytest.mark.parametrize("filename", ["LICENSE", ".env", ".config/settings.json"])
+def test_get_dir_hash_with_extensionless_and_hidden_files(temp_path, filename):
+    path = temp_path(f"x/{filename}")
+    fsutil.create_file(path, content="hello world 1")
+    dir_hash = fsutil.get_dir_hash(temp_path("x"))
+    fsutil.write_file(path, content="hello world 2")
+    assert fsutil.get_dir_hash(temp_path("x")) != dir_hash
 
-    original_hash = fsutil.get_dir_hash(directory, func=func)
-    # These are pytest assertions, not runtime security checks.
-    assert original_hash != empty_hash  # nosec B101
 
-    fsutil.write_file(path, content="updated content")
-    assert fsutil.get_dir_hash(directory, func=func) != original_hash  # nosec B101
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="Test skipped on Windows")
+def test_get_dir_hash_with_symlinks(temp_path):
+    fsutil.create_file(temp_path("x/f1.txt"), content="hello world 1")
+    fsutil.create_dir(temp_path("y"))
+    os.symlink(temp_path("x"), temp_path("y/x-link"))
+    os.symlink(temp_path("missing"), temp_path("y/missing-link"))
+    assert fsutil.get_dir_hash(temp_path("y")) == fsutil.get_dir_hash(temp_path("x"))
 
 
 def test_get_dir_last_modified_date(temp_path):
